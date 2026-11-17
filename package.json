@@ -1,0 +1,48 @@
+{
+  "name": "intactwarden",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Firefox extension that verifies, locally in the browser, that the web vaults of Bitwarden and Vaultwarden serve exactly the code of the vendor's GitHub releases",
+  "license": "MIT",
+  "author": "Paweł Hawrylak (https://github.com/phawrylak)",
+  "type": "module",
+  "repository": "https://github.com/phawrylak/IntactWarden",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "extension"
+  ],
+  "scripts": {
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc -p tsconfig.json && tsc -p extension/tsconfig.json",
+    "test": "vitest run --project unit",
+    "test:corpus": "vitest run --project corpus",
+    "build:ext": "node extension/build/build.ts",
+    "package:ext": "node extension/build/package.ts",
+    "test:e2e": "node extension/test/e2e/run.ts",
+    "check-links": "node tools/check-links.ts",
+    "verify-store-package": "node tools/verify-store-package.ts",
+    "recompute": "node tools/recompute.ts",
+    "publish:amo": "node tools/publish-amo.ts",
+    "check": "npm run lint && npm run typecheck && npm test && npm run check-links"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.20.5",
+    "eslint": "^9.39.5",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0",
+    "yaml": "2.9.1"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.8"
+    }
+  }
+}

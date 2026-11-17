@@ -1,0 +1,41 @@
+/* Popup: fixed width, compact cards. Shared styles: ui.css. */
+html,
+body {
+  width: 380px;
+  min-height: 120px;
+}
+
+main.page-popup {
+  padding: 12px;
+}
+
+.popup-header h1 {
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.popup-header p {
+  margin: 2px 0;
+}
+
+.card {
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.card h2 {
+  font-size: 0.95rem;
+}
+
+.flags {
+  margin: 6px 0 0;
+}
+
+.small {
+  font-size: 0.85em;
+}
+
+.popup-footer {
+  justify-content: space-between;
+  margin-top: 8px;
+}

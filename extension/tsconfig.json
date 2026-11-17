@@ -1,0 +1,9 @@
+{
+  "//": "Extension runtime code (background, content scripts, pages): browser libs only, no Node types. Build scripts and tests are checked by the root tsconfig.json.",
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": []
+  },
+  "include": ["src/**/*.ts"]
+}

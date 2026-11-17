@@ -1,0 +1,230 @@
+# Extension release (docs/release.md; docs/security.md, "Trust in the verifier").
+# Triggered by a `v<major>.<minor>.<patch>` tag on main.
+#
+# A pushed tag runs this file as it is at the tagged commit, so the checks below bind only a tag that
+# a maintainer created: the tag ruleset (docs/release.md, "Repository hardening") restricts creating,
+# moving and deleting `v*` tags to maintainers, and every verify command pins the provenance to the tag with
+# `--source-ref refs/tags/v<version>` (store-diff.yml also pins the tag's commit and requires it on
+# main).
+#
+# - build (`contents: read`): requires an annotated tag that GitHub reports as verified and that
+#   the release key (`RELEASE_KEY_FPR`) signed, whose commit is on main and whose version equals
+#   extension/package.json; builds and packages the Firefox zip (both steps run bundle-lint), then
+#   builds and packages it again from scratch and requires byte-identical output; adds the AMO
+#   source tarball and SHA256SUMS.
+# - attest (`contents: read`, `id-token: write`, `attestations: write`): GitHub build provenance
+#   for the zip and the source tarball (actions/attest-build-provenance).
+# - publish (`contents: write`): a draft GitHub release carrying the zip, the source tarball,
+#   SHA256SUMS and the provenance bundle; the maintainer publishes it as an immutable release.
+#   The upload to AMO is manual (docs/release.md, "Release checklist").
+name: release-extension
+
+on:
+  push:
+    tags: ['v*']
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  REPO: phawrylak/IntactWarden
+  # The fingerprint of the maintainer's OpenPGP release key, its primary key (a signing subkey's
+  # fingerprint is refused): 40 hexadecimal digits, upper case, no spaces, in quotes. It is the
+  # first `fpr` line of `gpg --list-keys --with-colons <key>`. Any signing subkey of that key may
+  # sign the tag, if the key published on keys.openpgp.org holds it.
+  RELEASE_KEY_FPR: 'EBEDF02CDFE151093FDF3C3728D33FF55626F337'
+
+jobs:
+  build:
+    if: github.repository == 'phawrylak/IntactWarden'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.tag.outputs.version }}
+    steps:
+      - name: Check out the tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Require a verified annotated tag on main, signed by the release key, with the package version
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! [[ "$GITHUB_REF_NAME" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo '::error::release tags are v<major>.<minor>.<patch>'
+            exit 1
+          fi
+          version="${BASH_REMATCH[1]}"
+          commit="$(git rev-parse 'HEAD^{commit}')"
+          ref_type="$(gh api "repos/$REPO/git/ref/tags/$GITHUB_REF_NAME" --jq '.object.type')"
+          tag_object="$(gh api "repos/$REPO/git/ref/tags/$GITHUB_REF_NAME" --jq '.object.sha')"
+          if [ "$ref_type" != tag ] || ! [[ "$tag_object" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::the release tag must be an annotated tag'
+            exit 1
+          fi
+          verified="$(gh api "repos/$REPO/git/tags/$tag_object" --jq '.verification.verified')"
+          target="$(gh api "repos/$REPO/git/tags/$tag_object" --jq '.object.sha')"
+          if [ "$verified" != true ]; then
+            echo '::error::GitHub does not report the tag signature as verified'
+            exit 1
+          fi
+          if ! [[ "$RELEASE_KEY_FPR" =~ ^[0-9A-F]{40}$ ]]; then
+            echo '::error::RELEASE_KEY_FPR is not set to the fingerprint of the release key'
+            exit 1
+          fi
+          curl -fsS "https://keys.openpgp.org/vks/v1/by-fingerprint/$RELEASE_KEY_FPR" |
+            gpg --batch --import
+          # Fails for an unsigned tag and for a missing, expired or revoked key.
+          if ! signature="$(git verify-tag --raw "$tag_object" 2>&1)"; then
+            echo '::error::the tag signature does not verify'
+            exit 1
+          fi
+          # A VALIDSIG line ends with the fingerprint of the primary key.
+          if ! grep -Eq "^\[GNUPG:\] VALIDSIG .* $RELEASE_KEY_FPR\$" <<<"$signature"; then
+            echo '::error::the tag is not signed by the primary key that RELEASE_KEY_FPR names'
+            exit 1
+          fi
+          if [ "$target" != "$commit" ]; then
+            echo '::error::the tag does not point at the checked-out commit'
+            exit 1
+          fi
+          # refs/heads/main by its commit (a tag named main must not stand in for the branch).
+          main_sha="$(gh api "repos/$REPO/git/ref/heads/main" --jq '.object.sha')"
+          if ! [[ "$main_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::cannot resolve refs/heads/main'
+            exit 1
+          fi
+          on_main="$(gh api "repos/$REPO/compare/$main_sha...$commit?per_page=1" \
+            --jq '"\(.status) \(.ahead_by)"')"
+          if [ "$on_main" != 'identical 0' ] && [ "$on_main" != 'behind 0' ]; then
+            echo '::error::the tagged commit is not on main'
+            exit 1
+          fi
+          package_version="$(jq -r '.version' extension/package.json)"
+          if [ "$package_version" != "$version" ]; then
+            echo "::error::extension/package.json has version $package_version, the tag $version"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Install dependencies (no lifecycle scripts)
+        run: npm ci --ignore-scripts
+      - name: Typecheck (the profiles are typed constants)
+        run: npm run typecheck
+      - name: Profile invariants (packages/profiles/test)
+        run: npm test -- packages/profiles
+      - name: Build the Firefox package
+        run: npm run build:ext
+      - name: Package (deterministic zip and SHA256SUMS)
+        run: npm run package:ext
+      - name: Build and package again from scratch
+        run: |
+          mv extension/dist "$RUNNER_TEMP/dist-first"
+          npm run build:ext
+          npm run package:ext
+      - name: Compare the two builds byte for byte
+        run: diff -r "$RUNNER_TEMP/dist-first" extension/dist
+      - name: Collect the release files
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+        run: |
+          out="$RUNNER_TEMP/release"
+          mkdir -p "$out"
+          (cd extension/dist && sha256sum --check --strict SHA256SUMS)
+          cp "extension/dist/intactwarden-$VERSION-firefox.zip" "$out/"
+          git archive --format=tar.gz --prefix="intactwarden-$VERSION-source/" \
+            --output="$out/intactwarden-$VERSION-source.tar.gz" HEAD
+          cd "$out"
+          sha256sum "intactwarden-$VERSION-firefox.zip" "intactwarden-$VERSION-source.tar.gz" > SHA256SUMS
+          cat SHA256SUMS
+      - name: Upload the release files
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-${{ github.ref_name }}
+          path: ${{ runner.temp }}/release
+          retention-days: 7
+          if-no-files-found: error
+
+  attest:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download the release files
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-${{ github.ref_name }}
+          path: ${{ runner.temp }}/release
+      - name: Build provenance for the zip and the source tarball
+        id: provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            ${{ runner.temp }}/release/intactwarden-${{ needs.build.outputs.version }}-firefox.zip
+            ${{ runner.temp }}/release/intactwarden-${{ needs.build.outputs.version }}-source.tar.gz
+      - name: Keep the provenance bundle
+        env:
+          BUNDLE: ${{ steps.provenance.outputs.bundle-path }}
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/provenance"
+          cp "$BUNDLE" "$RUNNER_TEMP/provenance/intactwarden-$VERSION-provenance.sigstore.json"
+      - name: Upload the provenance bundle
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: provenance-${{ github.ref_name }}
+          path: ${{ runner.temp }}/provenance
+          retention-days: 7
+          if-no-files-found: error
+
+  publish:
+    needs: [build, attest]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Download the release files
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-${{ github.ref_name }}
+          path: ${{ runner.temp }}/release
+      - name: Download the provenance bundle
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: provenance-${{ github.ref_name }}
+          path: ${{ runner.temp }}/release
+      - name: Create the draft GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          cd "$RUNNER_TEMP/release"
+          sha256sum --check --strict SHA256SUMS
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$REPO" \
+            --draft \
+            --verify-tag \
+            --title "IntactWarden $VERSION" \
+            --notes "Built by release-extension.yml from the signed tag $GITHUB_REF_NAME. Check it with: sha256sum --ignore-missing -c SHA256SUMS; gh attestation verify intactwarden-$VERSION-firefox.zip --repo $REPO --signer-workflow $REPO/.github/workflows/release-extension.yml --source-ref refs/tags/$GITHUB_REF_NAME. Changes: CHANGELOG.md." \
+            "intactwarden-$VERSION-firefox.zip" \
+            "intactwarden-$VERSION-source.tar.gz" \
+            SHA256SUMS \
+            "intactwarden-$VERSION-provenance.sigstore.json"

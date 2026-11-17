@@ -1,0 +1,8 @@
+main.page-blocked {
+  /* Wide enough for a whole sha256 (64 monospace digits) on one line next to its label. */
+  max-width: 800px;
+}
+
+.proceed {
+  border-color: var(--red);
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@intactwarden/core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure TypeScript core shared by the IntactWarden extension, its build and the recompute CLI (hashing, JCS, archives, routing, slot templates, derivations, verdicts)",
+  "license": "MIT",
+  "author": "Paweł Hawrylak (https://github.com/phawrylak)",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*"
+  }
+}

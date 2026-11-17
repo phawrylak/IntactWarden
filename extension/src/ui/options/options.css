@@ -1,0 +1,14 @@
+.instances {
+  list-style: none;
+  padding: 0;
+}
+
+.instance h3 {
+  margin-top: 0;
+}
+
+.add-instance {
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+  padding-top: 8px;
+}

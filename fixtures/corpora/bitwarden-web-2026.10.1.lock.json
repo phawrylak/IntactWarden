@@ -1,0 +1,133 @@
+{
+  "$comment": "Corpus lock for the Bitwarden cloud derivation, generated from local files (release zip, tagged config, live crawl of both cloud origins). File keys are paths below the zip root; *_name values are script paths as referenced from the HTML. unchanged.set_sha256 is the sha256 of the UTF-8 text formed by one line \"<sha256>  <path>\\n\" per unchanged file, sorted by path.",
+  "pinned_at": "2026-11-06T11:01:01Z",
+  "release": {
+    "repo": "bitwarden/clients",
+    "tag": "web-v2026.10.1",
+    "commit": "91214c3b978edb5496a32a946451960fe7d44531",
+    "asset": "web-2026.10.1-selfhosted-COMMERCIAL.zip",
+    "url": "https://github.com/bitwarden/clients/releases/download/web-v2026.10.1/web-2026.10.1-selfhosted-COMMERCIAL.zip",
+    "sha256": "8ae50b7dd15c213b9ce43fbc93cd85af061d95ad0782651d80c5e68f3f3824a6",
+    "size": 50220770,
+    "root": "build/",
+    "immutable": false
+  },
+  "config": {
+    "base": {
+      "path": "apps/web/config/base.json",
+      "commit": "91214c3b978edb5496a32a946451960fe7d44531",
+      "url": "https://raw.githubusercontent.com/bitwarden/clients/91214c3b978edb5496a32a946451960fe7d44531/apps/web/config/base.json",
+      "sha256": "5827de818277d12905e618fc10edd5d3eca391fd5a6ad62c6d0ff6e935dbabe3"
+    },
+    "cloud": {
+      "path": "apps/web/config/cloud.json",
+      "commit": "91214c3b978edb5496a32a946451960fe7d44531",
+      "url": "https://raw.githubusercontent.com/bitwarden/clients/91214c3b978edb5496a32a946451960fe7d44531/apps/web/config/cloud.json",
+      "sha256": "592314297a9a0ce1815d2b107b6f32c1bf66597db335c185e718bc25ad8d9be6"
+    },
+    "euprd": {
+      "path": "apps/web/config/euprd.json",
+      "commit": "91214c3b978edb5496a32a946451960fe7d44531",
+      "url": "https://raw.githubusercontent.com/bitwarden/clients/91214c3b978edb5496a32a946451960fe7d44531/apps/web/config/euprd.json",
+      "sha256": "a0ea9ec711be8fe2e21a2ab5315292ff4f5dbb453af4e3de99ca9c5ced6b84eb"
+    }
+  },
+  "selfhosted": {
+    "cache_tag": "i9gaj5",
+    "main_name": "app/main.e6e5863d81ffec268583.js",
+    "duo_js_name": "connectors/duo-redirect.03e8601fa8fe442b6b63.js",
+    "webauthn_fb_js_name": "connectors/webauthn-fallback.05e3632ca572e86e912f.js"
+  },
+  "regions": {
+    "cloud-us": {
+      "env": "cloud",
+      "origin": "https://vault.bitwarden.com",
+      "observed_at": "2026-11-05",
+      "cache_tag": "w4e0z",
+      "main_name": "app/main.1acba9cab2a37e1e33ca.js",
+      "duo_js_name": "connectors/duo-redirect.25df43e178f0cf2fa02e.js",
+      "webauthn_fb_js_name": "connectors/webauthn-fallback.710aaf235219942d0d5e.js",
+      "expected": {
+        "/index.html": {
+          "sha256": "e476d6d53219d3b9916ff04af384b63447a9cd66d0775af3b980cc8d59c01f70",
+          "size": 23090
+        },
+        "/duo-redirect-connector.html": {
+          "sha256": "ed7f6ddb71db8c3999515d519d6be2553218fa409741e621b2d2e9a277855934",
+          "size": 799
+        },
+        "/webauthn-fallback-connector.html": {
+          "sha256": "f18c635e5b91684f51a2a69fb6b4568deea25f1f90359890f8c273311cf145a7",
+          "size": 7828
+        },
+        "/app/main.1acba9cab2a37e1e33ca.js": {
+          "sha256": "f2503173e68bcde509e9320958e1656f1bcd92c9e0815da095b7f69525a09f09",
+          "size": 6706920
+        },
+        "/connectors/duo-redirect.25df43e178f0cf2fa02e.js": {
+          "sha256": "01cdf3cd7f5c7e077f94f7dba25ee00f617bf0e438f8549bba962c93c2752849",
+          "size": 8417
+        },
+        "/connectors/webauthn-fallback.710aaf235219942d0d5e.js": {
+          "sha256": "b6c511363d6dc66864c721e0fd31b5ac33d4a68fb3cb529cebaa24696a71fe5a",
+          "size": 8758
+        }
+      }
+    },
+    "cloud-eu": {
+      "env": "euprd",
+      "origin": "https://vault.bitwarden.eu",
+      "observed_at": "2026-11-05",
+      "cache_tag": "bjwi5",
+      "main_name": "app/main.9a8eda2d501e783f60d9.js",
+      "duo_js_name": "connectors/duo-redirect.bfc70c3f6e9687130f2c.js",
+      "webauthn_fb_js_name": "connectors/webauthn-fallback.5c4ac8bdb384501a4194.js",
+      "expected": {
+        "/index.html": {
+          "sha256": "57acc153c3fb1b75328cd3e62df15d0bfe5e6a2a436e4ef199104adf816a692d",
+          "size": 23090
+        },
+        "/duo-redirect-connector.html": {
+          "sha256": "ee50a8cbf9148f71980881d8c5482486600e97b3ed5e1a51e583ce8fbadf097b",
+          "size": 799
+        },
+        "/webauthn-fallback-connector.html": {
+          "sha256": "11014256fcc0eb2c59b8d067713cd7718f7cf8a42f5c68f26b56bbbdc564f2a7",
+          "size": 7828
+        },
+        "/app/main.9a8eda2d501e783f60d9.js": {
+          "sha256": "4e7fabfb9e92be3c3f0fcd2e34b7777c7711b985c09287928e3c09764111a44f",
+          "size": 6706917
+        },
+        "/connectors/duo-redirect.bfc70c3f6e9687130f2c.js": {
+          "sha256": "12640c17aa8d71e70e9a710e978c977a1ff8aa54fbfcbc74a83959ffd23249c0",
+          "size": 8417
+        },
+        "/connectors/webauthn-fallback.5c4ac8bdb384501a4194.js": {
+          "sha256": "bc6ff56cf80f7f92b0fb0a0f5bd3e9c9c8d263c9685a0871ce653e8b358eed35",
+          "size": 8758
+        }
+      }
+    }
+  },
+  "unchanged": {
+    "non_map_files": 276,
+    "derived_files": 6,
+    "files": 270,
+    "set_sha256": "3bff1abd0658c8c5e2db545844aa9375cc82052201ece35169a76a6e8bd44415",
+    "sample": {
+      "/app/vendor.9515864ec4d3ce1acf45.js": "c564f46ba7182a645bd712290795f9642e9c7ce40d996f630b8880b0046a0f9d",
+      "/app/polyfills.11c471dc266a0d8811d6.js": "f82c77595dd5dc54e2b9b84e1cabfc0ea8b0e0aa267eb0adf2c5bde5e686f823",
+      "/edbccabf45fa994a91dc.module.wasm": "f8ce5e9bc6dbf47c04d89e07a8d54d2b7b1d44902b22cb2eb16a8e9fd04ef73d",
+      "/541.f38c2a08966cd91bbade.js": "6abb120c1babf14b2d78a9e4f0363131b6802fbfeb7108d35f283cba5a3ad3a5",
+      "/195.d4ed0c5d550e92c646e9.js": "83161b5d723b9a722a18c23d8701903a042971118fcc01b8e47ab240bd5a06fe",
+      "/685.27a5758e44eac0d98e07.js": "b9b66fbba1d7f5190e9c4feefdb1b37f9ba11a1ee2bbc15743bfacd4ea358e53",
+      "/theme_head.6991036cc6ce1ab5eee1.js": "f238a0b9bcff5db162f9bdd0c340190081a079a11d07514bf56e7fd4c9448259",
+      "/styles.7993c0193ec4dde2a2a5.css": "b0aedab6bfdaad85f65310654a9563cf0ace015f0741c7c27a7afd46d9a9d096",
+      "/locales/en/messages.json": "7e0fc3748453f7042df89b5753b80c55378aaf8570f30cee798e8d9f857bbbcf",
+      "/scripts/dropin.js": "8bba12a53b95c810a951231eec0f6bddd6be55b9fefe1b2d575de350c57d7977",
+      "/connectors/sso.b9116a340807ff18cc2d.js": "b5f6b70a755537119456d52fd951dd7240c931795d3dfe78191c7e36eaa91ffc",
+      "/404.html": "bc6b4374b4057e451e727aa62851acff0f8ba8572b17e636aa0c41e78fd84e09"
+    }
+  }
+}

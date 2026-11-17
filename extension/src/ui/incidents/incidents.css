@@ -1,0 +1,13 @@
+.alert.focus,
+tr.focus {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.checklist {
+  margin-top: 8px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}

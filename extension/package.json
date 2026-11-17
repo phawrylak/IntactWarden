@@ -1,0 +1,19 @@
+{
+  "name": "@intactwarden/extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IntactWarden browser extension for desktop Firefox: verifies web vault code before it runs",
+  "license": "MIT",
+  "author": "Paweł Hawrylak (https://github.com/phawrylak)",
+  "type": "module",
+  "dependencies": {
+    "@intactwarden/builders": "0.0.0",
+    "@intactwarden/core": "0.0.0",
+    "@intactwarden/profiles": "0.0.0"
+  },
+  "devDependencies": {
+    "@types/selenium-webdriver": "4.35.7",
+    "esbuild": "0.28.2",
+    "selenium-webdriver": "4.51.0"
+  }
+}

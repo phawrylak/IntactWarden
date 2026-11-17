@@ -1,0 +1,1697 @@
+{
+  "action_title": {
+    "message": "IntactWarden: $STATE$. $SENTENCE$",
+    "description": "Placeholders: $STATE$, $SENTENCE$.",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      },
+      "sentence": {
+        "content": "$2"
+      }
+    }
+  },
+  "action_title_checking": {
+    "message": "IntactWarden: Sprawdzanie…"
+  },
+  "action_title_error": {
+    "message": "IntactWarden nie może odczytać stanu tej karty. Odśwież stronę."
+  },
+  "action_title_grant": {
+    "message": "IntactWarden: Przyznaj dostęp – brakuje dostępu do chronionej witryny albo do GitHuba."
+  },
+  "actionTitle": {
+    "message": "IntactWarden"
+  },
+  "app_bitwarden_web": {
+    "message": "Sejf internetowy Bitwarden"
+  },
+  "app_vaultwarden_web": {
+    "message": "Sejf internetowy Vaultwarden"
+  },
+  "assurance_release_derived": {
+    "message": "Zgodne z wydaniem na GitHubie i opublikowaną konfiguracją"
+  },
+  "assurance_release_exact": {
+    "message": "Zgodne z plikiem wydania na GitHubie"
+  },
+  "blocked_btn_back": {
+    "message": "Wróć"
+  },
+  "blocked_btn_proceed_once": {
+    "message": "Kontynuuj jednorazowo"
+  },
+  "blocked_btn_retry": {
+    "message": "Spróbuj ponownie"
+  },
+  "blocked_confirm_hint": {
+    "message": "Odblokuj sejf na tej stronie tylko wtedy, gdy ufasz temu, kto prowadzi ten serwer: niezweryfikowany kod może odczytać hasło główne i całą zawartość sejfu."
+  },
+  "blocked_confirm_proceed": {
+    "message": "Rozumiem, że ten kod nie jest zweryfikowany."
+  },
+  "blocked_details_heading": {
+    "message": "Co się nie powiodło"
+  },
+  "blocked_heading": {
+    "message": "IntactWarden zablokował tę stronę: $STATE$",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      }
+    }
+  },
+  "blocked_no_override_note": {
+    "message": "Tej blokady nie można ominąć inaczej niż przez wyłączenie IntactWarden."
+  },
+  "blocked_not_covered_note": {
+    "message": "IntactWarden nigdy nie wczytuje tej strony. Aby z niej skorzystać, otwórz ją w oknie prywatnym, w którym IntactWarden nie działa, albo w profilu Firefoksa bez IntactWarden. Sejf używany w ten sposób nie jest sprawdzany."
+  },
+  "blocked_protection_lost_desc": {
+    "message": "IntactWarden nie mógł sprawdzić tej strony, więc jej nie wczytał i nic z niej nie zostało uruchomione. Często to błędnie wpisany adres albo link do nieistniejącej strony, na który serwer odpowiedział własną stroną błędu: sprawdź adres. W przeciwnym razie odśwież stronę."
+  },
+  "blocked_label_expected": {
+    "message": "Oczekiwany sha256"
+  },
+  "blocked_label_observed": {
+    "message": "Zaobserwowany sha256"
+  },
+  "blocked_label_path": {
+    "message": "Ścieżka"
+  },
+  "blocked_label_site": {
+    "message": "Witryna"
+  },
+  "blocked_not_found": {
+    "message": "IntactWarden nie ma zapisu tej blokady (mogła wygasnąć). Wróć i odśwież stronę."
+  },
+  "blocked_page_title": {
+    "message": "IntactWarden: strona zablokowana"
+  },
+  "blocked_proceed_explain": {
+    "message": "Wczytuje dokładnie tę niezweryfikowaną stronę jeden raz i tylko w tej karcie. Zostanie to zapisane w dzienniku incydentów."
+  },
+  "blocked_proceed_failed": {
+    "message": "Nie udało się zezwolić na stronę. Spróbuj ponownie lub wróć."
+  },
+  "blocked_proceed_heading": {
+    "message": "Kontynuuj jednorazowo (bez weryfikacji)"
+  },
+  "checklist_address": {
+    "message": "Sprawdź, czy to adres serwera, którego się spodziewasz."
+  },
+  "checklist_devices": {
+    "message": "Przejrzyj ostatnio używane urządzenia na koncie i ustawienia dostępu awaryjnego."
+  },
+  "checklist_logout": {
+    "message": "Wyloguj wszystkie pozostałe sesje."
+  },
+  "checklist_password": {
+    "message": "Zmień hasło główne, jeśli wpisano je, gdy strona była czerwona."
+  },
+  "checklist_site_data": {
+    "message": "Jeśli w tej witrynie zgłoszono service workera: usuń dane witryny w Firefoksie. Na karcie tej witryny kliknij tarczę po lewej stronie paska adresu, wybierz „Wyczyść ciasteczka i dane witryny” i zaloguj się ponownie."
+  },
+  "consent_third_party_heading": {
+    "message": "Zezwolić na $NAME$ na jedno wczytanie strony?",
+    "description": "Placeholders: $NAME$.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "consent_third_party_source": {
+    "message": "Ten kod pochodzi od $NAME$, a nie z wydania Bitwarden. IntactWarden nie może go sprawdzić.",
+    "description": "Placeholders: $NAME$.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "consent_third_party_reach": {
+    "message": "Dopóki ta strona jest otwarta, ten kod może na niej odczytać Twój sejf. Inne strony sejfu tej witryny, otwarte wcześniej lub w tym czasie, nie są pokazywane jako zweryfikowane, dopóki ich nie odświeżysz."
+  },
+  "consent_third_party_scope": {
+    "message": "Zezwól tylko po to, by dokonać płatności. Strona odświeży się teraz z tym kodem; po zapłacie odśwież ją, a kod znów zostanie zablokowany."
+  },
+  "consent_third_party_private": {
+    "message": "Najbezpieczniej: zapłać w oknie prywatnym (zaloguj się, zapłać, wyloguj się, zamknij okno), aby nie naruszać zwykłej sesji, ale tylko jeśli IntactWarden może w nim działać (Rozszerzenia i motywy → IntactWarden → „Działanie w oknach prywatnych”). Bez tego sejf w oknie prywatnym nie jest w ogóle sprawdzany, więc zapłać w tym oknie."
+  },
+  "consent_third_party_confirm": {
+    "message": "Zezwól na $NAME$ i odśwież",
+    "description": "Placeholders: $NAME$.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "consent_third_party_cancel": {
+    "message": "Anuluj"
+  },
+  "coverage_data": {
+    "message": "Dane $OK$/$TOTAL$",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_document": {
+    "message": "Dokument $OK$/$TOTAL$",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_fonts": {
+    "message": "Czcionki $OK$/$TOTAL$",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_scripts": {
+    "message": "Skrypty $OK$/$TOTAL$",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_styles": {
+    "message": "Style $OK$/$TOTAL$",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_third_party": {
+    "message": "Zewnętrzne $COUNT$ ($NAMES$)",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      },
+      "names": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_third_party_none": {
+    "message": "Zewnętrzne 0"
+  },
+  "coverage_unverifiable": {
+    "message": "Nie do sprawdzenia $COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "coverage_wasm": {
+    "message": "WASM $OK$/$TOTAL$",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "deployment_cloud_eu": {
+    "message": "Chmura Bitwarden (UE)"
+  },
+  "deployment_cloud_us": {
+    "message": "Chmura Bitwarden (USA)"
+  },
+  "deployment_self_hosted": {
+    "message": "Serwer własny"
+  },
+  "docs_link_guide": {
+    "message": "Przewodnik użytkownika"
+  },
+  "docs_link_privacy": {
+    "message": "Polityka prywatności"
+  },
+  "docs_link_check": {
+    "message": "Sprawdź sprawdzającego"
+  },
+  "docs_link_self_hosting": {
+    "message": "Przewodnik po własnych serwerach"
+  },
+  "docs_link_not_proven": {
+    "message": "Więcej o tym, czego to nie dowodzi"
+  },
+  "docs_links_note": {
+    "message": "Przewodnik, polityka prywatności i pozostałe strony pomocy są w języku angielskim i otwierają się w serwisie GitHub, w nowej karcie."
+  },
+  "details_allowed_for_page": {
+    "message": "dozwolone na to wczytanie strony"
+  },
+  "details_build": {
+    "message": "Kompilacja $BUILD$ z wydania $RELEASE$",
+    "placeholders": {
+      "build": {
+        "content": "$1"
+      },
+      "release": {
+        "content": "$2"
+      }
+    }
+  },
+  "details_col_class": {
+    "message": "Rodzaj"
+  },
+  "details_col_expected": {
+    "message": "Oczekiwany"
+  },
+  "details_col_observed": {
+    "message": "Zaobserwowany"
+  },
+  "details_col_path": {
+    "message": "Ścieżka"
+  },
+  "details_col_result": {
+    "message": "Wynik"
+  },
+  "details_copied": {
+    "message": "Raport skopiowano do schowka."
+  },
+  "details_copy_failed": {
+    "message": "Nie udało się skopiować raportu."
+  },
+  "details_copy_report": {
+    "message": "Kopiuj raport bez parametrów zapytania"
+  },
+  "details_core": {
+    "message": "sha256 manifestu $HASH$",
+    "placeholders": {
+      "hash": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_dispute_recorded": {
+    "message": "Zapisane w tej przeglądarce: $VALUE$",
+    "description": "Placeholder: $VALUE$ (a sha256 digest or a commit).",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_dispute_observed": {
+    "message": "GitHub zgłasza teraz: $VALUE$",
+    "description": "Placeholder: $VALUE$ (a sha256 digest or a commit).",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_expected_template": {
+    "message": "szablon"
+  },
+  "details_frame": {
+    "message": "Ramka $PATH$",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_heading": {
+    "message": "Szczegóły weryfikacji"
+  },
+  "details_intro": {
+    "message": "Każdy plik wczytany przez stronę wraz z oczekiwanym i zaobserwowanym skrótem. Ścieżki nigdy nie zawierają parametrów zapytania ani fragmentów."
+  },
+  "details_no_items": {
+    "message": "Nie zapisano jeszcze żadnych plików."
+  },
+  "details_no_state": {
+    "message": "Brak stanu weryfikacji dla tej karty (mogła zostać zamknięta lub odświeżona)."
+  },
+  "details_no_tab": {
+    "message": "Nie wskazano karty. Otwórz Szczegóły z okienka IntactWarden."
+  },
+  "details_page_title": {
+    "message": "IntactWarden: szczegóły"
+  },
+  "details_style_accepted_few": {
+    "message": "Zaakceptowany. Ukrywa $COUNT$ rodzaje elementów (lista poniżej).",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_accepted_many": {
+    "message": "Zaakceptowany. Ukrywa $COUNT$ rodzajów elementów (lista poniżej).",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_accepted_one": {
+    "message": "Zaakceptowany. Ukrywa $COUNT$ rodzaj elementów (lista poniżej).",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_accepted_other": {
+    "message": "Zaakceptowany. Ukrywa $COUNT$ rodzaju elementów (lista poniżej).",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_heading": {
+    "message": "Arkusz stylów serwera $PATH$",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_rejected": {
+    "message": "Nie został zaakceptowany. $REASON$",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_table_caption": {
+    "message": "Pliki tej strony i wyniki ich weryfikacji"
+  },
+  "details_top_document": {
+    "message": "Strona $PATH$",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      }
+    }
+  },
+  "doc_class_dynamic_document": {
+    "message": "Strona dynamiczna"
+  },
+  "doc_class_manifest": {
+    "message": "Część wydania"
+  },
+  "doc_class_not_covered": {
+    "message": "Poza zakresem"
+  },
+  "doc_class_pending": {
+    "message": "W trakcie sprawdzania"
+  },
+  "doc_class_server_rendered": {
+    "message": "Generowana przez serwer"
+  },
+  "doc_class_unknown": {
+    "message": "Nieznana strona"
+  },
+  "extDescription": {
+    "message": "Sprawdza, czy sejfy internetowe Bitwarden i Vaultwarden uruchamiają dokładnie ten kod, który opublikowano na GitHubie."
+  },
+  "extName": {
+    "message": "IntactWarden"
+  },
+  "failure_asset_not_found": {
+    "message": "wydanie nie zawiera odpowiedniego pliku"
+  },
+  "failure_build_refused": {
+    "message": "z pliku wydania nie udało się zbudować manifestu"
+  },
+  "failure_digest_mismatch": {
+    "message": "pobrany plik nie zgadza się ze skrótem podanym przez GitHuba"
+  },
+  "failure_digest_unavailable": {
+    "message": "GitHub nie podaje skrótu pliku wydania"
+  },
+  "failure_disputed": {
+    "message": "GitHub podaje inne dane niż zapisane wcześniej"
+  },
+  "failure_image_only_release": {
+    "message": "wydanie opublikowano wyłącznie jako obraz kontenera"
+  },
+  "failure_limit_reached": {
+    "message": "osiągnięto limit pobierania nowych wydań (3 na witrynę i 12 łącznie w ciągu 24 godzin)"
+  },
+  "failure_network": {
+    "message": "nie udało się połączyć z GitHubem"
+  },
+  "failure_permission_missing": {
+    "message": "brak dostępu do GitHuba"
+  },
+  "failure_rate_limited": {
+    "message": "osiągnięto limit żądań GitHuba"
+  },
+  "failure_release_not_found": {
+    "message": "nie znaleziono wydania na GitHubie"
+  },
+  "flag_blocked": {
+    "message": "IntactWarden zatrzymał coś na tej stronie."
+  },
+  "flag_checking": {
+    "message": "Sprawdzanie… część plików jest jeszcze weryfikowana."
+  },
+  "flag_retro": {
+    "message": "Zweryfikowano po fakcie."
+  },
+  "flag_retro_at": {
+    "message": "Zweryfikowano po fakcie o $TIME$.",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "incident_hashes": {
+    "message": "oczekiwany $EXPECTED$ · zaobserwowany $OBSERVED$",
+    "placeholders": {
+      "expected": {
+        "content": "$1"
+      },
+      "observed": {
+        "content": "$2"
+      }
+    }
+  },
+  "incident_kind_build_unverified": {
+    "message": "Kompilacja niezweryfikowana"
+  },
+  "incident_kind_deep_verify_failed": {
+    "message": "Głęboka weryfikacja nie powiodła się"
+  },
+  "incident_kind_mismatch": {
+    "message": "Niezgodność"
+  },
+  "incident_kind_proceed_once": {
+    "message": "Użyto opcji „Kontynuuj jednorazowo”"
+  },
+  "incident_kind_protection_lost": {
+    "message": "Ochrona utracona"
+  },
+  "incident_kind_release_disputed": {
+    "message": "Sporne wydanie"
+  },
+  "incidents_ack_explain": {
+    "message": "Ten alert pozostaje otwarty do czasu potwierdzenia, nawet po odświeżeniu strony; do tego czasu żadna strona tej witryny nie jest oznaczana jako zweryfikowana. Najpierw wykonaj powyższe kroki."
+  },
+  "incidents_acknowledged": {
+    "message": "Alert potwierdzony."
+  },
+  "incidents_action_failed": {
+    "message": "Nie udało się. Spróbuj ponownie."
+  },
+  "incidents_alert_title": {
+    "message": "$STATE$ w $ORIGIN$",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      },
+      "origin": {
+        "content": "$2"
+      }
+    }
+  },
+  "incidents_alerts_heading": {
+    "message": "Otwarte alerty"
+  },
+  "incidents_alerts_none": {
+    "message": "Brak otwartych alertów."
+  },
+  "incidents_btn_acknowledge": {
+    "message": "Potwierdź"
+  },
+  "incidents_checklist_heading": {
+    "message": "Lista kroków naprawczych"
+  },
+  "incidents_col_kind": {
+    "message": "Co"
+  },
+  "incidents_col_state": {
+    "message": "Stan"
+  },
+  "incidents_col_when": {
+    "message": "Kiedy"
+  },
+  "incidents_col_where": {
+    "message": "Gdzie"
+  },
+  "incidents_heading": {
+    "message": "Alerty i incydenty"
+  },
+  "incidents_log_heading": {
+    "message": "Dziennik incydentów"
+  },
+  "incidents_log_intro": {
+    "message": "Tylko witryna i ścieżka, przechowywane 90 dni (najwyżej 200 najnowszych wpisów) wyłącznie w tej przeglądarce."
+  },
+  "incidents_log_none": {
+    "message": "Brak incydentów."
+  },
+  "incidents_page_title": {
+    "message": "IntactWarden: alerty i incydenty"
+  },
+  "item_class_data": {
+    "message": "Dane"
+  },
+  "item_class_document": {
+    "message": "Dokument"
+  },
+  "item_class_dynamic": {
+    "message": "Dane dynamiczne"
+  },
+  "item_class_font": {
+    "message": "Czcionka"
+  },
+  "item_class_image": {
+    "message": "Obraz"
+  },
+  "item_class_media": {
+    "message": "Multimedia"
+  },
+  "item_class_script": {
+    "message": "Skrypt"
+  },
+  "item_class_server_style": {
+    "message": "Arkusz stylów serwera"
+  },
+  "item_class_sourcemap": {
+    "message": "Mapa źródeł"
+  },
+  "item_class_style": {
+    "message": "Arkusz stylów"
+  },
+  "item_class_third_party": {
+    "message": "Podmiot zewnętrzny"
+  },
+  "item_class_unknown": {
+    "message": "Nieznany"
+  },
+  "item_class_wasm": {
+    "message": "WebAssembly"
+  },
+  "job_download_line": {
+    "message": "Pobrano $DONE$ z $TOTAL$",
+    "placeholders": {
+      "done": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "job_failed_line": {
+    "message": "Niepowodzenie: $FAILURE$.",
+    "placeholders": {
+      "failure": {
+        "content": "$1"
+      }
+    }
+  },
+  "job_phase_building": {
+    "message": "Budowanie manifestu"
+  },
+  "job_phase_done": {
+    "message": "Gotowe"
+  },
+  "job_phase_downloading": {
+    "message": "Pobieranie pliku wydania"
+  },
+  "job_phase_failed": {
+    "message": "Niepowodzenie"
+  },
+  "job_phase_queued": {
+    "message": "Oczekiwanie"
+  },
+  "job_phase_resolving": {
+    "message": "Wyszukiwanie wydania na GitHubie"
+  },
+  "job_phase_storing": {
+    "message": "Zapisywanie"
+  },
+  "job_phase_verifying": {
+    "message": "Sprawdzanie pobranego pliku ze skrótem z GitHuba"
+  },
+  "match_exact": {
+    "message": "dokładne"
+  },
+  "match_style_accepted": {
+    "message": "arkusz zaakceptowany"
+  },
+  "match_template": {
+    "message": "szablon"
+  },
+  "not_proven_others": {
+    "message": "Tego, co serwowano innym osobom: nie ma niezależnego obserwatora, jest tylko to, co zobaczyła ta przeglądarka."
+  },
+  "not_proven_device": {
+    "message": "Przejętej przeglądarki lub systemu operacyjnego ani złośliwego oprogramowania na tym urządzeniu."
+  },
+  "not_proven_earlier": {
+    "message": "Ustawień pozostawionych przez kod, który wcześniej działał bez weryfikacji."
+  },
+  "not_proven_extensions": {
+    "message": "Tego, co robią inne rozszerzenia zainstalowane w Firefoksie."
+  },
+  "not_proven_lookalike": {
+    "message": "Witryn phishingowych udających prawdziwe. IntactWarden ostrzega przy dodawaniu takiego adresu, ale nie chroni witryn, których nie zna."
+  },
+  "not_proven_operator": {
+    "message": "Tego, kto prowadzi serwer własny. Zgodny kod nic nie mówi o operatorze."
+  },
+  "not_proven_server": {
+    "message": "Ataków po stronie serwera i API, np. osłabionych ustawień wyprowadzania klucza lub podmienionych kluczy publicznych."
+  },
+  "not_proven_source": {
+    "message": "Złośliwego kodu, który znajduje się w samym kodzie źródłowym na GitHubie lub w przypiętych wersjach jego zależności."
+  },
+  "not_proven_stylesheet": {
+    "message": "Tego, co serwer Vaultwarden ukrywa własnym arkuszem stylów (w Szczegółach widać, co ukrywa zaakceptowany arkusz)."
+  },
+  "notify_message": {
+    "message": "$ORIGIN$ – $TEXT$",
+    "placeholders": {
+      "origin": {
+        "content": "$1"
+      },
+      "text": {
+        "content": "$2"
+      }
+    }
+  },
+  "notify_title": {
+    "message": "IntactWarden: $STATE$",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_github_explain": {
+    "message": "Gdy witryna działa na wydaniu, którego IntactWarden jeszcze nie ma, przeglądarka pobiera je z GitHuba i sama buduje jego manifest (listę oczekiwanych skrótów plików). Żądania nie zawierają ciasteczek, danych logowania ani adresu witryny."
+  },
+  "onboarding_grant": {
+    "message": "Przyznaj dostęp"
+  },
+  "onboarding_grant_ok": {
+    "message": "Dostęp przyznany."
+  },
+  "onboarding_grant_refused": {
+    "message": "Dostęp nie został przyznany."
+  },
+  "onboarding_granted": {
+    "message": "przyznano"
+  },
+  "onboarding_heading": {
+    "message": "Konfiguracja IntactWarden"
+  },
+  "onboarding_icon_authoritative": {
+    "message": "Liczy się tylko ikona na pasku narzędzi. IntactWarden nigdy nie pokazuje „zweryfikowano” wewnątrz strony; strona może podrobić wszystko, co sama rysuje."
+  },
+  "onboarding_intro": {
+    "message": "IntactWarden sprawdza, czy Twój sejf internetowy Bitwarden lub Vaultwarden uruchamia dokładnie kod opublikowany na GitHubie. Kilka kroków zapewni, że zobaczysz jego ostrzeżenia."
+  },
+  "onboarding_not_granted": {
+    "message": "nie przyznano"
+  },
+  "onboarding_open_tabs_few": {
+    "message": "$COUNT$ chronione karty zostały otwarte, zanim IntactWarden był gotowy. Odśwież je skrótem Ctrl+Shift+R (na macOS Cmd+Shift+R), aby je zweryfikować.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_open_tabs_many": {
+    "message": "$COUNT$ chronionych kart zostało otwartych, zanim IntactWarden był gotowy. Odśwież je skrótem Ctrl+Shift+R (na macOS Cmd+Shift+R), aby je zweryfikować.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_open_tabs_one": {
+    "message": "$COUNT$ chroniona karta została otwarta, zanim IntactWarden był gotowy. Odśwież ją skrótem Ctrl+Shift+R (na macOS Cmd+Shift+R), aby ją zweryfikować.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_open_tabs_other": {
+    "message": "Liczba chronionych kart otwartych, zanim IntactWarden był gotowy: $COUNT$. Odśwież je skrótem Ctrl+Shift+R (na macOS Cmd+Shift+R), aby je zweryfikować.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_page_title": {
+    "message": "IntactWarden: konfiguracja"
+  },
+  "onboarding_permissions_intro": {
+    "message": "Firefox przyznaje ten dostęp podczas instalacji, a możesz go w każdej chwili cofnąć w ustawieniach dodatku. Bez niego IntactWarden nic nie widzi i niczego nie chroni."
+  },
+  "onboarding_permissions_missing": {
+    "message": "Brakuje części dostępu. Do czasu jego przyznania IntactWarden pokazuje „!” na ikonie."
+  },
+  "onboarding_permissions_ok": {
+    "message": "Przyznano cały wymagany dostęp."
+  },
+  "onboarding_pin_done": {
+    "message": "Ikona IntactWarden jest przypięta do paska narzędzi."
+  },
+  "onboarding_pin_hint": {
+    "message": "Kliknij przycisk rozszerzeń (puzzel) na pasku narzędzi, potem koło zębate obok IntactWarden i wybierz „Przypnij do paska narzędzi”."
+  },
+  "onboarding_pin_missing": {
+    "message": "Ikona IntactWarden nie jest jeszcze przypięta."
+  },
+  "onboarding_pin_unknown": {
+    "message": "Upewnij się, że ikona IntactWarden jest przypięta do paska narzędzi."
+  },
+  "onboarding_private_allowed": {
+    "message": "IntactWarden działa także w oknach prywatnych."
+  },
+  "onboarding_private_not_allowed": {
+    "message": "IntactWarden nie działa w oknach prywatnych, więc otwarte w nich sejfy nie są sprawdzane. Aby na to zezwolić: Rozszerzenia i motywy → IntactWarden → „Działanie w oknach prywatnych”."
+  },
+  "onboarding_purpose_deep_verify": {
+    "message": "wydania na GitHubie (głęboka weryfikacja)"
+  },
+  "onboarding_purpose_official": {
+    "message": "chmura Bitwarden"
+  },
+  "onboarding_step_github": {
+    "message": "Sprawdzanie nowych wydań"
+  },
+  "onboarding_step_limits": {
+    "message": "Czego to nie dowodzi"
+  },
+  "onboarding_step_permissions": {
+    "message": "Dostęp do witryn"
+  },
+  "onboarding_step_pin": {
+    "message": "Ikona zawsze na widoku"
+  },
+  "onboarding_step_private": {
+    "message": "Okna prywatne"
+  },
+  "onboarding_step_tabs": {
+    "message": "Odśwież otwarte karty sejfu"
+  },
+  "onboarding_step_browser": {
+    "message": "Ochrona w Firefoksie"
+  },
+  "onboarding_protection": {
+    "message": "IntactWarden sprawdza każdy plik, zanim strona może go użyć, i zatrzymuje kod niezgodny z wydaniem na GitHubie."
+  },
+  "onboarding_protection_detail": {
+    "message": "Korzystaj z sejfu internetowego Bitwarden lub Vaultwarden tylko w Firefoksie z IntactWarden: operacje takie jak zmiana hasła głównego są dostępne tylko w sejfie internetowym, a tylko Firefox pozwala IntactWarden sprawdzić i zatrzymać kod, zanim zostanie uruchomiony."
+  },
+  "options_add_checking": {
+    "message": "Sprawdzanie serwera…"
+  },
+  "options_add_failed": {
+    "message": "Nie udało się dodać serwera."
+  },
+  "options_add_heading": {
+    "message": "Dodaj serwer"
+  },
+  "options_add_hint": {
+    "message": "Wpisz adres samodzielnie, np. https://vault.example.org, razem ze ścieżką, jeśli sejf nie jest w katalogu głównym. Zwykłe http:// działa tylko na tym komputerze."
+  },
+  "options_add_label": {
+    "message": "Adres serwera"
+  },
+  "options_add_save": {
+    "message": "Dodaj serwer"
+  },
+  "options_alerts_heading": {
+    "message": "Alerty"
+  },
+  "options_deep_verify_intro": {
+    "message": "Gdy witryna działa na wydaniu, którego IntactWarden jeszcze nie ma, przeglądarka pobiera je z GitHuba (ok. 40–50 MB) i sama buduje manifest."
+  },
+  "options_heading": {
+    "message": "Ustawienia IntactWarden"
+  },
+  "options_instance_added": {
+    "message": "Dodano $DATE$",
+    "placeholders": {
+      "date": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_added_ok": {
+    "message": "Dodano $ORIGIN$.",
+    "placeholders": {
+      "origin": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_app": {
+    "message": "Aplikacja: $APP$",
+    "placeholders": {
+      "app": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_base_path": {
+    "message": "Ścieżka sejfu: $PATH$",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_grant": {
+    "message": "Przyznaj dostęp"
+  },
+  "options_instance_last_build": {
+    "message": "Ostatnia kompilacja: $BUILD$",
+    "placeholders": {
+      "build": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_permission_missing": {
+    "message": "Brak dostępu: IntactWarden nie może sprawdzić tego serwera."
+  },
+  "options_instance_permission_ok": {
+    "message": "Dostęp przyznany"
+  },
+  "options_instance_remove": {
+    "message": "Usuń"
+  },
+  "options_instance_remove_confirm": {
+    "message": "Potwierdź usunięcie"
+  },
+  "options_instance_remove_failed": {
+    "message": "Nie udało się usunąć serwera."
+  },
+  "options_instance_removed": {
+    "message": "Serwer usunięty."
+  },
+  "options_instances_heading": {
+    "message": "Twoje serwery"
+  },
+  "options_instances_intro": {
+    "message": "Dodaj własny serwer Bitwarden lub Vaultwarden. IntactWarden będzie wtedy sprawdzać jego sejf internetowy z wydaniami na GitHubie."
+  },
+  "options_instances_none": {
+    "message": "Nie dodano jeszcze żadnego serwera."
+  },
+  "options_link_incidents": {
+    "message": "Alerty i incydenty"
+  },
+  "options_link_onboarding": {
+    "message": "Lista kroków konfiguracji"
+  },
+  "options_notifications": {
+    "message": "Pokazuj powiadomienie przy każdym nowym czerwonym stanie"
+  },
+  "options_notifications_hint": {
+    "message": "Powiadomienia to zabezpieczenie na wypadek, gdy ikona jest poza zasięgiem wzroku."
+  },
+  "options_page_title": {
+    "message": "IntactWarden: ustawienia"
+  },
+  "options_privacy_heading": {
+    "message": "Prywatność i okna prywatne"
+  },
+  "options_private_unknown": {
+    "message": "Dostęp w oknach prywatnych: nieznany."
+  },
+  "options_save_failed": {
+    "message": "Nie udało się zapisać ustawienia."
+  },
+  "options_saved": {
+    "message": "Zapisano."
+  },
+  "options_statement_heading": {
+    "message": "Oświadczenie o prywatności"
+  },
+  "options_trust_heading": {
+    "message": "Głęboka weryfikacja i dane zaufania"
+  },
+  "outcome_mismatch": {
+    "message": "Niezgodność"
+  },
+  "outcome_non_executing": {
+    "message": "Nieuruchamiany (strona błędu)"
+  },
+  "outcome_ok": {
+    "message": "OK"
+  },
+  "outcome_passive": {
+    "message": "Policzono (pasywny)"
+  },
+  "outcome_pending": {
+    "message": "Sprawdzanie…"
+  },
+  "outcome_recorded": {
+    "message": "Zapisano do późniejszego sprawdzenia"
+  },
+  "outcome_style_rejected": {
+    "message": "Nie zaakceptowano"
+  },
+  "outcome_third_party": {
+    "message": "Podmiot zewnętrzny"
+  },
+  "outcome_unverifiable": {
+    "message": "Nie do sprawdzenia"
+  },
+  "page_error": {
+    "message": "IntactWarden nie mógł wczytać tej strony. Zamknij ją i spróbuj ponownie."
+  },
+  "popup_alert_unacknowledged": {
+    "message": "Alert: $STATE$ w tej witrynie ($TIME$). Otwórz listę kroków naprawczych, aby zobaczyć, co dalej.",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "popup_btn_allow_style": {
+    "message": "Zezwól na arkusz stylów serwera w tej karcie i odśwież"
+  },
+  "popup_btn_allow_third_party": {
+    "message": "Zezwól na $NAME$ na jedno wczytanie strony…",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_btn_checklist": {
+    "message": "Lista kroków naprawczych"
+  },
+  "popup_btn_details": {
+    "message": "Szczegóły"
+  },
+  "popup_btn_grant": {
+    "message": "Przyznaj dostęp"
+  },
+  "popup_co_resident_source": {
+    "message": "Otwarta niezweryfikowana strona w tej witrynie: $PATH$ (stan na $TIME$).",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "popup_coverage_heading": {
+    "message": "Co sprawdzono"
+  },
+  "popup_error": {
+    "message": "IntactWarden nie może odczytać stanu tej karty. Traktuj ją jako niezweryfikowaną i odśwież stronę."
+  },
+  "popup_in_page_note": {
+    "message": "Liczy się tylko ta ikona: IntactWarden nigdy nie pokazuje „zweryfikowano” wewnątrz strony."
+  },
+  "popup_label_app": {
+    "message": "Aplikacja"
+  },
+  "popup_label_assurance": {
+    "message": "Poziom pewności"
+  },
+  "popup_label_commit": {
+    "message": "Commit"
+  },
+  "popup_label_deployment": {
+    "message": "Wdrożenie"
+  },
+  "popup_label_release": {
+    "message": "Wydanie na GitHubie"
+  },
+  "popup_label_version": {
+    "message": "Wersja"
+  },
+  "popup_limit_dynamic": {
+    "message": "Odpowiedzi API i inne dane dynamiczne nie są kodem i nie są sprawdzane."
+  },
+  "popup_limit_third_party": {
+    "message": "Kod i dane podmiotów zewnętrznych nie są weryfikowane: $NAMES$.",
+    "placeholders": {
+      "names": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_limits_heading": {
+    "message": "Czego się nie sprawdza"
+  },
+  "popup_link_incidents": {
+    "message": "Alerty i incydenty"
+  },
+  "popup_link_options": {
+    "message": "Ustawienia"
+  },
+  "popup_not_protected_title": {
+    "message": "Ta witryna nie jest chroniona"
+  },
+  "popup_page_title": {
+    "message": "IntactWarden"
+  },
+  "popup_provenance_heading": {
+    "message": "Skąd pochodzi kod"
+  },
+  "popup_reasons_heading": {
+    "message": "Dlaczego"
+  },
+  "popup_self_hosted_lead": {
+    "message": "Serwer dodany $DATE$. To potwierdza kod, a nie to, kto prowadzi serwer.",
+    "placeholders": {
+      "date": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_accepted_few": {
+    "message": "Arkusz stylów serwera: zaakceptowany, ukrywa $COUNT$ rodzaje elementów.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_accepted_many": {
+    "message": "Arkusz stylów serwera: zaakceptowany, ukrywa $COUNT$ rodzajów elementów.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_accepted_one": {
+    "message": "Arkusz stylów serwera: zaakceptowany, ukrywa $COUNT$ rodzaj elementów.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_accepted_other": {
+    "message": "Arkusz stylów serwera: zaakceptowany, ukrywa $COUNT$ rodzaju elementów.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_rejected": {
+    "message": "Arkusz stylów serwera: nie został zaakceptowany. $REASON$",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_unknown_deep_verify": {
+    "message": "Pobieranie i sprawdzanie wydania z GitHuba w Twojej przeglądarce…"
+  },
+  "popup_unknown_failed": {
+    "message": "Nie udało się sprawdzić wydania: $FAILURE$.",
+    "placeholders": {
+      "failure": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_unknown_hint": {
+    "message": "Ustalanie, na którym wydaniu działa serwer…"
+  },
+  "popup_vaultwarden_style_note": {
+    "message": "Serwery Vaultwarden dodają własny arkusz stylów. IntactWarden akceptuje go tylko wtedy, gdy jedynie ukrywa standardowe elementy; w Szczegółach widać, co ukrywa."
+  },
+  "privacy_network_github": {
+    "message": "GitHub (api.github.com, github.com, release-assets.githubusercontent.com, objects.githubusercontent.com, raw.githubusercontent.com), aby pobrać wydanie, na którym działa chroniona witryna, a którego IntactWarden jeszcze nie ma. Żądania nie zawierają ciasteczek, danych logowania ani adresu witryny. Poza losowym adresem dodatku (moz-extension://…), który Firefox dołącza do żądań do api.github.com, są takie same dla każdego użytkownika danego wydania."
+  },
+  "privacy_network_hint": {
+    "message": "Plik wersji chronionej witryny (/version.json lub /vw-version.json), najwyżej raz na minutę, wyłącznie po to, by wybrać wydanie do pobrania."
+  },
+  "privacy_network_intro": {
+    "message": "Jedyne żądania sieciowe, które IntactWarden wykonuje sam:"
+  },
+  "privacy_network_probe": {
+    "message": "Jedno żądanie bez danych logowania do serwera, który sam(a) dodajesz (jego api/config), aby odróżnić Bitwarden od Vaultwarden."
+  },
+  "privacy_no_telemetry": {
+    "message": "IntactWarden nie zbiera telemetrii i nikomu nie wysyła niczego o Tobie, Twoim sejfie ani odwiedzanych stronach."
+  },
+  "privacy_storage": {
+    "message": "Przechowywane tylko w tej przeglądarce: ustawienia, Twoje serwery, alerty, najnowsza kompilacja widziana w każdej witrynie, manifesty, skróty wydań podane przez GitHuba, ostatnie głębokie weryfikacje oraz dziennik incydentów (tylko witryna i ścieżka, bez parametrów zapytania i fragmentów; 90 dni, 200 najnowszych wpisów)."
+  },
+  "privacy_trust_mode": {
+    "message": "Skąd pochodzą manifesty: Twoja przeglądarka buduje je z wydań na GitHubie. IntactWarden nie pobiera żadnych danych od swojego opiekuna ani z jego CI. Wydanie jest uznawane w postaci, w jakiej GitHub podał je, gdy ta przeglądarka zobaczyła je pierwszy raz."
+  },
+  "options_add_confirm_lookalike": {
+    "message": "To mój własny serwer, a nie Bitwarden."
+  },
+  "options_add_refusal_duplicate": {
+    "message": "Ten serwer jest już na liście."
+  },
+  "options_add_refusal_http_not_loopback": {
+    "message": "Zwykłe http:// jest dozwolone tylko na tym komputerze (localhost). Dla tego serwera użyj https://."
+  },
+  "options_add_refusal_lookalike_unconfirmed": {
+    "message": "Przed dodaniem serwera potwierdź, że sam(a) go prowadzisz."
+  },
+  "options_add_refusal_invalid_input": {
+    "message": "Wpisz adres serwera, np. https://vault.example.org."
+  },
+  "options_add_refusal_official_origin": {
+    "message": "To oficjalny adres chmury Bitwarden. IntactWarden już go chroni; nie można go dodać jako własnego serwera."
+  },
+  "options_add_refusal_permission_denied": {
+    "message": "Nie przyznano dostępu do serwera, więc nie można go sprawdzić."
+  },
+  "options_add_refusal_unreachable": {
+    "message": "Nie udało się połączyć z serwerem."
+  },
+  "options_add_refusal_no_server": {
+    "message": "Pod tym adresem nie odpowiada serwer Bitwarden ani Vaultwarden. Sprawdź adres, także ścieżkę, jeśli sejf nie jest w katalogu głównym."
+  },
+  "options_add_warning_lookalike": {
+    "message": "Uwaga: ten adres przypomina oficjalny adres Bitwarden albo zawiera znaki międzynarodowe, które mogą go udawać. Podobne adresy to częsta sztuczka phishingowa. Dodaj go tylko wtedy, gdy sam(a) prowadzisz ten serwer: zaznacz pole poniżej, a potem ponownie wybierz „Dodaj serwer”."
+  },
+  "provenance_artifact": {
+    "message": "sha256 pliku wydania $HASH$",
+    "placeholders": {
+      "hash": {
+        "content": "$1"
+      }
+    }
+  },
+  "provenance_built_locally": {
+    "message": "Manifest zbudowany w Twojej przeglądarce z wydania $RELEASE$ na GitHubie.",
+    "placeholders": {
+      "release": {
+        "content": "$1"
+      }
+    }
+  },
+  "provenance_bundled": {
+    "message": "Manifest dołączony do IntactWarden $VERSION$.",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "provenance_server_asserted": {
+    "message": "$VERSION$ (według serwera)",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "reason_BUILD_UNVERIFIED__image_only_release": {
+    "message": "Wydanie opublikowano wyłącznie jako obraz kontenera."
+  },
+  "reason_BUILD_UNVERIFIED__not_derivable": {
+    "message": "Tej kompilacji nie udało się odtworzyć z wydania na GitHubie i opublikowanej konfiguracji albo nie udało się pobrać tego wydania z GitHuba."
+  },
+  "reason_BUILD_UNVERIFIED__selfhost_unpublished": {
+    "message": "Serwer działa na kompilacji, która nie odpowiada żadnemu opublikowanemu wydaniu, albo nie udało się pobrać z GitHuba wydania wskazanego przez serwer."
+  },
+  "reason_CO_RESIDENT_UNVERIFIED__released_mismatch": {
+    "message": "Otwarto stronę z niezgodnością."
+  },
+  "reason_CO_RESIDENT_UNVERIFIED__third_party_code": {
+    "message": "Otwarta jest strona, na której działa skrypt płatności."
+  },
+  "reason_CO_RESIDENT_UNVERIFIED__unverifiable": {
+    "message": "Otwarta jest strona, której nie dało się sprawdzić."
+  },
+  "reason_DISPUTED__pin_changed": {
+    "message": "GitHub podaje teraz inny skrót pliku lub tag niż zapisany wcześniej."
+  },
+  "reason_MISMATCH__bytes": {
+    "message": "Zawartość pliku różni się od wydania na GitHubie."
+  },
+  "reason_MISMATCH__header": {
+    "message": "Wykryto niedozwolony nagłówek lub przekierowanie."
+  },
+  "reason_MISMATCH__inline_code": {
+    "message": "Na stronie uruchomiono kod osadzony (inline), którego ta aplikacja nigdy nie używa."
+  },
+  "reason_MISMATCH__release_differs": {
+    "message": "Serwer wskazuje wydanie, ale ta strona się od niego różni."
+  },
+  "reason_MISMATCH__service_worker": {
+    "message": "W tej witrynie zarejestrowano service workera."
+  },
+  "reason_MISMATCH__unknown_path": {
+    "message": "Wczytano skrypt lub inny aktywny plik, którego nie ma w wydaniu."
+  },
+  "reason_NEW_BUILD__catching_up": {
+    "message": "Odpowiadające jej wydanie z GitHuba nie zostało jeszcze sprawdzone."
+  },
+  "reason_NEW_BUILD__unavailable": {
+    "message": "Nie można teraz pobrać wydania z GitHuba."
+  },
+  "reason_NOT_COVERED__admin_portal": {
+    "message": "To jest panel administracyjny."
+  },
+  "reason_NOT_COVERED__auth_flow": {
+    "message": "To jest strona logowania serwera."
+  },
+  "reason_NOT_COVERED__not_covered_path": {
+    "message": "Ta ścieżka jest oznaczona jako poza zakresem."
+  },
+  "reason_PROTECTION_LOST__filter_failed": {
+    "message": "Filtr odpowiedzi zawiódł."
+  },
+  "reason_PROTECTION_LOST__internal_error": {
+    "message": "Wystąpił błąd wewnętrzny."
+  },
+  "reason_PROTECTION_LOST__permission_revoked": {
+    "message": "Dostęp IntactWarden do tej witryny został cofnięty."
+  },
+  "reason_PROTECTION_LOST__sw_served": {
+    "message": "Na żądanie odpowiedział service worker."
+  },
+  "reason_PROTECTION_LOST__timeout": {
+    "message": "Sprawdzanie pliku trwało zbyt długo."
+  },
+  "reason_PROTECTION_LOST__unbound": {
+    "message": "Plik został wczytany, zanim ustalono kompilację strony."
+  },
+  "reason_PROTECTION_LOST__untracked": {
+    "message": "Ta strona była otwarta, zanim IntactWarden zaczął ją sprawdzać, albo żądania nie udało się przypisać do jednej strony."
+  },
+  "reason_PROTECTION_LOST__unverifiable_active": {
+    "message": "Nie udało się sprawdzić aktywnego pliku."
+  },
+  "reason_PROTECTION_LOST__verifier_restarted": {
+    "message": "IntactWarden uruchomił się ponownie, gdy strona była otwarta."
+  },
+  "reason_third_party_host": {
+    "message": "Kod zewnętrzny z $HOST$.",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "reason_UNVERIFIED_STYLE__custom_rules": {
+    "message": "Arkusz zawiera reguły wykraczające poza ukrywanie standardowych elementów sejfu."
+  },
+  "reason_UNVERIFIED_STYLE__malformed": {
+    "message": "Nie udało się przetworzyć arkusza stylów."
+  },
+  "refusal_archive_invalid": {
+    "message": "archiwum jest nieprawidłowe"
+  },
+  "refusal_asset_name_mismatch": {
+    "message": "nazwa pliku się nie zgadza"
+  },
+  "refusal_derivation_failed": {
+    "message": "nie udało się wyprowadzić plików chmurowych"
+  },
+  "refusal_digest_mismatch": {
+    "message": "skrót się nie zgadza"
+  },
+  "refusal_forbidden_content": {
+    "message": "archiwum zawiera niedozwoloną zawartość"
+  },
+  "refusal_invalid_core": {
+    "message": "zbudowany manifest jest nieprawidłowy"
+  },
+  "refusal_rebuild_differs": {
+    "message": "manifest odtworzony z GitHuba różni się od używanego; zapisano to jako incydent, prosimy o zgłoszenie"
+  },
+  "refusal_size_mismatch": {
+    "message": "rozmiar się nie zgadza"
+  },
+  "refusal_tag_mismatch": {
+    "message": "tag się nie zgadza"
+  },
+  "refusal_unsupported": {
+    "message": "nieobsługiwane"
+  },
+  "refusal_version_mismatch": {
+    "message": "wersja się nie zgadza"
+  },
+  "retry_btn_check_now": {
+    "message": "Sprawdź teraz"
+  },
+  "retry_explain": {
+    "message": "IntactWarden sprawdza ponownie co minutę i przy każdym postępie pobierania. Po odświeżeniu sejf otworzy się na stronie głównej."
+  },
+  "retry_heading": {
+    "message": "Trwa sprawdzanie nowej kompilacji"
+  },
+  "retry_page_title": {
+    "message": "IntactWarden: sprawdzanie nowej kompilacji"
+  },
+  "retry_progress_label": {
+    "message": "Postęp pobierania"
+  },
+  "retry_sentence": {
+    "message": "Pojawiła się nowa kompilacja; IntactWarden pobiera odpowiadające jej wydanie z GitHuba, aby ją sprawdzić. Strona odświeży się sama, gdy kompilacja zostanie rozpoznana."
+  },
+  "retry_sentence_idle": {
+    "message": "Pojawiła się nowa kompilacja. IntactWarden nie pobiera teraz odpowiadającego jej wydania z GitHuba (limit żądań GitHuba, brak dostępu do GitHuba albo wcześniejsza nieudana próba). Jeśli po 10 minutach od pierwszej próby nadal nie uda się go pobrać, strona pokaże stan „Kompilacja niezweryfikowana” z przyciskiem „Kontynuuj jednorazowo”. Kliknij „Sprawdź teraz”, aby ponownie wczytać stronę i jeszcze raz sprawdzić kompilację."
+  },
+  "state_BUILD_UNVERIFIED": {
+    "message": "Kompilacja niezweryfikowana"
+  },
+  "state_BUILD_UNVERIFIED_desc": {
+    "message": "Tej kompilacji nie udało się powiązać z wydaniem na GitHubie, więc jej kod nie jest zweryfikowany. Zmodyfikowany serwer wygląda tak samo, więc kontynuuj tylko, jeśli ufasz temu, kto go prowadzi."
+  },
+  "state_CO_RESIDENT_UNVERIFIED": {
+    "message": "Niezweryfikowana strona w tej witrynie"
+  },
+  "state_CO_RESIDENT_UNVERIFIED_desc": {
+    "message": "W tej witrynie jest otwarta niezweryfikowana strona, która może sterować tą kartą."
+  },
+  "state_DISPUTED": {
+    "message": "Sporne wydanie"
+  },
+  "state_DISPUTED_desc": {
+    "message": "Skrót pliku lub tag zapisany wcześniej dla tego wydania się zmienił. Nie wpisuj sekretów. Wydanie pozostaje sporne w tej przeglądarce; prosimy o zgłoszenie."
+  },
+  "state_MISMATCH": {
+    "message": "Niezgodność"
+  },
+  "state_MISMATCH_desc": {
+    "message": "Kod na tej stronie nie zgadza się z jego wydaniem na GitHubie. Nie wpisuj sekretów."
+  },
+  "state_NEW_BUILD": {
+    "message": "Nowa kompilacja"
+  },
+  "state_NEW_BUILD_desc": {
+    "message": "Ta witryna działa na nowej kompilacji, której IntactWarden nie porównał jeszcze z jej wydaniem na GitHubie."
+  },
+  "state_NOT_COVERED": {
+    "message": "Poza zakresem"
+  },
+  "state_NOT_COVERED_desc": {
+    "message": "Ta strona leży pod ścieżką, której IntactWarden nie weryfikuje, np. w panelu administracyjnym. Jest zablokowana: jej kodu nie ma w żadnym wydaniu, a działałby obok sejfu."
+  },
+  "state_NOT_PROTECTED": {
+    "message": "Niechroniona"
+  },
+  "state_NOT_PROTECTED_desc": {
+    "message": "IntactWarden sprawdza tylko chmurę Bitwarden i serwery dodane w Ustawieniach."
+  },
+  "state_PROTECTION_LOST": {
+    "message": "Ochrona utracona"
+  },
+  "state_PROTECTION_LOST_desc": {
+    "message": "IntactWarden nie mógł sprawdzić ani chronić tej strony. To, czego nie mógł sprawdzić, zostało zablokowane; jeśli pojawił się alert, kod mógł mimo to zostać uruchomiony bez sprawdzenia. Odśwież stronę skrótem Ctrl+Shift+R (na macOS Cmd+Shift+R) i przyznaj dostęp, jeśli pojawi się taka prośba."
+  },
+  "state_RECOVERING": {
+    "message": "Przywracanie bezpieczeństwa"
+  },
+  "state_RECOVERING_desc": {
+    "message": "Alert dla tej witryny jest nadal otwarty. Wykonaj kroki z listy naprawczej i potwierdź alert."
+  },
+  "state_ROLLBACK": {
+    "message": "Starsza kompilacja"
+  },
+  "state_ROLLBACK_desc": {
+    "message": "Ta kompilacja jest starsza niż najnowsza, którą ta przeglądarka widziała już w tej witrynie."
+  },
+  "state_THIRD_PARTY_CODE": {
+    "message": "Kod zewnętrzny"
+  },
+  "state_THIRD_PARTY_CODE_desc": {
+    "message": "Ta strona wczytuje kod podmiotu zewnętrznego, np. operatora płatności, którego nie da się zweryfikować. Jest on blokowany, chyba że zezwolisz na niego dla jednego wczytania strony."
+  },
+  "state_UNVERIFIED_STYLE": {
+    "message": "Arkusz stylów serwera nie został zaakceptowany"
+  },
+  "state_UNVERIFIED_STYLE_desc": {
+    "message": "Twój serwer dodaje własny arkusz stylów, którego IntactWarden nie akceptuje. Nie uruchomi on kodu, ale może zmienić to, co pokazuje sejf."
+  },
+  "state_VERIFIED": {
+    "message": "Zweryfikowano"
+  },
+  "state_VERIFIED_desc": {
+    "message": "Zweryfikowano przed uruchomieniem: każdy plik wczytany przez tę stronę zgadza się z wydaniem na GitHubie."
+  },
+  "third_party_2fa_directory": {
+    "message": "2FA Directory"
+  },
+  "third_party_billing_scripts": {
+    "message": "skrypty płatności"
+  },
+  "third_party_braintree": {
+    "message": "Braintree"
+  },
+  "third_party_duo": {
+    "message": "Duo"
+  },
+  "third_party_email_forwarders": {
+    "message": "usługi przekazywania e-maili"
+  },
+  "third_party_hibp": {
+    "message": "Have I Been Pwned"
+  },
+  "third_party_icon_services": {
+    "message": "usługi ikon witryn"
+  },
+  "third_party_paypal": {
+    "message": "PayPal"
+  },
+  "third_party_stripe": {
+    "message": "Stripe"
+  },
+  "popup_badge": {
+    "message": "Blokuje kod, którego nie może zweryfikować"
+  },
+  "popup_blocked_page_title": {
+    "message": "IntactWarden zatrzymał stronę w tej karcie"
+  },
+  "popup_blocked_page_desc": {
+    "message": "Strona w tej karcie wyjaśnia dlaczego i co możesz zrobić. Nic z zablokowanej strony nie zostało uruchomione."
+  },
+  "trust_col_assurance": {
+    "message": "Poziom pewności"
+  },
+  "trust_col_build": {
+    "message": "Kompilacja"
+  },
+  "trust_col_source": {
+    "message": "Źródło"
+  },
+  "trust_cores_count_few": {
+    "message": "Dostępne $COUNT$ manifesty.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_cores_count_many": {
+    "message": "Dostępnych $COUNT$ manifestów.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_cores_count_one": {
+    "message": "Dostępny $COUNT$ manifest.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_cores_count_other": {
+    "message": "Dostępne $COUNT$ manifestu.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_cores_heading": {
+    "message": "Manifesty"
+  },
+  "trust_cores_none": {
+    "message": "Brak manifestów."
+  },
+  "trust_disputed": {
+    "message": "sporny"
+  },
+  "trust_github_backoff": {
+    "message": "Osiągnięto limit żądań GitHuba; IntactWarden czeka do $TIME$.",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_github_grant": {
+    "message": "Przyznaj dostęp do GitHuba"
+  },
+  "trust_github_permission_missing": {
+    "message": "Nie przyznano dostępu do GitHuba, więc nie można sprawdzać nowych wydań."
+  },
+  "trust_job_line": {
+    "message": "$APP$ $VERSION$: $PHASE$ (rozpoczęto $TIME$)",
+    "placeholders": {
+      "app": {
+        "content": "$1"
+      },
+      "version": {
+        "content": "$2"
+      },
+      "phase": {
+        "content": "$3"
+      },
+      "time": {
+        "content": "$4"
+      }
+    }
+  },
+  "trust_jobs_heading": {
+    "message": "Ostatnie głębokie weryfikacje"
+  },
+  "trust_jobs_none": {
+    "message": "Jeszcze żadnych."
+  },
+  "trust_sources": {
+    "message": "Manifesty są budowane w tej przeglądarce z wydań na GitHubie."
+  },
+  "trust_load_failed": {
+    "message": "Nie udało się wczytać zapisanych manifestów: każda chroniona strona pokazuje „Ochrona utracona”."
+  },
+  "trust_pin_asset": {
+    "message": "$RELEASE$ · $ASSET$ · sha256 $HASH$ · $SOURCE$",
+    "placeholders": {
+      "release": {
+        "content": "$1"
+      },
+      "asset": {
+        "content": "$2"
+      },
+      "hash": {
+        "content": "$3"
+      },
+      "source": {
+        "content": "$4"
+      }
+    }
+  },
+  "trust_pin_bundled": {
+    "message": "dołączone"
+  },
+  "trust_pin_config": {
+    "message": "$REPO$ · $PATH$ · sha256 $HASH$ · $SOURCE$",
+    "placeholders": {
+      "repo": {
+        "content": "$1"
+      },
+      "path": {
+        "content": "$2"
+      },
+      "hash": {
+        "content": "$3"
+      },
+      "source": {
+        "content": "$4"
+      }
+    }
+  },
+  "trust_pin_local": {
+    "message": "zobaczone po raz pierwszy w tej przeglądarce"
+  },
+  "trust_pins_heading": {
+    "message": "Zapisane pliki wydań (przypięcia)"
+  },
+  "trust_pins_none": {
+    "message": "Brak."
+  },
+  "trust_source_bundled": {
+    "message": "Dołączony do IntactWarden"
+  },
+  "trust_source_deep_verify": {
+    "message": "Zbudowany w tej przeglądarce z GitHuba ($TIME$)",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_unavailable": {
+    "message": "Nie udało się wczytać danych zaufania."
+  },
+  "unverifiable_empty_body": {
+    "message": "pusta odpowiedź"
+  },
+  "unverifiable_filter_failed": {
+    "message": "filtr zawiódł"
+  },
+  "unverifiable_internal_error": {
+    "message": "błąd wewnętrzny"
+  },
+  "unverifiable_no_host_permission": {
+    "message": "brak dostępu do witryny"
+  },
+  "unverifiable_sw_served": {
+    "message": "dostarczone przez service workera"
+  },
+  "unverifiable_timeout": {
+    "message": "trwało zbyt długo"
+  },
+  "unverifiable_too_large": {
+    "message": "za duże do sprawdzenia"
+  },
+  "unverifiable_unbound": {
+    "message": "kompilacja nieznana na czas"
+  },
+  "unverifiable_verifier_restarted": {
+    "message": "IntactWarden uruchomił się ponownie"
+  },
+  "details_source_deep_verify": {
+    "message": "Zbudowany w tej przeglądarce z wydania na GitHubie"
+  }
+}

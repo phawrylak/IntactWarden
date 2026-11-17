@@ -1,0 +1,41 @@
+{
+  "$comment": "Corpus lock for the vaultwarden-web release core (dani-garcia/bw_web_builds v2026.10.1). Digests and sizes are GitHub's listed values; commit is the peeled tag (git ls-remote v2026.10.1^{}) and tag_object the annotated tag object itself (the unpeeled line). File keys are paths below the tarball root web-vault/. files.set_sha256 is the sha256 of the UTF-8 text formed by one line \"<sha256>  <path>\\n\" per tarball file (all 295, /app-id.json included), sorted by path; the hashes were taken programmatically from the tarball and equal the research hash list.",
+  "pinned_at": "2026-11-06T20:03:45Z",
+  "release": {
+    "repo": "dani-garcia/bw_web_builds",
+    "repo_id": 161632059,
+    "tag": "v2026.10.1",
+    "commit": "f35c1cbb7b582781243d1166f5cad21f6988ab5f",
+    "tag_object": "878e7d7a00f5989f1d743cd0c2d7b9aa460107c5",
+    "asset": "bw_web_v2026.10.1.tar.gz",
+    "url": "https://github.com/dani-garcia/bw_web_builds/releases/download/v2026.10.1/bw_web_v2026.10.1.tar.gz",
+    "sha256": "354de9056c871e48db84975985e7d57c111ac6537bd4e4720488019e8638060f",
+    "size": 41793283,
+    "root": "web-vault/",
+    "immutable": true
+  },
+  "files": {
+    "count": 295,
+    "total_size": 168741428,
+    "non_map_files": 266,
+    "sourcemaps": 29,
+    "documents": 9,
+    "set_sha256": "9028e7c33995e6d3a2b53e683da758b836cfd3d1a08878749ddc5fdb96d51df7",
+    "sample": {
+      "/index.html": "d358da3d01e385d476e5b1a31bd3cdac5da4b8441a7533ad9398921893e98dde",
+      "/404.html": "aff2e4dd03d65345200eb451fa0e7f641f0e9970e0b7cc75ae98c6a1bcac881e",
+      "/sso-connector.html": "07215446024333291d075b60bd56bf8abac6968a785527b8a3d5044e39d3e96d",
+      "/duo-redirect-connector.html": "d545d5e00321269ae17f0417a7eb61f92b0540f369f4ec194efd6bbfddd8bbbf",
+      "/app/main.1176a28a68b7b4809391.js": "5defb27621655bc05a54d042e32ce21d66dadd337b3bc60bc0cb49c234e441d1",
+      "/app/vendor.55e794a42a5fe0d2e9eb.js": "72743d318759598b69c3c774bc3aff8cde97af3c54f3b3b912575ae4bc740e75",
+      "/466839efc4da38d60ce3.module.wasm": "2fd7fe38bae0974df01bfdeddc31e4f69c7d74a5d86c567d378fa0afc81a0a16",
+      "/styles.7b4e836b041b0b1d10ae.css": "96e32b8bebd4e5ab4b4485dfafac4053c0eb59e8ef77a8dd76da19c226b09561",
+      "/vw-version.json": "c4884b775c9c177b045b8e4a153db86c94e0380626fa5a58b3a2447501ce570e",
+      "/version.json": "56ef835b70c95edbb58816273bb0030fc0b67f87abdc4a07c84f1326b707bb6c",
+      "/app-id.json": "cf27eab0c8a76d66473174a8144ddd95560724b0aae651e396eb61b043747212",
+      "/.nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/locales/en/messages.json": "7e0fc3748453f7042df89b5753b80c55378aaf8570f30cee798e8d9f857bbbcf",
+      "/images/icon-white.svg": "cc3f6fa3724456dc0115edb83ff097d1aa2a1344d5d85be7e2ed2ddccdb53112"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "//": "Browsers of the Firefox e2e suite (tools/e2e/browsers.ts), Linux x86_64. Each archive must hash to the sha256 pinned here before it is unpacked; nothing else is trusted. The first firefox entry is the default; CI runs every entry (the latest release and the minimum ESR, strict_min_version 153.0) through INTACTWARDEN_E2E_FIREFOX_VERSION. To bump a version, take the line of linux-x86_64/en-US/firefox-<version>.tar.xz from Mozilla's SHA256SUMS next to the release, checking SHA256SUMS.asc with gpg against the Mozilla release key (14F26682D0916CDD81E37B6D61B7B526D98F0353) before you paste the digest.",
+  "firefox": [
+    {
+      "version": "160.0",
+      "sha256": "fde774e9757c8878534c05ec210db592bf6a1b244c57941ffb2e364c04f35fcd"
+    },
+    {
+      "version": "153.7.0esr",
+      "sha256": "7d2eb92ca3a7b2a83de092eb9b94c853980214de2fbfdccb2ac39d61c593c5a5"
+    }
+  ],
+  "geckodriver": {
+    "version": "0.37.1",
+    "sha256": "e815130ea95983e162ae91843b48d3a3ce991735635fce83a647afde21e09f7e"
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+package-lock.json
+/coverage/
+dist/
+# Documentation is hand-formatted (tables, diagrams).
+*.md
+dist-test/

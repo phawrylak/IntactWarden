@@ -1,0 +1,28 @@
+# Dependencies and build output
+node_modules/
+dist/
+# Extension test builds (npm run build:ext -- --test)
+dist-test/
+# Test coverage output
+/coverage/
+*.tsbuildinfo
+
+# Local environment
+.env
+.env.*
+.DS_Store
+
+# Downloaded upstream files (corpus tests, test builds, the end-to-end browser
+# archives) are cached by digest in fixtures/corpora/.downloads/; .cache/ holds
+# the browsers unpacked for end-to-end tests and their logs. Vendor bytes are
+# fetched by digest at test time and must never be committed (Bitwarden
+# COMMERCIAL builds contain bitwarden_license code).
+.cache/
+fixtures/corpora/.downloads/
+
+# Release files downloaded to check a package (docs/security.md, "Check it yourself")
+/intactwarden-*-firefox.zip
+/intactwarden-*-source.tar.gz
+/intactwarden-*-provenance.sigstore.json
+/SHA256SUMS
+*.xpi

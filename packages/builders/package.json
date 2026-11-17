@@ -1,0 +1,16 @@
+{
+  "name": "@intactwarden/builders",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure TypeScript core-manifest builders shared by the extension's local deep verify, its build and the recompute command line (Bitwarden release and cloud cores, Vaultwarden release cores)",
+  "license": "MIT",
+  "author": "Paweł Hawrylak (https://github.com/phawrylak)",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@intactwarden/core": "0.0.0",
+    "@intactwarden/profiles": "0.0.0"
+  }
+}

@@ -1,0 +1,359 @@
+/*
+ * Shared styles of IntactWarden's extension pages. Light and dark
+ * themes follow prefers-color-scheme; state colours meet WCAG AA contrast for
+ * text on their tinted backgrounds in both themes. No external resources.
+ */
+
+:root {
+  color-scheme: light dark;
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #4b5563;
+  --border: #d1d5db;
+  --focus: #1d4ed8;
+  --link: #1d4ed8;
+  --red: #a3122a;
+  --red-bg: #fde8eb;
+  --amber: #8a4b00;
+  --amber-bg: #fdf1dc;
+  --grey: #374151;
+  --grey-bg: #eceef2;
+  --green: #14532d;
+  --green-bg: #dcf3e4;
+  --btn-bg: #e5e7eb;
+  --btn-text: #111827;
+  --primary-bg: #1d4ed8;
+  --primary-text: #ffffff;
+  --danger-bg: #a3122a;
+  --danger-text: #ffffff;
+  --radius: 8px;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Noto Sans',
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #181b21;
+    --text: #e8eaed;
+    --muted: #a6adbb;
+    --border: #3a3f4b;
+    --focus: #8ab4ff;
+    --link: #8ab4ff;
+    --red: #ffb3bd;
+    --red-bg: #3d1218;
+    --amber: #ffd08a;
+    --amber-bg: #3a2608;
+    --grey: #d1d5db;
+    --grey-bg: #262a33;
+    --green: #a7e8bd;
+    --green-bg: #11301c;
+    --btn-bg: #2b303a;
+    --btn-text: #e8eaed;
+    --primary-bg: #8ab4ff;
+    --primary-text: #0b1530;
+    --danger-bg: #ffb3bd;
+    --danger-text: #3d0a12;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 1.4rem;
+  margin: 0 0 12px;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 0 0 8px;
+}
+
+h3 {
+  font-size: 1rem;
+  margin: 12px 0 6px;
+}
+
+p {
+  margin: 6px 0;
+}
+
+a {
+  color: var(--link);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 0 0 14px;
+}
+
+.muted,
+.hint {
+  color: var(--muted);
+  font-size: 0.92em;
+}
+
+.mono {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.btn {
+  font: inherit;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary-bg);
+  color: var(--primary-text);
+}
+
+.btn-danger {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.field {
+  margin: 8px 0;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.field-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 8px;
+  align-items: start;
+}
+
+.field-check label {
+  font-weight: normal;
+  margin: 0;
+}
+
+.field-check .hint {
+  grid-column: 2;
+  margin: 2px 0 0;
+}
+
+input[type='text'] {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  min-width: 16em;
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92em;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  padding: 5px 6px;
+  vertical-align: top;
+}
+
+th {
+  font-weight: 600;
+}
+
+ul,
+ol {
+  margin: 6px 0;
+  padding-left: 22px;
+}
+
+.chip {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 0.85em;
+  background: var(--grey-bg);
+  color: var(--grey);
+  border: 1px solid var(--border);
+}
+
+.notice {
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin: 8px 0;
+}
+
+/* State colours (class names from the verdict lattice colours). */
+.state-red,
+.notice-red {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.state-amber,
+.notice-amber {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.state-grey,
+.state-none {
+  background: var(--grey-bg);
+  color: var(--grey);
+}
+
+.state-green,
+.notice-green {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.result-ok {
+  color: var(--green);
+}
+
+.result-bad {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.result-warn {
+  color: var(--amber);
+}
+
+.result-muted {
+  color: var(--muted);
+}
+
+.status-band {
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.status-band .state-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.status-band p {
+  margin: 4px 0 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 12px;
+  row-gap: 3px;
+  margin: 0;
+}
+
+.kv dt {
+  color: var(--muted);
+}
+
+.kv dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.linklike {
+  font: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--link);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+details > summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+progress {
+  width: 100%;
+  height: 1em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

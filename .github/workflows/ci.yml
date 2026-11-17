@@ -1,0 +1,144 @@
+# Lint, typecheck, unit tests and extension packages for the IntactWarden monorepo.
+# Hardening rules (docs/release.md, "Repository hardening"): no default
+# token permissions, actions pinned by full commit SHA, no Actions caches,
+# no pull_request_target, dependencies installed without lifecycle scripts.
+# tools/workflows.test.ts enforces them on every workflow (`npm test`, job `check`).
+# The ruleset on main requires every job below by its check name (`check (22)`, `e2e (160.0)`…):
+# change the ruleset together with a matrix.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
+      - name: Install dependencies (no lifecycle scripts)
+        run: npm ci --ignore-scripts
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+      - name: Relative links in Markdown
+        run: npm run check-links
+
+  # Extension package: the Firefox package, the only one IntactWarden ships (no bundled cores,
+  # so no vendor download), is built and packaged, with bundle-lint (docs/security.md,
+  # "Permissions and network requests") inside both steps; then it is built and packaged again
+  # from scratch and the two outputs must be byte-identical (reproducible builds;
+  # docs/security.md, "Trust in the verifier").
+  extension:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Install dependencies (no lifecycle scripts)
+        run: npm ci --ignore-scripts
+      - name: Build the Firefox package
+        run: npm run build:ext
+      - name: Package (deterministic zips and SHA256SUMS)
+        run: npm run package:ext
+      - name: Build and package again from scratch
+        run: |
+          mv extension/dist "$RUNNER_TEMP/dist-first"
+          npm run build:ext
+          npm run package:ext
+      - name: Compare the two builds byte for byte
+        run: |
+          diff -r "$RUNNER_TEMP/dist-first" extension/dist
+          cat extension/dist/SHA256SUMS
+
+  # Opt-in corpus tests (`npm run test:corpus`): real upstream release assets
+  # fetched by digest (fixtures/corpora/*.lock.json) and built into cores with
+  # the golden digests; the cloud cores reproduce vault.bitwarden.com and
+  # vault.bitwarden.eu byte for byte.
+  corpus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Install dependencies (no lifecycle scripts)
+        run: npm ci --ignore-scripts
+      - name: Corpus tests
+        run: npm run test:corpus
+
+  # Firefox end-to-end suite (extension/test/e2e/README.md): the test
+  # packages and the shipping package in a real Firefox driven by geckodriver, on the pinned latest
+  # release and on the manifest's minimum ESR (strict_min_version 153.0).
+  # Browsers come from tools/e2e/browsers.ts: both Firefox versions and geckodriver are
+  # pinned by sha256 in extension/test/e2e/browsers.lock.json, which must list every
+  # version of the matrix. A browser that cannot be obtained fails the job.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        firefox: ['160.0', '153.7.0esr']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Install dependencies (no lifecycle scripts)
+        run: npm ci --ignore-scripts
+      - name: End-to-end suite
+        env:
+          INTACTWARDEN_E2E_FIREFOX_VERSION: ${{ matrix.firefox }}
+        run: npm run test:e2e
+      - name: Keep the scenario logs
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: e2e-${{ matrix.firefox }}
+          path: .cache/e2e
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: ignore

@@ -1,0 +1,8 @@
+.permissions {
+  list-style: none;
+  padding: 0;
+}
+
+.permissions li {
+  margin: 4px 0;
+}

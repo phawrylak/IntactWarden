@@ -1,0 +1,1758 @@
+{
+  "action_title": {
+    "message": "IntactWarden: $STATE$. $SENTENCE$",
+    "description": "Placeholders: $STATE$, $SENTENCE$.",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      },
+      "sentence": {
+        "content": "$2"
+      }
+    }
+  },
+  "action_title_checking": {
+    "message": "IntactWarden: Checking…"
+  },
+  "action_title_error": {
+    "message": "IntactWarden cannot read its state for this tab. Reload the page."
+  },
+  "action_title_grant": {
+    "message": "IntactWarden: Grant access — access to a protected site or to GitHub is missing."
+  },
+  "actionTitle": {
+    "message": "IntactWarden"
+  },
+  "app_bitwarden_web": {
+    "message": "Bitwarden web vault"
+  },
+  "app_vaultwarden_web": {
+    "message": "Vaultwarden web vault"
+  },
+  "assurance_release_derived": {
+    "message": "Matches GitHub release + published config"
+  },
+  "assurance_release_exact": {
+    "message": "Matches GitHub release asset"
+  },
+  "blocked_btn_back": {
+    "message": "Go back"
+  },
+  "blocked_btn_proceed_once": {
+    "message": "Proceed once"
+  },
+  "blocked_btn_retry": {
+    "message": "Retry"
+  },
+  "blocked_confirm_hint": {
+    "message": "Unlock your vault on this page only if you trust whoever runs this server: code that is not verified can read your master password and everything in your vault."
+  },
+  "blocked_confirm_proceed": {
+    "message": "I understand that this code is not verified."
+  },
+  "blocked_details_heading": {
+    "message": "What failed"
+  },
+  "blocked_heading": {
+    "message": "IntactWarden blocked this page: $STATE$",
+    "description": "Placeholders: $STATE$.",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      }
+    }
+  },
+  "blocked_no_override_note": {
+    "message": "There is no way past this block other than turning IntactWarden off."
+  },
+  "blocked_not_covered_note": {
+    "message": "IntactWarden never loads this page. To use it, open it in a private window where IntactWarden does not run, or in a Firefox profile without IntactWarden. The vault you use there is not checked."
+  },
+  "blocked_protection_lost_desc": {
+    "message": "IntactWarden could not check this page, so it did not load it and nothing of it ran. Often this is a mistyped address or a link to a page that does not exist, answered by the server's own error page: check the address. Otherwise reload the page."
+  },
+  "blocked_label_expected": {
+    "message": "Expected sha256"
+  },
+  "blocked_label_observed": {
+    "message": "Observed sha256"
+  },
+  "blocked_label_path": {
+    "message": "Path"
+  },
+  "blocked_label_site": {
+    "message": "Site"
+  },
+  "blocked_not_found": {
+    "message": "IntactWarden has no record of this block (it may have expired). Go back and reload the page."
+  },
+  "blocked_page_title": {
+    "message": "IntactWarden: page blocked"
+  },
+  "blocked_proceed_explain": {
+    "message": "This loads exactly this unverified page once, in this tab only. It is recorded in the incident log."
+  },
+  "blocked_proceed_failed": {
+    "message": "Could not allow the page. Try again or go back."
+  },
+  "blocked_proceed_heading": {
+    "message": "Proceed once (unverified)"
+  },
+  "checklist_address": {
+    "message": "Check that the address is the server you expect."
+  },
+  "checklist_devices": {
+    "message": "Review your account's recent devices and emergency-access settings."
+  },
+  "checklist_logout": {
+    "message": "Log out all other sessions."
+  },
+  "checklist_password": {
+    "message": "Change your master password if you typed it while the page was red."
+  },
+  "checklist_site_data": {
+    "message": "If a service worker was reported on this site: remove the site's data in Firefox. In a tab of the site, click the shield at the left of the address bar, choose \"Clear cookies and site data\" and log in again."
+  },
+  "consent_third_party_heading": {
+    "message": "Allow $NAME$ for one page load?",
+    "description": "Placeholders: $NAME$.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "consent_third_party_source": {
+    "message": "This code comes from $NAME$, not from the Bitwarden release. IntactWarden cannot check it.",
+    "description": "Placeholders: $NAME$.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "consent_third_party_reach": {
+    "message": "While this page is open, that code can read your vault on it. Other vault pages of this site that are open or opened meanwhile are not shown as verified until you reload them."
+  },
+  "consent_third_party_scope": {
+    "message": "Allow it only to make a payment. The page reloads now with it allowed; when you have paid, reload the page and the code is blocked again."
+  },
+  "consent_third_party_private": {
+    "message": "Safest: pay in a private window (log in, pay, log out, close the window), so your normal session is never touched, but only if IntactWarden may run there (Extensions and Themes → IntactWarden → \"Run in Private Windows\"). Without that, a vault in a private window is not checked at all, so pay in this window instead."
+  },
+  "consent_third_party_confirm": {
+    "message": "Allow $NAME$ and reload",
+    "description": "Placeholders: $NAME$.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "consent_third_party_cancel": {
+    "message": "Cancel"
+  },
+  "coverage_data": {
+    "message": "Data $OK$/$TOTAL$",
+    "description": "Placeholders: $OK$, $TOTAL$.",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_document": {
+    "message": "Document $OK$/$TOTAL$",
+    "description": "Placeholders: $OK$, $TOTAL$.",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_fonts": {
+    "message": "Fonts $OK$/$TOTAL$",
+    "description": "Placeholders: $OK$, $TOTAL$.",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_scripts": {
+    "message": "Scripts $OK$/$TOTAL$",
+    "description": "Placeholders: $OK$, $TOTAL$.",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_styles": {
+    "message": "Styles $OK$/$TOTAL$",
+    "description": "Placeholders: $OK$, $TOTAL$.",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_third_party": {
+    "message": "Third-party $COUNT$ ($NAMES$)",
+    "description": "Placeholders: $COUNT$, $NAMES$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      },
+      "names": {
+        "content": "$2"
+      }
+    }
+  },
+  "coverage_third_party_none": {
+    "message": "Third-party 0"
+  },
+  "coverage_unverifiable": {
+    "message": "Unverifiable $COUNT$",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "coverage_wasm": {
+    "message": "WASM $OK$/$TOTAL$",
+    "description": "Placeholders: $OK$, $TOTAL$.",
+    "placeholders": {
+      "ok": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "deployment_cloud_eu": {
+    "message": "Bitwarden cloud (EU)"
+  },
+  "deployment_cloud_us": {
+    "message": "Bitwarden cloud (US)"
+  },
+  "deployment_self_hosted": {
+    "message": "Self-hosted server"
+  },
+  "docs_link_guide": {
+    "message": "User guide"
+  },
+  "docs_link_privacy": {
+    "message": "Privacy policy"
+  },
+  "docs_link_check": {
+    "message": "Check the checker"
+  },
+  "docs_link_self_hosting": {
+    "message": "Self-hosting guide"
+  },
+  "docs_link_not_proven": {
+    "message": "More on what this does not prove"
+  },
+  "docs_links_note": {
+    "message": "The user guide, the privacy policy and the other help pages open on GitHub, in a new tab."
+  },
+  "details_allowed_for_page": {
+    "message": "allowed for this page load"
+  },
+  "details_build": {
+    "message": "Build $BUILD$ from $RELEASE$",
+    "description": "Placeholders: $BUILD$, $RELEASE$.",
+    "placeholders": {
+      "build": {
+        "content": "$1"
+      },
+      "release": {
+        "content": "$2"
+      }
+    }
+  },
+  "details_col_class": {
+    "message": "Kind"
+  },
+  "details_col_expected": {
+    "message": "Expected"
+  },
+  "details_col_observed": {
+    "message": "Observed"
+  },
+  "details_col_path": {
+    "message": "Path"
+  },
+  "details_col_result": {
+    "message": "Result"
+  },
+  "details_copied": {
+    "message": "Report copied to the clipboard."
+  },
+  "details_copy_failed": {
+    "message": "The report could not be copied."
+  },
+  "details_copy_report": {
+    "message": "Copy redacted report"
+  },
+  "details_core": {
+    "message": "Manifest sha256 $HASH$",
+    "description": "Placeholders: $HASH$.",
+    "placeholders": {
+      "hash": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_dispute_recorded": {
+    "message": "Recorded in this browser: $VALUE$",
+    "description": "Placeholder: $VALUE$ (a sha256 digest or a commit).",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_dispute_observed": {
+    "message": "GitHub reports now: $VALUE$",
+    "description": "Placeholder: $VALUE$ (a sha256 digest or a commit).",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_expected_template": {
+    "message": "template"
+  },
+  "details_frame": {
+    "message": "Frame $PATH$",
+    "description": "Placeholders: $PATH$.",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_heading": {
+    "message": "Verification details"
+  },
+  "details_intro": {
+    "message": "Every file the page loaded, with the hash IntactWarden expected and the hash it saw. Paths never include query strings or fragments."
+  },
+  "details_no_items": {
+    "message": "No files recorded yet."
+  },
+  "details_no_state": {
+    "message": "There is no verification state for this tab (it may have been closed or reloaded)."
+  },
+  "details_no_tab": {
+    "message": "No tab was given. Open Details from the IntactWarden popup."
+  },
+  "details_page_title": {
+    "message": "IntactWarden: details"
+  },
+  "details_style_accepted_few": {
+    "message": "Accepted. It hides $COUNT$ element types (listed below).",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_accepted_many": {
+    "message": "Accepted. It hides $COUNT$ element types (listed below).",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_accepted_one": {
+    "message": "Accepted. It hides $COUNT$ element type (listed below).",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_accepted_other": {
+    "message": "Accepted. It hides $COUNT$ element types (listed below).",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_heading": {
+    "message": "Server stylesheet $PATH$",
+    "description": "Placeholders: $PATH$.",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_style_rejected": {
+    "message": "Not accepted. $REASON$",
+    "description": "Placeholders: $REASON$.",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "details_table_caption": {
+    "message": "Files of this page and their verification results"
+  },
+  "details_top_document": {
+    "message": "Page $PATH$",
+    "description": "Placeholders: $PATH$.",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      }
+    }
+  },
+  "doc_class_dynamic_document": {
+    "message": "Dynamic page"
+  },
+  "doc_class_manifest": {
+    "message": "Part of the release"
+  },
+  "doc_class_not_covered": {
+    "message": "Not covered"
+  },
+  "doc_class_pending": {
+    "message": "Being checked"
+  },
+  "doc_class_server_rendered": {
+    "message": "Generated by the server"
+  },
+  "doc_class_unknown": {
+    "message": "Unknown page"
+  },
+  "extDescription": {
+    "message": "Checks that the Bitwarden and Vaultwarden web vaults run exactly the code published on GitHub."
+  },
+  "extName": {
+    "message": "IntactWarden",
+    "description": "Product name (not translated)."
+  },
+  "failure_asset_not_found": {
+    "message": "the release has no matching file"
+  },
+  "failure_build_refused": {
+    "message": "the release file could not be turned into a manifest"
+  },
+  "failure_digest_mismatch": {
+    "message": "the download does not match GitHub's digest"
+  },
+  "failure_digest_unavailable": {
+    "message": "GitHub lists no digest for the release file"
+  },
+  "failure_disputed": {
+    "message": "GitHub reports different data than recorded earlier"
+  },
+  "failure_image_only_release": {
+    "message": "the release was published only as a container image"
+  },
+  "failure_limit_reached": {
+    "message": "the download limit for new releases was reached (3 per site and 12 in total in 24 hours)"
+  },
+  "failure_network": {
+    "message": "GitHub could not be reached"
+  },
+  "failure_permission_missing": {
+    "message": "access to GitHub is not granted"
+  },
+  "failure_rate_limited": {
+    "message": "GitHub's request limit was reached"
+  },
+  "failure_release_not_found": {
+    "message": "the release was not found on GitHub"
+  },
+  "flag_blocked": {
+    "message": "IntactWarden stopped something on this page."
+  },
+  "flag_checking": {
+    "message": "Checking… some files are still being verified."
+  },
+  "flag_retro": {
+    "message": "Verified after the fact."
+  },
+  "flag_retro_at": {
+    "message": "Verified after the fact at $TIME$.",
+    "description": "Placeholders: $TIME$.",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "incident_hashes": {
+    "message": "expected $EXPECTED$ · observed $OBSERVED$",
+    "description": "Placeholders: $EXPECTED$, $OBSERVED$.",
+    "placeholders": {
+      "expected": {
+        "content": "$1"
+      },
+      "observed": {
+        "content": "$2"
+      }
+    }
+  },
+  "incident_kind_build_unverified": {
+    "message": "Build not verified"
+  },
+  "incident_kind_deep_verify_failed": {
+    "message": "Deep verify failed"
+  },
+  "incident_kind_mismatch": {
+    "message": "Mismatch"
+  },
+  "incident_kind_proceed_once": {
+    "message": "\"Proceed once\" used"
+  },
+  "incident_kind_protection_lost": {
+    "message": "Protection lost"
+  },
+  "incident_kind_release_disputed": {
+    "message": "Release disputed"
+  },
+  "incidents_ack_explain": {
+    "message": "This alert stays open until you acknowledge it, even if the page is reloaded; until then no page of this site is shown as verified. Work through the steps above first."
+  },
+  "incidents_acknowledged": {
+    "message": "Alert acknowledged."
+  },
+  "incidents_action_failed": {
+    "message": "That did not work. Try again."
+  },
+  "incidents_alert_title": {
+    "message": "$STATE$ on $ORIGIN$",
+    "description": "Placeholders: $STATE$, $ORIGIN$.",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      },
+      "origin": {
+        "content": "$2"
+      }
+    }
+  },
+  "incidents_alerts_heading": {
+    "message": "Open alerts"
+  },
+  "incidents_alerts_none": {
+    "message": "No open alerts."
+  },
+  "incidents_btn_acknowledge": {
+    "message": "Acknowledge"
+  },
+  "incidents_checklist_heading": {
+    "message": "Recovery checklist"
+  },
+  "incidents_col_kind": {
+    "message": "What"
+  },
+  "incidents_col_state": {
+    "message": "State"
+  },
+  "incidents_col_when": {
+    "message": "When"
+  },
+  "incidents_col_where": {
+    "message": "Where"
+  },
+  "incidents_heading": {
+    "message": "Alerts and incidents"
+  },
+  "incidents_log_heading": {
+    "message": "Incident log"
+  },
+  "incidents_log_intro": {
+    "message": "Site and path only, kept for 90 days (at most the newest 200 entries), stored only in this browser."
+  },
+  "incidents_log_none": {
+    "message": "No incidents."
+  },
+  "incidents_page_title": {
+    "message": "IntactWarden: alerts and incidents"
+  },
+  "item_class_data": {
+    "message": "Data"
+  },
+  "item_class_document": {
+    "message": "Document"
+  },
+  "item_class_dynamic": {
+    "message": "Dynamic data"
+  },
+  "item_class_font": {
+    "message": "Font"
+  },
+  "item_class_image": {
+    "message": "Image"
+  },
+  "item_class_media": {
+    "message": "Media"
+  },
+  "item_class_script": {
+    "message": "Script"
+  },
+  "item_class_server_style": {
+    "message": "Server stylesheet"
+  },
+  "item_class_sourcemap": {
+    "message": "Source map"
+  },
+  "item_class_style": {
+    "message": "Stylesheet"
+  },
+  "item_class_third_party": {
+    "message": "Third party"
+  },
+  "item_class_unknown": {
+    "message": "Unknown"
+  },
+  "item_class_wasm": {
+    "message": "WebAssembly"
+  },
+  "job_download_line": {
+    "message": "Downloaded $DONE$ of $TOTAL$",
+    "description": "Placeholders: $DONE$, $TOTAL$.",
+    "placeholders": {
+      "done": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
+    }
+  },
+  "job_failed_line": {
+    "message": "Failed: $FAILURE$.",
+    "description": "Placeholders: $FAILURE$.",
+    "placeholders": {
+      "failure": {
+        "content": "$1"
+      }
+    }
+  },
+  "job_phase_building": {
+    "message": "Building the manifest"
+  },
+  "job_phase_done": {
+    "message": "Done"
+  },
+  "job_phase_downloading": {
+    "message": "Downloading the release file"
+  },
+  "job_phase_failed": {
+    "message": "Failed"
+  },
+  "job_phase_queued": {
+    "message": "Waiting"
+  },
+  "job_phase_resolving": {
+    "message": "Looking up the release on GitHub"
+  },
+  "job_phase_storing": {
+    "message": "Saving"
+  },
+  "job_phase_verifying": {
+    "message": "Checking the download against GitHub's digest"
+  },
+  "match_exact": {
+    "message": "exact"
+  },
+  "match_style_accepted": {
+    "message": "stylesheet accepted"
+  },
+  "match_template": {
+    "message": "template"
+  },
+  "not_proven_others": {
+    "message": "What other people were served: there is no independent observer, only what this browser saw."
+  },
+  "not_proven_device": {
+    "message": "A compromised browser or operating system, or malware on this device."
+  },
+  "not_proven_earlier": {
+    "message": "Settings left behind by code that ran unverified earlier."
+  },
+  "not_proven_extensions": {
+    "message": "What other extensions installed in Firefox do."
+  },
+  "not_proven_lookalike": {
+    "message": "Look-alike phishing sites. IntactWarden warns when you add one, but it cannot protect sites it does not know."
+  },
+  "not_proven_operator": {
+    "message": "Who runs a self-hosted server. Matching code says nothing about the operator."
+  },
+  "not_proven_server": {
+    "message": "Server-side and API attacks, such as weakened key-derivation settings or substituted public keys."
+  },
+  "not_proven_source": {
+    "message": "Malicious code that is in the GitHub source itself or in its locked dependencies."
+  },
+  "not_proven_stylesheet": {
+    "message": "What a self-hosted Vaultwarden server hides with its own stylesheet (Details lists what an accepted stylesheet hides)."
+  },
+  "notify_message": {
+    "message": "$ORIGIN$ — $TEXT$",
+    "description": "Placeholders: $ORIGIN$, $TEXT$.",
+    "placeholders": {
+      "origin": {
+        "content": "$1"
+      },
+      "text": {
+        "content": "$2"
+      }
+    }
+  },
+  "notify_title": {
+    "message": "IntactWarden: $STATE$",
+    "description": "Placeholders: $STATE$.",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_github_explain": {
+    "message": "When a site runs a release that IntactWarden does not have yet, your browser fetches that release from GitHub and builds its manifest (the list of expected file hashes) itself. The requests carry no cookies, credentials or site address."
+  },
+  "onboarding_grant": {
+    "message": "Grant access"
+  },
+  "onboarding_grant_ok": {
+    "message": "Access granted."
+  },
+  "onboarding_grant_refused": {
+    "message": "Access was not granted."
+  },
+  "onboarding_granted": {
+    "message": "granted"
+  },
+  "onboarding_heading": {
+    "message": "Set up IntactWarden"
+  },
+  "onboarding_icon_authoritative": {
+    "message": "Only the toolbar icon counts. IntactWarden never shows \"verified\" inside a page; a page can fake anything it draws itself."
+  },
+  "onboarding_intro": {
+    "message": "IntactWarden checks that your Bitwarden or Vaultwarden web vault runs exactly the code published on GitHub. A few steps make sure you will see its warnings."
+  },
+  "onboarding_not_granted": {
+    "message": "not granted"
+  },
+  "onboarding_open_tabs_few": {
+    "message": "$COUNT$ protected tabs were opened before IntactWarden was ready. Reload them with Ctrl+Shift+R (Cmd+Shift+R on macOS) to verify them.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_open_tabs_many": {
+    "message": "$COUNT$ protected tabs were opened before IntactWarden was ready. Reload them with Ctrl+Shift+R (Cmd+Shift+R on macOS) to verify them.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_open_tabs_one": {
+    "message": "$COUNT$ protected tab was opened before IntactWarden was ready. Reload it with Ctrl+Shift+R (Cmd+Shift+R on macOS) to verify it.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_open_tabs_other": {
+    "message": "$COUNT$ protected tabs were opened before IntactWarden was ready. Reload them with Ctrl+Shift+R (Cmd+Shift+R on macOS) to verify them.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "onboarding_page_title": {
+    "message": "IntactWarden: setup"
+  },
+  "onboarding_permissions_intro": {
+    "message": "Firefox grants this access at installation, and you can revoke it at any time in the add-on settings. Without it IntactWarden sees nothing and protects nothing."
+  },
+  "onboarding_permissions_missing": {
+    "message": "Some access is missing. IntactWarden shows \"!\" on its icon until it is granted."
+  },
+  "onboarding_permissions_ok": {
+    "message": "All required access is granted."
+  },
+  "onboarding_pin_done": {
+    "message": "The IntactWarden icon is pinned to the toolbar."
+  },
+  "onboarding_pin_hint": {
+    "message": "Click the extensions button (puzzle piece) in the toolbar, then the gear next to IntactWarden, and choose \"Pin to Toolbar\"."
+  },
+  "onboarding_pin_missing": {
+    "message": "The IntactWarden icon is not pinned yet."
+  },
+  "onboarding_pin_unknown": {
+    "message": "Make sure the IntactWarden icon is pinned to the toolbar."
+  },
+  "onboarding_private_allowed": {
+    "message": "IntactWarden also runs in private windows."
+  },
+  "onboarding_private_not_allowed": {
+    "message": "IntactWarden does not run in private windows, so vaults opened there are not checked. To allow it: Extensions and Themes → IntactWarden → \"Run in Private Windows\"."
+  },
+  "onboarding_purpose_deep_verify": {
+    "message": "GitHub releases (deep verify)"
+  },
+  "onboarding_purpose_official": {
+    "message": "Bitwarden cloud"
+  },
+  "onboarding_step_github": {
+    "message": "Checking new releases"
+  },
+  "onboarding_step_limits": {
+    "message": "What this does not prove"
+  },
+  "onboarding_step_permissions": {
+    "message": "Site access"
+  },
+  "onboarding_step_pin": {
+    "message": "Keep the icon visible"
+  },
+  "onboarding_step_private": {
+    "message": "Private windows"
+  },
+  "onboarding_step_tabs": {
+    "message": "Reload open vault tabs"
+  },
+  "onboarding_step_browser": {
+    "message": "Protection in Firefox"
+  },
+  "onboarding_protection": {
+    "message": "IntactWarden checks every file before the page can use it and stops code that does not match its GitHub release."
+  },
+  "onboarding_protection_detail": {
+    "message": "Use the Bitwarden or Vaultwarden web vault only in Firefox with IntactWarden: operations such as changing the master password exist only in the web vault, and only Firefox lets IntactWarden check and stop code before it runs."
+  },
+  "options_add_checking": {
+    "message": "Checking the server…"
+  },
+  "options_add_failed": {
+    "message": "The server could not be added."
+  },
+  "options_add_heading": {
+    "message": "Add a server"
+  },
+  "options_add_hint": {
+    "message": "Type the address yourself, for example https://vault.example.org, with its path if the vault is not at the root. Plain http:// works only on this computer."
+  },
+  "options_add_label": {
+    "message": "Server address"
+  },
+  "options_add_save": {
+    "message": "Add server"
+  },
+  "options_alerts_heading": {
+    "message": "Alerts"
+  },
+  "options_deep_verify_intro": {
+    "message": "When a site runs a release IntactWarden does not have yet, your browser downloads it from GitHub (about 40–50 MB) and builds the manifest itself."
+  },
+  "options_heading": {
+    "message": "IntactWarden settings"
+  },
+  "options_instance_added": {
+    "message": "Added on $DATE$",
+    "description": "Placeholders: $DATE$.",
+    "placeholders": {
+      "date": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_added_ok": {
+    "message": "Added $ORIGIN$.",
+    "description": "Placeholders: $ORIGIN$.",
+    "placeholders": {
+      "origin": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_app": {
+    "message": "App: $APP$",
+    "description": "Placeholders: $APP$.",
+    "placeholders": {
+      "app": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_base_path": {
+    "message": "Vault path: $PATH$",
+    "description": "Placeholders: $PATH$.",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_grant": {
+    "message": "Grant access"
+  },
+  "options_instance_last_build": {
+    "message": "Last build: $BUILD$",
+    "description": "Placeholders: $BUILD$.",
+    "placeholders": {
+      "build": {
+        "content": "$1"
+      }
+    }
+  },
+  "options_instance_permission_missing": {
+    "message": "Access missing: IntactWarden cannot check this server."
+  },
+  "options_instance_permission_ok": {
+    "message": "Access granted"
+  },
+  "options_instance_remove": {
+    "message": "Remove"
+  },
+  "options_instance_remove_confirm": {
+    "message": "Confirm removal"
+  },
+  "options_instance_remove_failed": {
+    "message": "The server could not be removed."
+  },
+  "options_instance_removed": {
+    "message": "Server removed."
+  },
+  "options_instances_heading": {
+    "message": "Your servers"
+  },
+  "options_instances_intro": {
+    "message": "Add a self-hosted Bitwarden or Vaultwarden server. IntactWarden then checks its web vault against GitHub releases."
+  },
+  "options_instances_none": {
+    "message": "No servers added yet."
+  },
+  "options_link_incidents": {
+    "message": "Alerts and incidents"
+  },
+  "options_link_onboarding": {
+    "message": "Setup checklist"
+  },
+  "options_notifications": {
+    "message": "Show a notification for every new red state"
+  },
+  "options_notifications_hint": {
+    "message": "Notifications are the safety net when the icon is out of sight."
+  },
+  "options_page_title": {
+    "message": "IntactWarden: settings"
+  },
+  "options_privacy_heading": {
+    "message": "Privacy and private windows"
+  },
+  "options_private_unknown": {
+    "message": "Private window access: unknown."
+  },
+  "options_save_failed": {
+    "message": "The setting could not be saved."
+  },
+  "options_saved": {
+    "message": "Saved."
+  },
+  "options_statement_heading": {
+    "message": "Privacy statement"
+  },
+  "options_trust_heading": {
+    "message": "Deep verify and trust data"
+  },
+  "outcome_mismatch": {
+    "message": "Mismatch"
+  },
+  "outcome_non_executing": {
+    "message": "Not executed (error page)"
+  },
+  "outcome_ok": {
+    "message": "OK"
+  },
+  "outcome_passive": {
+    "message": "Counted (passive)"
+  },
+  "outcome_pending": {
+    "message": "Checking…"
+  },
+  "outcome_recorded": {
+    "message": "Recorded for later check"
+  },
+  "outcome_style_rejected": {
+    "message": "Not accepted"
+  },
+  "outcome_third_party": {
+    "message": "Third party"
+  },
+  "outcome_unverifiable": {
+    "message": "Not verifiable"
+  },
+  "page_error": {
+    "message": "IntactWarden could not load this page. Close it and try again."
+  },
+  "popup_alert_unacknowledged": {
+    "message": "Alert: $STATE$ on this site ($TIME$). Open the recovery checklist to see what to do next.",
+    "description": "Placeholders: $STATE$, $TIME$.",
+    "placeholders": {
+      "state": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "popup_btn_allow_style": {
+    "message": "Allow the server stylesheet for this tab and reload"
+  },
+  "popup_btn_allow_third_party": {
+    "message": "Allow $NAME$ for one page load…",
+    "description": "Placeholders: $NAME$.",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_btn_checklist": {
+    "message": "Recovery checklist"
+  },
+  "popup_btn_details": {
+    "message": "Details"
+  },
+  "popup_btn_grant": {
+    "message": "Grant access"
+  },
+  "popup_co_resident_source": {
+    "message": "Unverified page open on this site: $PATH$ (as of $TIME$).",
+    "description": "Placeholders: $PATH$, $TIME$.",
+    "placeholders": {
+      "path": {
+        "content": "$1"
+      },
+      "time": {
+        "content": "$2"
+      }
+    }
+  },
+  "popup_coverage_heading": {
+    "message": "What was checked"
+  },
+  "popup_error": {
+    "message": "IntactWarden cannot read the state of this tab. Treat it as unverified and reload the page."
+  },
+  "popup_in_page_note": {
+    "message": "Only this icon counts: IntactWarden never shows \"verified\" inside the page."
+  },
+  "popup_label_app": {
+    "message": "App"
+  },
+  "popup_label_assurance": {
+    "message": "Assurance"
+  },
+  "popup_label_commit": {
+    "message": "Commit"
+  },
+  "popup_label_deployment": {
+    "message": "Deployment"
+  },
+  "popup_label_release": {
+    "message": "GitHub release"
+  },
+  "popup_label_version": {
+    "message": "Version"
+  },
+  "popup_limit_dynamic": {
+    "message": "API responses and other dynamic data are not code and are not checked."
+  },
+  "popup_limit_third_party": {
+    "message": "Third-party code and data are not verified: $NAMES$.",
+    "description": "Placeholders: $NAMES$.",
+    "placeholders": {
+      "names": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_limits_heading": {
+    "message": "What is not checked"
+  },
+  "popup_link_incidents": {
+    "message": "Alerts and incidents"
+  },
+  "popup_link_options": {
+    "message": "Settings"
+  },
+  "popup_not_protected_title": {
+    "message": "This site is not protected"
+  },
+  "popup_page_title": {
+    "message": "IntactWarden"
+  },
+  "popup_provenance_heading": {
+    "message": "Where the code comes from"
+  },
+  "popup_reasons_heading": {
+    "message": "Why"
+  },
+  "popup_self_hosted_lead": {
+    "message": "Server you added on $DATE$. This proves the code, not who runs the server.",
+    "description": "Placeholders: $DATE$.",
+    "placeholders": {
+      "date": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_accepted_few": {
+    "message": "Server stylesheet: accepted, hides $COUNT$ element types.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_accepted_many": {
+    "message": "Server stylesheet: accepted, hides $COUNT$ element types.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_accepted_one": {
+    "message": "Server stylesheet: accepted, hides $COUNT$ element type.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_accepted_other": {
+    "message": "Server stylesheet: accepted, hides $COUNT$ element types.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_server_style_rejected": {
+    "message": "Server stylesheet: not accepted. $REASON$",
+    "description": "Placeholders: $REASON$.",
+    "placeholders": {
+      "reason": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_unknown_deep_verify": {
+    "message": "Fetching and checking the GitHub release in your browser…"
+  },
+  "popup_unknown_failed": {
+    "message": "The release could not be checked: $FAILURE$.",
+    "description": "Placeholders: $FAILURE$.",
+    "placeholders": {
+      "failure": {
+        "content": "$1"
+      }
+    }
+  },
+  "popup_unknown_hint": {
+    "message": "Asking the server which release it runs…"
+  },
+  "popup_vaultwarden_style_note": {
+    "message": "Vaultwarden servers add their own stylesheet. IntactWarden accepts it only if it just hides stock elements; Details lists what it hides."
+  },
+  "privacy_network_github": {
+    "message": "GitHub (api.github.com, github.com, release-assets.githubusercontent.com, objects.githubusercontent.com, raw.githubusercontent.com), to fetch a release that a protected site runs and that IntactWarden does not have yet. The requests carry no cookies, no credentials and no site address. Apart from the add-on's random address (moz-extension://…), which Firefox adds to requests to api.github.com, they are the same for every user of that release."
+  },
+  "privacy_network_hint": {
+    "message": "The version file of a protected site (/version.json or /vw-version.json), at most once a minute, only to choose which release to fetch."
+  },
+  "privacy_network_intro": {
+    "message": "The only network requests IntactWarden makes itself:"
+  },
+  "privacy_network_probe": {
+    "message": "One request without credentials to a server you add yourself (its api/config), to tell Bitwarden from Vaultwarden."
+  },
+  "privacy_no_telemetry": {
+    "message": "IntactWarden collects no telemetry and sends nothing about you, your vault or the pages you visit to anyone."
+  },
+  "privacy_storage": {
+    "message": "Stored only in this browser: settings, your servers, alerts, the newest build seen per site, manifests, GitHub's release digests, recent deep verifications, and an incident log (site and path only, no query strings or fragments; 90 days, newest 200 entries)."
+  },
+  "privacy_trust_mode": {
+    "message": "Where manifests come from: your browser builds them from GitHub releases. IntactWarden fetches no data from its maintainer or its CI. A release is trusted as GitHub listed it the first time this browser saw it."
+  },
+  "options_add_confirm_lookalike": {
+    "message": "This is my own server, not Bitwarden."
+  },
+  "options_add_refusal_duplicate": {
+    "message": "This server is already in the list."
+  },
+  "options_add_refusal_http_not_loopback": {
+    "message": "Plain http:// is accepted only on this computer (localhost). Use https:// for this server."
+  },
+  "options_add_refusal_lookalike_unconfirmed": {
+    "message": "Confirm that you run this server yourself before adding it."
+  },
+  "options_add_refusal_invalid_input": {
+    "message": "Type a server address such as https://vault.example.org."
+  },
+  "options_add_refusal_official_origin": {
+    "message": "This is an official Bitwarden cloud address. IntactWarden already protects it; it cannot be added as your own server."
+  },
+  "options_add_refusal_permission_denied": {
+    "message": "Access to the server was not granted, so it cannot be checked."
+  },
+  "options_add_refusal_unreachable": {
+    "message": "The server could not be reached."
+  },
+  "options_add_refusal_no_server": {
+    "message": "No Bitwarden or Vaultwarden server answers at this address. Check the address, including the path if the vault is not at the root."
+  },
+  "options_add_warning_lookalike": {
+    "message": "Warning: this address looks like an official Bitwarden address, or uses international characters that can imitate one. Look-alike addresses are a common phishing trick. Add it only if you run this server yourself: tick the box below, then choose \"Add server\" again."
+  },
+  "provenance_artifact": {
+    "message": "Release file sha256 $HASH$",
+    "description": "Placeholders: $HASH$.",
+    "placeholders": {
+      "hash": {
+        "content": "$1"
+      }
+    }
+  },
+  "provenance_built_locally": {
+    "message": "Manifest built in your browser from GitHub release $RELEASE$.",
+    "description": "Placeholders: $RELEASE$.",
+    "placeholders": {
+      "release": {
+        "content": "$1"
+      }
+    }
+  },
+  "provenance_bundled": {
+    "message": "Manifest bundled with IntactWarden $VERSION$.",
+    "description": "Placeholders: $VERSION$.",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "provenance_server_asserted": {
+    "message": "$VERSION$ (according to the server)",
+    "description": "Placeholders: $VERSION$.",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "reason_BUILD_UNVERIFIED__image_only_release": {
+    "message": "The release was published only as a container image."
+  },
+  "reason_BUILD_UNVERIFIED__not_derivable": {
+    "message": "The build could not be rebuilt from its GitHub release and published configuration, or that release could not be downloaded from GitHub."
+  },
+  "reason_BUILD_UNVERIFIED__selfhost_unpublished": {
+    "message": "The server runs a build that matches no published release, or the release the server names could not be downloaded from GitHub."
+  },
+  "reason_CO_RESIDENT_UNVERIFIED__released_mismatch": {
+    "message": "A page with a mismatch was opened."
+  },
+  "reason_CO_RESIDENT_UNVERIFIED__third_party_code": {
+    "message": "A page that runs a payment script is open."
+  },
+  "reason_CO_RESIDENT_UNVERIFIED__unverifiable": {
+    "message": "A page that could not be checked is open."
+  },
+  "reason_DISPUTED__pin_changed": {
+    "message": "GitHub now reports a different file digest or tag than the one recorded earlier."
+  },
+  "reason_MISMATCH__bytes": {
+    "message": "A file's bytes differ from the GitHub release."
+  },
+  "reason_MISMATCH__header": {
+    "message": "A forbidden header or redirect was seen."
+  },
+  "reason_MISMATCH__inline_code": {
+    "message": "Inline code ran in the page; this app never uses it."
+  },
+  "reason_MISMATCH__release_differs": {
+    "message": "The server names a release, but this page differs from it."
+  },
+  "reason_MISMATCH__service_worker": {
+    "message": "A service worker was registered on this site."
+  },
+  "reason_MISMATCH__unknown_path": {
+    "message": "A script or other active file that is not in the release was loaded."
+  },
+  "reason_NEW_BUILD__catching_up": {
+    "message": "The matching GitHub release has not been checked yet."
+  },
+  "reason_NEW_BUILD__unavailable": {
+    "message": "The GitHub release cannot be fetched right now."
+  },
+  "reason_NOT_COVERED__admin_portal": {
+    "message": "This is the admin panel."
+  },
+  "reason_NOT_COVERED__auth_flow": {
+    "message": "This is a sign-in page of the server."
+  },
+  "reason_NOT_COVERED__not_covered_path": {
+    "message": "This path is declared as not covered."
+  },
+  "reason_PROTECTION_LOST__filter_failed": {
+    "message": "The response filter failed."
+  },
+  "reason_PROTECTION_LOST__internal_error": {
+    "message": "An internal error occurred."
+  },
+  "reason_PROTECTION_LOST__permission_revoked": {
+    "message": "IntactWarden's access to this site was removed."
+  },
+  "reason_PROTECTION_LOST__sw_served": {
+    "message": "A service worker answered a request."
+  },
+  "reason_PROTECTION_LOST__timeout": {
+    "message": "Checking a file took too long."
+  },
+  "reason_PROTECTION_LOST__unbound": {
+    "message": "A file loaded before the page's build was known."
+  },
+  "reason_PROTECTION_LOST__untracked": {
+    "message": "This page was open before IntactWarden started checking it, or a request could not be tied to a single page."
+  },
+  "reason_PROTECTION_LOST__unverifiable_active": {
+    "message": "An active file could not be checked."
+  },
+  "reason_PROTECTION_LOST__verifier_restarted": {
+    "message": "IntactWarden restarted while the page was open."
+  },
+  "reason_third_party_host": {
+    "message": "Third-party code from $HOST$.",
+    "description": "Placeholders: $HOST$.",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "reason_UNVERIFIED_STYLE__custom_rules": {
+    "message": "The stylesheet has rules beyond hiding the vault's stock elements."
+  },
+  "reason_UNVERIFIED_STYLE__malformed": {
+    "message": "The stylesheet could not be parsed."
+  },
+  "refusal_archive_invalid": {
+    "message": "the archive is invalid"
+  },
+  "refusal_asset_name_mismatch": {
+    "message": "file name does not match"
+  },
+  "refusal_derivation_failed": {
+    "message": "the cloud files could not be derived"
+  },
+  "refusal_digest_mismatch": {
+    "message": "digest does not match"
+  },
+  "refusal_forbidden_content": {
+    "message": "the archive contains forbidden content"
+  },
+  "refusal_invalid_core": {
+    "message": "the built manifest is invalid"
+  },
+  "refusal_rebuild_differs": {
+    "message": "the manifest rebuilt from GitHub differs from the one in use; this is recorded as an incident, please report it"
+  },
+  "refusal_size_mismatch": {
+    "message": "size does not match"
+  },
+  "refusal_tag_mismatch": {
+    "message": "tag does not match"
+  },
+  "refusal_unsupported": {
+    "message": "not supported"
+  },
+  "refusal_version_mismatch": {
+    "message": "version does not match"
+  },
+  "retry_btn_check_now": {
+    "message": "Check now"
+  },
+  "retry_explain": {
+    "message": "IntactWarden checks again every minute and whenever the download progresses. After the reload the vault opens at its home page."
+  },
+  "retry_heading": {
+    "message": "A new build is being checked"
+  },
+  "retry_page_title": {
+    "message": "IntactWarden: checking a new build"
+  },
+  "retry_progress_label": {
+    "message": "Download progress"
+  },
+  "retry_sentence": {
+    "message": "A new build appeared; IntactWarden is fetching the matching GitHub release to check it. This page reloads by itself once the build is known."
+  },
+  "retry_sentence_idle": {
+    "message": "A new build appeared. IntactWarden is not fetching its GitHub release right now (GitHub's request limit, no access to GitHub, or an earlier attempt that failed). If it still cannot fetch it 10 minutes after the first attempt, the page shows Build not verified, with \"Proceed once\". Click \"Check now\" to load the page again and check the build again."
+  },
+  "state_BUILD_UNVERIFIED": {
+    "message": "Build not verified"
+  },
+  "state_BUILD_UNVERIFIED_desc": {
+    "message": "This build could not be tied to a GitHub release, so its code is not verified. A modified server looks the same, so proceed only if you trust whoever runs it."
+  },
+  "state_CO_RESIDENT_UNVERIFIED": {
+    "message": "Unverified page on this site"
+  },
+  "state_CO_RESIDENT_UNVERIFIED_desc": {
+    "message": "An unverified page on this site is open and could control this tab."
+  },
+  "state_DISPUTED": {
+    "message": "Disputed"
+  },
+  "state_DISPUTED_desc": {
+    "message": "A file digest or tag recorded earlier for this release has changed. Do not type secrets. The release stays disputed in this browser; please report it."
+  },
+  "state_MISMATCH": {
+    "message": "Mismatch"
+  },
+  "state_MISMATCH_desc": {
+    "message": "Code on this page does not match its GitHub release. Do not type secrets."
+  },
+  "state_NEW_BUILD": {
+    "message": "New build"
+  },
+  "state_NEW_BUILD_desc": {
+    "message": "This site runs a new build that IntactWarden has not checked against its GitHub release yet."
+  },
+  "state_NOT_COVERED": {
+    "message": "Not covered"
+  },
+  "state_NOT_COVERED_desc": {
+    "message": "This page is on a path IntactWarden does not verify, such as the admin panel. It is blocked: its code is in no release and would run next to the vault."
+  },
+  "state_NOT_PROTECTED": {
+    "message": "Not protected"
+  },
+  "state_NOT_PROTECTED_desc": {
+    "message": "IntactWarden checks only the Bitwarden cloud and the servers you add in Settings."
+  },
+  "state_PROTECTION_LOST": {
+    "message": "Protection lost"
+  },
+  "state_PROTECTION_LOST_desc": {
+    "message": "IntactWarden could not check or protect this page. What it could not check was blocked; if an alert was raised, code may have run unchecked all the same. Reload the page with Ctrl+Shift+R (Cmd+Shift+R on macOS), and grant access if asked."
+  },
+  "state_RECOVERING": {
+    "message": "Recovering"
+  },
+  "state_RECOVERING_desc": {
+    "message": "An alert for this site is still open. Work through the recovery checklist and acknowledge the alert."
+  },
+  "state_ROLLBACK": {
+    "message": "Older build"
+  },
+  "state_ROLLBACK_desc": {
+    "message": "This build is older than the newest one this browser has already seen on this site."
+  },
+  "state_THIRD_PARTY_CODE": {
+    "message": "Third-party code"
+  },
+  "state_THIRD_PARTY_CODE_desc": {
+    "message": "This page loads code from a third party, such as a payment provider, that cannot be verified. It is blocked unless you allow it for one page load."
+  },
+  "state_UNVERIFIED_STYLE": {
+    "message": "Server stylesheet not accepted"
+  },
+  "state_UNVERIFIED_STYLE_desc": {
+    "message": "Your server adds its own stylesheet, which IntactWarden does not accept. It cannot run code, but it can change what the vault shows."
+  },
+  "state_VERIFIED": {
+    "message": "Verified"
+  },
+  "state_VERIFIED_desc": {
+    "message": "Verified before running: every file this page loaded matches its GitHub release."
+  },
+  "third_party_2fa_directory": {
+    "message": "2FA Directory"
+  },
+  "third_party_billing_scripts": {
+    "message": "payment scripts"
+  },
+  "third_party_braintree": {
+    "message": "Braintree"
+  },
+  "third_party_duo": {
+    "message": "Duo"
+  },
+  "third_party_email_forwarders": {
+    "message": "e-mail forwarding services"
+  },
+  "third_party_hibp": {
+    "message": "Have I Been Pwned"
+  },
+  "third_party_icon_services": {
+    "message": "website icon services"
+  },
+  "third_party_paypal": {
+    "message": "PayPal"
+  },
+  "third_party_stripe": {
+    "message": "Stripe"
+  },
+  "popup_badge": {
+    "message": "Blocks code it cannot verify"
+  },
+  "popup_blocked_page_title": {
+    "message": "IntactWarden stopped the page in this tab"
+  },
+  "popup_blocked_page_desc": {
+    "message": "The page in this tab says why and what you can do. Nothing of the blocked page ran."
+  },
+  "trust_col_assurance": {
+    "message": "Assurance"
+  },
+  "trust_col_build": {
+    "message": "Build"
+  },
+  "trust_col_source": {
+    "message": "Source"
+  },
+  "trust_cores_count_few": {
+    "message": "$COUNT$ manifests available.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_cores_count_many": {
+    "message": "$COUNT$ manifests available.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_cores_count_one": {
+    "message": "$COUNT$ manifest available.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_cores_count_other": {
+    "message": "$COUNT$ manifests available.",
+    "description": "Placeholders: $COUNT$.",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_cores_heading": {
+    "message": "Manifests"
+  },
+  "trust_cores_none": {
+    "message": "No manifests."
+  },
+  "trust_disputed": {
+    "message": "disputed"
+  },
+  "trust_github_backoff": {
+    "message": "GitHub's request limit was reached; IntactWarden waits until $TIME$.",
+    "description": "Placeholders: $TIME$.",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_github_grant": {
+    "message": "Grant access to GitHub"
+  },
+  "trust_github_permission_missing": {
+    "message": "Access to GitHub is not granted, so new releases cannot be checked."
+  },
+  "trust_job_line": {
+    "message": "$APP$ $VERSION$: $PHASE$ (started $TIME$)",
+    "description": "Placeholders: $APP$, $VERSION$, $PHASE$, $TIME$.",
+    "placeholders": {
+      "app": {
+        "content": "$1"
+      },
+      "version": {
+        "content": "$2"
+      },
+      "phase": {
+        "content": "$3"
+      },
+      "time": {
+        "content": "$4"
+      }
+    }
+  },
+  "trust_jobs_heading": {
+    "message": "Recent deep verifications"
+  },
+  "trust_jobs_none": {
+    "message": "None yet."
+  },
+  "trust_sources": {
+    "message": "Manifests are built in this browser from GitHub releases."
+  },
+  "trust_load_failed": {
+    "message": "The stored manifests could not be loaded: every protected page shows \"Protection lost\"."
+  },
+  "trust_pin_asset": {
+    "message": "$RELEASE$ · $ASSET$ · sha256 $HASH$ · $SOURCE$",
+    "description": "Placeholders: $RELEASE$, $ASSET$, $HASH$, $SOURCE$.",
+    "placeholders": {
+      "release": {
+        "content": "$1"
+      },
+      "asset": {
+        "content": "$2"
+      },
+      "hash": {
+        "content": "$3"
+      },
+      "source": {
+        "content": "$4"
+      }
+    }
+  },
+  "trust_pin_bundled": {
+    "message": "bundled"
+  },
+  "trust_pin_config": {
+    "message": "$REPO$ · $PATH$ · sha256 $HASH$ · $SOURCE$",
+    "description": "Placeholders: $REPO$, $PATH$, $HASH$, $SOURCE$.",
+    "placeholders": {
+      "repo": {
+        "content": "$1"
+      },
+      "path": {
+        "content": "$2"
+      },
+      "hash": {
+        "content": "$3"
+      },
+      "source": {
+        "content": "$4"
+      }
+    }
+  },
+  "trust_pin_local": {
+    "message": "first seen by this browser"
+  },
+  "trust_pins_heading": {
+    "message": "Recorded release files (pins)"
+  },
+  "trust_pins_none": {
+    "message": "None."
+  },
+  "trust_source_bundled": {
+    "message": "Bundled with IntactWarden"
+  },
+  "trust_source_deep_verify": {
+    "message": "Built in this browser from GitHub ($TIME$)",
+    "description": "Placeholders: $TIME$.",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "trust_unavailable": {
+    "message": "The trust data could not be loaded."
+  },
+  "unverifiable_empty_body": {
+    "message": "empty response"
+  },
+  "unverifiable_filter_failed": {
+    "message": "filter failed"
+  },
+  "unverifiable_internal_error": {
+    "message": "internal error"
+  },
+  "unverifiable_no_host_permission": {
+    "message": "no access to the site"
+  },
+  "unverifiable_sw_served": {
+    "message": "served by a service worker"
+  },
+  "unverifiable_timeout": {
+    "message": "took too long"
+  },
+  "unverifiable_too_large": {
+    "message": "too large to check"
+  },
+  "unverifiable_unbound": {
+    "message": "build not known in time"
+  },
+  "unverifiable_verifier_restarted": {
+    "message": "IntactWarden restarted"
+  },
+  "details_source_deep_verify": {
+    "message": "Built in this browser from the GitHub release"
+  }
+}

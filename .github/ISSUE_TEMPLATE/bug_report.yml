@@ -1,0 +1,41 @@
+name: Bug or false alarm
+description: Something does not work, or IntactWarden shows the wrong state.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Issues are public: replace your server's address before you post. Report a security
+        vulnerability privately instead, above all anything that shows Verified while unverified
+        code runs (see SECURITY.md).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, the state IntactWarden showed and the state you expected.
+    validations:
+      required: true
+  - type: dropdown
+    id: site
+    attributes:
+      label: Site
+      options:
+        - Bitwarden cloud (vault.bitwarden.com, vault.bitwarden.eu)
+        - Bitwarden self-hosted
+        - Vaultwarden
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Firefox and IntactWarden versions
+      placeholder: Firefox 160.0, IntactWarden 1.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Redacted report
+      description: IntactWarden icon → Details → Copy redacted report. Replace your server's address.
+      render: text
