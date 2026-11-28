@@ -416,7 +416,6 @@ function notes(n: readonly {id: string; title: string}[]): string {
 export async function addInstance(d: E2EDriver, site: Site): Promise<{instance: InstanceRecord}> {
   const added = await d.ui('UI_ADD_INSTANCE', {
     input: `${site.origin}${site.basePath === '/' ? '/' : site.basePath}`,
-    lookalikeConfirmed: false,
   });
   if (!added.ok) throw new Error(`adding ${site.origin} refused: ${added.code}`);
   return {instance: added.instance};

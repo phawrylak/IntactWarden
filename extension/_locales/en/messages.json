@@ -1242,9 +1242,6 @@
   "options_add_refusal_http_not_loopback": {
     "message": "Plain http:// is accepted only on this computer (localhost). Use https:// for this server."
   },
-  "options_add_refusal_lookalike_unconfirmed": {
-    "message": "Confirm that you run this server yourself before adding it."
-  },
   "options_add_refusal_invalid_input": {
     "message": "Type a server address such as https://vault.example.org."
   },

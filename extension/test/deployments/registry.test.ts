@@ -127,7 +127,7 @@ describe('createRegistry', () => {
         seen,
       ),
     });
-    const added = await reg.addInstance({input: 'vw.example.org/vault', lookalikeConfirmed: false});
+    const added = await reg.addInstance({input: 'vw.example.org/vault'});
     expect(added).toEqual({
       ok: true,
       instance: {
@@ -142,7 +142,7 @@ describe('createRegistry', () => {
     const po = reg.lookup(o)!;
     expect(po).toMatchObject({kind: 'instance', basePath: '/vault/', app: 'vaultwarden-web'});
     expect(await reg.fetchHint(po)).toEqual({version: '2026.10.1', at: 7});
-    expect(await reg.addInstance({input: o, lookalikeConfirmed: false})).toEqual({
+    expect(await reg.addInstance({input: o})).toEqual({
       ok: false,
       code: 'duplicate-instance',
     });
@@ -156,7 +156,7 @@ describe('createRegistry', () => {
       now: () => 0,
       fetch: fakeFetch({[`${o}/api/config`]: config(null, o)}),
     });
-    const added = await reg.addInstance({input: o, lookalikeConfirmed: false});
+    const added = await reg.addInstance({input: o});
     expect(added).toMatchObject({ok: true, instance: {app: 'bitwarden-web', base_path: '/'}});
   });
 
@@ -172,34 +172,16 @@ describe('createRegistry', () => {
       }),
     });
     for (const input of ['https://html.example', 'https://shape.example', 'https://none.example']) {
-      expect(await reg.addInstance({input, lookalikeConfirmed: false}), input).toEqual({
+      expect(await reg.addInstance({input}), input).toEqual({
         ok: false,
         code: 'no-server',
       });
     }
-    expect(
-      await reg.addInstance({input: 'https://down.example', lookalikeConfirmed: false}),
-    ).toEqual({
+    expect(await reg.addInstance({input: 'https://down.example'})).toEqual({
       ok: false,
       code: 'unreachable',
     });
     expect(reg.instances()).toEqual([]);
-  });
-
-  it('refuses a look-alike host unless the user confirmed it, where the instance is stored', async () => {
-    const env = createFakeEnv();
-    const o = 'https://vault.bitwarnem.com';
-    const reg = createRegistry({
-      ext: env.ext,
-      now: () => 0,
-      fetch: fakeFetch({[`${o}/api/config`]: config(null, o)}),
-    });
-    expect(await reg.addInstance({input: o, lookalikeConfirmed: false})).toEqual({
-      ok: false,
-      code: 'lookalike-unconfirmed',
-    });
-    expect(reg.instances()).toEqual([]);
-    expect((await reg.addInstance({input: o, lookalikeConfirmed: true})).ok).toBe(true);
   });
 
   it('refuses a server whose host permission is missing, before any request', async () => {
@@ -208,7 +190,7 @@ describe('createRegistry', () => {
       !(origins ?? []).includes('https://vw.example/*');
     const seen: string[] = [];
     const reg = createRegistry({ext: env.ext, now: () => 0, fetch: fakeFetch({}, seen)});
-    expect(await reg.addInstance({input: 'vw.example', lookalikeConfirmed: false})).toEqual({
+    expect(await reg.addInstance({input: 'vw.example'})).toEqual({
       ok: false,
       code: 'permission-denied',
     });
@@ -232,7 +214,7 @@ describe('createRegistry', () => {
     });
     await reg.ready();
     expect(reg.lookup('https://vault.bitwarden.com')?.granted).toBe(true);
-    expect((await reg.addInstance({input: o, lookalikeConfirmed: false})).ok).toBe(true);
+    expect((await reg.addInstance({input: o})).ok).toBe(true);
     expect(reg.lookup(o)?.granted).toBe(true);
     const status = await reg.permissionStatus();
     expect(status.every(p => p.granted)).toBe(true);
@@ -285,7 +267,7 @@ describe('createRegistry', () => {
     // Their match pattern is a required host permission.
     const env = createFakeEnv();
     const reg = createRegistry({ext: env.ext, now: () => 0, fetch: fakeFetch({})});
-    const add = (input: string) => reg.addInstance({input, lookalikeConfirmed: true});
+    const add = (input: string) => reg.addInstance({input});
     expect(await add('https://vault.bitwarden.com:8443')).toEqual({
       ok: false,
       code: 'refused-official-origin',

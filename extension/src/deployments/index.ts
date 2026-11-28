@@ -29,7 +29,7 @@ import {createLocalStore} from '../platform/storage.ts';
 import type {Ext} from '../platform/webext.ts';
 import {isRecord, randomId, VERSION_XYZ} from '../trust/common.ts';
 import {readBodyCapped, withDeadline} from '../trust/download.ts';
-import {isLookalikeHost, matchPatternFor, parseInstanceInput} from './serverAddress.ts';
+import {matchPatternFor, parseInstanceInput} from './serverAddress.ts';
 
 export interface RegistryDeps {
   readonly ext: Ext;
@@ -238,9 +238,6 @@ export function createRegistry(deps: RegistryDeps): ProfileRegistry {
       await ready;
       const parsed = parseInstanceInput(req.input);
       if (!parsed.ok) return {ok: false, code: parsed.code};
-      if (isLookalikeHost(new URL(parsed.origin).hostname) && !req.lookalikeConfirmed) {
-        return {ok: false, code: 'lookalike-unconfirmed'};
-      }
       const duplicate = (): boolean => instances.some(i => i.origin === parsed.origin);
       if (duplicate()) return {ok: false, code: 'duplicate-instance'};
       const permitted = await ext.permissions

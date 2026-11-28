@@ -340,7 +340,6 @@ class OptionsPage {
       try {
         const result = await this.ctx.bridge.call('UI_ADD_INSTANCE', {
           input: `${check.origin}${check.basePath}`,
-          lookalikeConfirmed: check.lookalike,
         });
         if (result.ok) {
           this.inputValue = '';

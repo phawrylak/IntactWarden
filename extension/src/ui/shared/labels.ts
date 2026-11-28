@@ -90,7 +90,6 @@ export const PROBE_REFUSAL_LABEL: Readonly<Record<AddInstanceRefusal, string>> =
   'invalid-input': 'options_add_refusal_invalid_input',
   'refused-official-origin': 'options_add_refusal_official_origin',
   'http-not-loopback': 'options_add_refusal_http_not_loopback',
-  'lookalike-unconfirmed': 'options_add_refusal_lookalike_unconfirmed',
   'permission-denied': 'options_add_refusal_permission_denied',
   unreachable: 'options_add_refusal_unreachable',
   'no-server': 'options_add_refusal_no_server',

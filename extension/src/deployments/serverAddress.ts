@@ -1,6 +1,7 @@
 /**
- * Instance input parsing and the look-alike check. Pure: the options page also runs both before it
- * requests the host permission.
+ * Instance input parsing and the look-alike check. Pure: the options page runs both before it
+ * requests the host permission, and the background parses the input again where the instance is
+ * stored (deployments/index.ts).
  *
  * - https always; http only for this computer (loopback), where Firefox gives the vault the
  *   secure context its crypto needs.
@@ -8,8 +9,8 @@
  *   of deep verify) are refused by host name, on any port: an instance there would share the
  *   required permission pattern, and removing the instance's permission would remove the
  *   required one.
- * - Look-alike hosts need an explicit confirmation, here in the page and again where the
- *   instance is stored (deployments/index.ts).
+ * - Look-alike hosts need an explicit confirmation in the options page before the host
+ *   permission is requested.
  */
 
 import {OFFICIAL_ORIGINS} from '@intactwarden/profiles';

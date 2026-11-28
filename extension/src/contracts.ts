@@ -150,8 +150,6 @@ export type AddInstanceRefusal =
   | 'refused-official-origin'
   /** http other than this computer (loopback). */
   | 'http-not-loopback'
-  /** A look-alike host the user did not confirm as their own server. */
-  | 'lookalike-unconfirmed'
   | 'permission-denied'
   | 'unreachable'
   /** `{base}api/config` is not the JSON a Bitwarden or Vaultwarden server answers. */
@@ -161,8 +159,6 @@ export type AddInstanceRefusal =
 export interface AddInstanceRequest {
   /** What the user typed: origin and base path. */
   readonly input: string;
-  /** The user confirmed that a look-alike host is their own server. */
-  readonly lookalikeConfirmed: boolean;
 }
 
 export type AddInstanceResult =
@@ -180,9 +176,10 @@ export interface ProfileRegistry {
   protectedOrigins(): ProtectedOrigins;
   instances(): readonly InstanceRecord[];
   /**
-   * Parses the typed address, checks the refusal list, the look-alike confirmation and the host
-   * permission (requested by the options page inside the click handler), asks `{base}api/config`
-   * which app the server runs (one credential-less GET), then persists and announces the instance.
+   * Parses the typed address, checks the refusal list and the host permission (requested by the
+   * options page inside the click handler, after its look-alike confirmation), asks
+   * `{base}api/config` which app the server runs (one credential-less GET), then persists and
+   * announces the instance.
    */
   addInstance(request: AddInstanceRequest): Promise<AddInstanceResult>;
   removeInstance(id: string): Promise<void>;

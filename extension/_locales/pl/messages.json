@@ -1195,9 +1195,6 @@
   "options_add_refusal_http_not_loopback": {
     "message": "Zwykłe http:// jest dozwolone tylko na tym komputerze (localhost). Dla tego serwera użyj https://."
   },
-  "options_add_refusal_lookalike_unconfirmed": {
-    "message": "Przed dodaniem serwera potwierdź, że sam(a) go prowadzisz."
-  },
   "options_add_refusal_invalid_input": {
     "message": "Wpisz adres serwera, np. https://vault.example.org."
   },
