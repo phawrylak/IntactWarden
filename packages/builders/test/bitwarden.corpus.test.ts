@@ -198,7 +198,11 @@ describe.runIf(CORPUS_ENABLED)('bitwarden builders on web-v2026.10.1', () => {
       'f8ce5e9bc6dbf47c04d89e07a8d54d2b7b1d44902b22cb2eb16a8e9fd04ef73d',
     );
     expectSecretsManager(core);
-    expect(core.files['/app-id.json']).toEqual({class: 'data', dynamic: true});
+    expect(core.files['/app-id.json']).toEqual({
+      sha256: 'cf27eab0c8a76d66473174a8144ddd95560724b0aae651e396eb61b043747212',
+      size: 276,
+      class: 'data',
+    });
     expect(Object.values(core.files).filter(e => e.class === 'sourcemap')).toHaveLength(38);
     expect(selfhosted.sha256).toBe(GOLDEN['selfhosted-commercial']);
   });

@@ -275,6 +275,40 @@ describe('verifyItem', () => {
       reason: 'unknown-path',
     });
   });
+  it('a self-hosted /app-id.json stays a dynamic path although the release core lists it', async () => {
+    const release = bytes('{"trustedFacets":[]}');
+    const served = bytes('{"trustedFacets":[{"ids":["https://vault.example.org"]}]}');
+    const origins = [
+      [po, VW_ORIGIN, vwCore('2026.10.1', {'/index.html': INDEX, '/app-id.json': release})],
+      [
+        bwSelfhostOrigin(),
+        BW_ORIGIN,
+        bwSelfhostCore('2026.10.1', {
+          '/index.html': {bytes: INDEX},
+          '/app-id.json': {bytes: release},
+        }),
+      ],
+    ] as const;
+    for (const [origin, at, listing] of origins) {
+      const check = (type: RequestObs['type'], b: Uint8Array) =>
+        verifyItem({
+          origin,
+          core: listing,
+          binding,
+          request: req(`${at}/app-id.json`, type),
+          status: 200,
+          headers: [['content-type', 'application/json']],
+          body: {sha256: sha(b), size: b.length, bytes: b},
+          allowedThirdParty: null,
+          now: 0,
+        });
+      expect((await check('xmlhttprequest', served)).outcome, at).toEqual({r: 'passive'});
+      expect((await check('script', release)).outcome, at).toEqual({
+        r: 'mismatch',
+        reason: 'unknown-path',
+      });
+    }
+  });
   it('server paths: active content is MISMATCH unknown-path, data is passive', async () => {
     // Hashing is the only thing that stops a same-origin script the floor (script-src 'self')
     // allows: not covered, server-rendered, outside the base path, the server stylesheet path.

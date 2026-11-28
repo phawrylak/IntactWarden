@@ -5,7 +5,7 @@
 
 import {describe, expect, it} from 'vitest';
 import {canonicalBytes, canonicalize} from '@intactwarden/core/jcs/canonicalize.ts';
-import {coreProblem, isDynamicEntry, type ExactEntry} from '@intactwarden/core/schema/manifest.ts';
+import {coreProblem, type ExactEntry} from '@intactwarden/core/schema/manifest.ts';
 import {BuildError, type BuildRefusal, type BuildRequest} from '../src/api.ts';
 import {createCoreBuilder} from '../src/coreBuilder.ts';
 import {
@@ -55,7 +55,6 @@ describe('Bitwarden release core', () => {
     const files = releaseFiles();
     expect(Object.keys(core.files).sort()).toEqual([...files.keys()].map(n => '/' + n).sort());
     for (const [name, data] of files) {
-      if (name === 'app-id.json') continue;
       const bytes = typeof data === 'string' ? enc.encode(data) : data;
       expect(core.files['/' + name]).toMatchObject({sha256: sha256(bytes), size: bytes.length});
     }
@@ -114,14 +113,6 @@ describe('Bitwarden release core', () => {
       'variant',
       'version',
     ]);
-  });
-
-  it('marks /app-id.json dynamic (the self-hosted server overrides it)', async () => {
-    const {core} = await build(bitwardenRequest(ZIP));
-    expect(core.files['/app-id.json']).toEqual({class: 'data', dynamic: true});
-    const without = buildReleaseZip({override: {'app-id.json': null}});
-    const {core: core2} = await build(bitwardenRequest(without));
-    expect(core2.files['/app-id.json']).toEqual({class: 'data', dynamic: true});
   });
 
   it('lists the Secrets Manager chunks as ordinary exact entries', async () => {
@@ -211,14 +202,10 @@ describe('Vaultwarden release core', () => {
     expect(sha256(bytes)).toBe(digest);
   });
 
-  it('lists every file as an exact entry, except the dynamic /app-id.json', async () => {
+  it('lists every file as an exact entry', async () => {
     const {core} = await build(vwRequest(TARBALL));
     for (const [path, content] of Object.entries(vwFiles())) {
       const entry = core.files['/' + path]!;
-      if (path === 'app-id.json') {
-        expect(isDynamicEntry(entry)).toBe(true);
-        continue;
-      }
       const bytes = typeof content === 'string' ? enc.encode(content) : content;
       expect(entry, path).toMatchObject({sha256: sha256(bytes), size: bytes.length});
     }

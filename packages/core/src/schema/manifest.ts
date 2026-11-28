@@ -33,13 +33,7 @@ export interface TemplateEntry {
   readonly template: Template;
 }
 
-/** Server-generated data file (e.g. Bitwarden self-hosted /app-id.json): never code. */
-export interface DynamicEntry {
-  readonly class: 'data';
-  readonly dynamic: true;
-}
-
-export type FileEntry = ExactEntry | TemplateEntry | DynamicEntry;
+export type FileEntry = ExactEntry | TemplateEntry;
 
 export interface Source {
   /** "https://github.com/<owner>/<repo>". */
@@ -101,10 +95,6 @@ export interface CoreManifest {
 
 export function isTemplateEntry(entry: FileEntry): entry is TemplateEntry {
   return 'template' in entry;
-}
-
-export function isDynamicEntry(entry: FileEntry): entry is DynamicEntry {
-  return 'dynamic' in entry;
 }
 
 export function isExactEntry(entry: FileEntry): entry is ExactEntry {

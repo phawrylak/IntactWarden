@@ -153,10 +153,7 @@ describe('cloud core (bitwarden-cloud-v1)', async () => {
     for (const [path, entry] of Object.entries(release.core.files)) {
       if (dropped.includes(path)) expect(core.files[path], path).toBeUndefined();
       else if (replaced.includes(path)) expect(isTemplateEntry(core.files[path]!), path).toBe(true);
-      else if (path === '/app-id.json') {
-        // Cloud serves the release file; only self-hosted servers override it.
-        expect(core.files[path]).toMatchObject({class: 'data', sha256: expect.any(String)});
-      } else expect(core.files[path], path).toEqual(entry);
+      else expect(core.files[path], path).toEqual(entry);
     }
   });
 

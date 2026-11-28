@@ -14,9 +14,10 @@
  *    `resources.server_styles`, Vaultwarden's `/css/vaultwarden.css`).
  *
  * The two apps differ only in the facts of `APPS`. A self-hosted server serves the archive
- * unchanged except `/app-id.json`, which it answers from its own configuration (a dynamic data
- * entry). The core is a pure function of the asset bytes, the release coordinates and the bundled
- * profile: no timestamps, no archive metadata, no dependence on entry order.
+ * unchanged except `/app-id.json`, which it answers from its own configuration (the profiles
+ * declare it in `dynamic_same_origin`). The core is a pure function of the asset bytes, the
+ * release coordinates and the bundled profile: no timestamps, no archive metadata, no dependence
+ * on entry order.
  */
 
 import {iterateTarGzFiles} from '@intactwarden/core/archive/tar.ts';
@@ -69,12 +70,6 @@ export const APPS: Readonly<Record<BuilderApp, AppFacts>> = {
     notFound: false,
   },
 };
-
-/**
- * Paths a self-hosted server answers itself (Bitwarden util/Server/Startup.cs, Vaultwarden
- * src/api/web.rs).
- */
-const DYNAMIC_PATHS: readonly string[] = ['/app-id.json'];
 
 /**
  * What a core needs of one file of a release: its digest and size, and the bytes only of the
@@ -228,16 +223,14 @@ export function exactEntry(file: ReleaseFileInfo): ExactEntry {
   return {sha256: file.sha256, size: file.size, class: classifyPath(file.path)};
 }
 
-/** The release-exact core: every file as an exact entry, the server's own paths dynamic. */
+/** The release-exact core: every file as an exact entry. */
 export async function releaseCore(loaded: LoadedRelease): Promise<CoreBuild> {
   const {plan, files} = loaded;
   const facts = APPS[plan.app];
-  const dynamic: FileEntry = {class: 'data', dynamic: true};
   const entries: Record<string, FileEntry> = {};
   for (const path of [...files.keys()].sort(compareStrings)) {
-    entries[path] = DYNAMIC_PATHS.includes(path) ? dynamic : exactEntry(files.get(path)!);
+    entries[path] = exactEntry(files.get(path)!);
   }
-  for (const path of DYNAMIC_PATHS) entries[path] ??= dynamic;
   const notFound = facts.notFound && files.has('/404.html');
   return finishCore({
     schema: 'intactwarden.manifest/1',

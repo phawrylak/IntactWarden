@@ -151,7 +151,6 @@ function vaultwardenCore(): Json {
       '/index.html': {sha256: H('1'), size: 10, class: 'document'},
       '/404.html': {sha256: H('2'), size: 10, class: 'document'},
       '/.nojekyll': {sha256: H('3'), size: 0, class: 'data'},
-      '/app-id.json': {class: 'data', dynamic: true},
     },
   };
 }
@@ -174,13 +173,6 @@ describe("coreProblem (the builders' postcondition)", () => {
   it('accepts a Bitwarden cloud core and a Vaultwarden release core', () => {
     expect(coreProblem(withChange(bitwardenCloudCore(), () => {}))).toBeNull();
     expect(coreProblem(withChange(vaultwardenCore(), () => {}))).toBeNull();
-  });
-
-  it('accepts a dynamic data entry', () => {
-    const m = withChange(bitwardenCloudCore(), m => {
-      files(m)['/app-id.json'] = {class: 'data', dynamic: true};
-    });
-    expect(coreProblem(m)).toBeNull();
   });
 
   const cases: [string, Json, (m: Json) => void, string][] = [
