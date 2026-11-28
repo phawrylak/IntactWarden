@@ -105,10 +105,9 @@ An extension like this runs next to your password vault, so do not take it on fa
 - I sign my release tags with my OpenPGP key from
   [keys.openpgp.org](https://keys.openpgp.org/search?q=phawrylak%40outlook.com), also at
   `https://github.com/phawrylak.gpg`.
-- Mozilla reviewed IntactWarden before publishing it on
-  [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/). The reviewer reads
-  the code in the package: this repository's TypeScript compiled to readable JavaScript, not
-  minified. The review checks the add-on against Mozilla's policies; it is not a security audit.
+- Mozilla reviewed IntactWarden, together with its source code, before publishing it on
+  [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/). The review checks
+  the add-on against Mozilla's policies; it is not a security audit.
 - Beyond that review there is no external audit. Please review the code yourself, by hand or with
   an AI assistant: give it the repository and [docs/security.md](docs/security.md), and ask how the
   extension could leak data, accept tampered code or raise a false alarm.
