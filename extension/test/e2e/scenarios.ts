@@ -1467,7 +1467,8 @@ export const SCENARIOS: readonly Scenario[] = [
         s => s.top?.binding !== null && allScriptsOk(s),
       );
       expect(r.top).toMatchObject({path: '/vw/', binding: {buildId: VW_BUILD}});
-      expect(await d.tabUrl(slash)).toBe(`${site.origin}/vw/`);
+      // The app's router may already have added its own fragment (#/login).
+      expect((await d.tabUrl(slash)).split('#')[0]).toBe(`${site.origin}/vw/`);
       const kept = await holds(
         'VERIFIED after the redirect',
         () => tabState(d, slash),

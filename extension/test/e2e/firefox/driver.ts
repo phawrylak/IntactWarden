@@ -724,19 +724,26 @@ export class RealFirefox implements E2EDriver {
   }
 
   async frameState(tab: number, marker: string): Promise<FrameState> {
-    await this.#inTab(tab);
-    await this.#d.switchTo().frame(0);
-    try {
-      return await this.#d.executeScript<FrameState>(
-        `return {
-          ran: self[arguments[0]] === true,
-          elements: document.querySelectorAll('*').length,
-          error: (/^about:neterror\\?e=([^&]*)/.exec(document.documentURI) || [])[1] || null,
-        };`,
-        marker,
-      );
-    } finally {
-      await this.#d.switchTo().defaultContent();
+    // While Firefox replaces the frame's document (with its own error page, for example), the
+    // script can come back with null: read the new document instead.
+    for (let attempt = 1; ; attempt++) {
+      await this.#inTab(tab);
+      await this.#d.switchTo().frame(0);
+      try {
+        const state = await this.#d.executeScript<FrameState | null>(
+          `return {
+            ran: self[arguments[0]] === true,
+            elements: document.querySelectorAll('*').length,
+            error: (/^about:neterror\\?e=([^&]*)/.exec(document.documentURI) || [])[1] || null,
+          };`,
+          marker,
+        );
+        if (state !== null) return state;
+      } finally {
+        await this.#d.switchTo().defaultContent();
+      }
+      if (attempt === 20) throw new Error('frameState: the frame never returned its state');
+      await new Promise(r => setTimeout(r, 100));
     }
   }
 
