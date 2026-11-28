@@ -1,7 +1,7 @@
 # Dependencies and build output
 node_modules/
 dist/
-# Extension test builds (npm run build:ext -- --test)
+# Extension test builds (npm run test:e2e)
 dist-test/
 # Test coverage output
 /coverage/

@@ -5,14 +5,14 @@
  * `host_permissions`.
  *
  * The expected host-permission set is computed independently by `generatedHostPermissions()`
- * (official origins of the bundled profiles + the GitHub hosts of `GITHUB_HOST_KEYS`), and
- * bundle-lint requires `host_permissions` and the static content script's matches to equal it
- * exactly.
+ * (official origins of the bundled profiles + `GITHUB_PERMISSION_PATTERNS`), and bundle-lint
+ * requires `host_permissions` to equal it exactly; the static content script matches only the
+ * official origins.
  */
 
 import {readFile} from 'node:fs/promises';
 import {OFFICIAL_ORIGINS} from '@intactwarden/profiles';
-import {GITHUB_HOSTS} from '../src/contracts.ts';
+import {GITHUB_PERMISSION_PATTERNS} from '../src/contracts.ts';
 import {MANIFEST_PATH} from './paths.ts';
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | JsonObject;
@@ -22,13 +22,6 @@ export interface JsonObject {
 
 /** Loopback hosts of test builds; never in a production build. */
 export const TEST_HOST_PERMISSIONS = Object.freeze(['http://127.0.0.1/*', 'http://localhost/*']);
-
-/**
- * GitHub hosts that need host permission: api.github.com, where a release download starts, and
- * release-assets, where it ends (raw.githubusercontent.com sends `Access-Control-Allow-Origin: *`
- * and needs none).
- */
-export const GITHUB_HOST_KEYS = Object.freeze(['api', 'releaseAssets'] as const);
 
 /** `https://host` → `https://host/*`. An origin with a port is refused. */
 export function originMatchPattern(origin: string): string {
@@ -51,7 +44,7 @@ export function officialMatchPatterns(origins: readonly string[] = OFFICIAL_ORIG
 export function generatedHostPermissions(options: {readonly test: boolean}): string[] {
   return [
     ...officialMatchPatterns(),
-    ...GITHUB_HOST_KEYS.map(k => originMatchPattern(GITHUB_HOSTS[k])),
+    ...GITHUB_PERMISSION_PATTERNS,
     ...(options.test ? TEST_HOST_PERMISSIONS : []),
   ];
 }

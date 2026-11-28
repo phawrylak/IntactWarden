@@ -21,9 +21,10 @@ A release is one `MAJOR.MINOR.PATCH` version, one signed tag
    checks the tag signature, `SHA256SUMS`, the provenance and the manifest, then uploads the attested
    zip unchanged with the source tarball; `--dry-run` only checks. The first version was submitted on
    AMO's website instead, with the listing text.
-5. **Compare** once AMO has approved it: `gh workflow run store-diff.yml` (the daily run needs the
-   repository variable `AMO_LISTED` set to `true`), then smoke-test the live listing on the current
-   Firefox ESR and the latest release.
+5. **Compare** once AMO has approved it: `gh workflow run store-diff.yml`, then smoke-test the live
+   listing on the current Firefox ESR and the latest release. The repository variable `AMO_LISTED`
+   gates manual runs too (the job is skipped while it is not `true`); it is set to `true` once AMO
+   serves 1.0.1, the first version whose files match the release zip byte for byte.
 
 ## CI
 

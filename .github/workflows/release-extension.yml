@@ -7,11 +7,10 @@
 # `--source-ref refs/tags/v<version>` (store-diff.yml also pins the tag's commit and requires it on
 # main).
 #
-# - build (`contents: read`): requires an annotated tag that GitHub reports as verified and that
-#   the release key (`RELEASE_KEY_FPR`) signed, whose commit is on main and whose version equals
-#   extension/package.json; builds and packages the Firefox zip (both steps run bundle-lint), then
-#   builds and packages it again from scratch and requires byte-identical output; adds the AMO
-#   source tarball and SHA256SUMS.
+# - build (`contents: read`): requires an annotated tag that the release key (`RELEASE_KEY_FPR`)
+#   signed, whose commit is on main and whose version equals extension/package.json; builds and
+#   packages the Firefox zip (both steps run bundle-lint), then builds and packages it again from
+#   scratch and requires byte-identical output; adds the AMO source tarball and SHA256SUMS.
 # - attest (`contents: read`, `id-token: write`, `attestations: write`): GitHub build provenance
 #   for the zip and the source tarball (actions/attest-build-provenance).
 # - publish (`contents: write`): a draft GitHub release carrying the zip, the source tarball,
@@ -55,7 +54,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Require a verified annotated tag on main, signed by the release key, with the package version
+      - name: Require an annotated tag on main, signed by the release key, with the package version
         id: tag
         env:
           GH_TOKEN: ${{ github.token }}
@@ -72,12 +71,7 @@ jobs:
             echo '::error::the release tag must be an annotated tag'
             exit 1
           fi
-          verified="$(gh api "repos/$REPO/git/tags/$tag_object" --jq '.verification.verified')"
           target="$(gh api "repos/$REPO/git/tags/$tag_object" --jq '.object.sha')"
-          if [ "$verified" != true ]; then
-            echo '::error::GitHub does not report the tag signature as verified'
-            exit 1
-          fi
           if ! [[ "$RELEASE_KEY_FPR" =~ ^[0-9A-F]{40}$ ]]; then
             echo '::error::RELEASE_KEY_FPR is not set to the fingerprint of the release key'
             exit 1

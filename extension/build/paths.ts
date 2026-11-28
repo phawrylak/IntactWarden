@@ -18,7 +18,7 @@ export const MANIFEST_PATH = join(EXTENSION_DIR, 'manifest.json');
 export const LOCALES_DIR = join(EXTENSION_DIR, '_locales');
 /** Production builds: `dist/firefox/`, the zip and SHA256SUMS. */
 export const DIST_DIR = join(EXTENSION_DIR, 'dist');
-/** Test builds (`--test`): `dist-test/firefox/`. Never packaged. */
+/** Test builds (`test: true`): `dist-test/firefox/`. Never packaged. */
 export const DIST_TEST_DIR = join(EXTENSION_DIR, 'dist-test');
 
 /**

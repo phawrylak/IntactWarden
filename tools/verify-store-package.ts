@@ -24,9 +24,7 @@
  *    tag (`--source-ref refs/tags/v<version>`); it does not verify the
  *    attestation itself (the GitHub CLI does).
  *
- * The strict reader is not loosened for store packages: if AMO packages use
- * zip features it refuses, the tool exits 3 with the reason (to be confirmed
- * on the first listing).
+ * Zip features the strict reader refuses are an input error (exit 3).
  *
  * Only node: built-ins and @intactwarden/core; Node >= 22.18 runs this file
  * directly (type stripping).

@@ -1,6 +1,6 @@
 /**
- * Bootstrap data generator, for test packages only (`--test --bootstrap`, the end-to-end suite):
- * the shipping package bundles no cores and no pins.
+ * Bootstrap data generator, for test packages only (the end-to-end suite,
+ * extension/test/e2e/run.ts): the shipping package bundles no cores and no pins.
  *
  * Reads the corpus locks in fixtures/corpora/ (`bitwarden-web-<x.y.z>.lock.json`,
  * `vaultwarden-web-<x.y.z>.lock.json`), checks every pinned coordinate against
@@ -21,8 +21,8 @@
  * Deterministic: the output is a pure function of the locks, the pinned bytes,
  * the builders and the bundled profiles (no clock, no environment). Vendor
  * bytes never leave the download cache; the package holds hashes and paths
- * only. Nothing generated is committed: build.ts runs this generator for each
- * test build that asks for it.
+ * only. Nothing generated is committed: the end-to-end suite runs this generator
+ * for each test build and passes its output to build.ts (`bootstrapData`).
  * Behind an HTTPS proxy, run the build with NODE_USE_ENV_PROXY=1 (first download only).
  */
 
@@ -47,7 +47,7 @@ import {
 } from '../src/contracts.ts';
 import {REPO_ROOT} from './paths.ts';
 
-/** `--bootstrap` of `npm run build:ext -- --test`: which apps get bundled cores. */
+/** Which apps get bundled cores. */
 export type BootstrapSelection = 'all' | 'none' | 'bitwarden' | 'vaultwarden';
 
 export const BOOTSTRAP_SELECTIONS: readonly BootstrapSelection[] = Object.freeze([

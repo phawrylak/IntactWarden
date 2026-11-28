@@ -1,7 +1,7 @@
 /**
  * `npm run test:e2e [-- --no-build] [-- <vitest arguments>]` (extension/test/e2e/README.md):
  *
- * 1. builds the two test packages (`--test`): every bundled core into `extension/dist-test/firefox/`,
+ * 1. builds the two test packages: every bundled core into `extension/dist-test/firefox/`,
  *    and only Bitwarden's into `extension/dist-test/bootstrap-bitwarden/firefox/` (the Vaultwarden
  *    release is then an unknown build that local deep verify must resolve); and the shipping
  *    (production) package, which bundles no cores, into `extension/dist-test/release/firefox/`;
@@ -46,7 +46,7 @@ async function main(): Promise<number> {
     await buildExtension({test: true, bootstrapData: all, log});
     await buildExtension({
       test: true,
-      bootstrap: 'bitwarden',
+      bootstrapData: await buildBootstrap({apps: 'bitwarden', log}),
       outRoot: join(DIST_TEST, 'bootstrap-bitwarden'),
       log,
     });

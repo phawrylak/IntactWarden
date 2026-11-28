@@ -48,7 +48,6 @@ const PERMISSIONS: Record<string, unknown> = {
 const TAG_REFUSALS: readonly string[] = [
   '! [[ "$GITHUB_REF_NAME" =~ ^v([0-9]+\\.[0-9]+\\.[0-9]+)$ ]]',
   '[ "$ref_type" != tag ] || ! [[ "$tag_object" =~ ^[0-9a-f]{40}$ ]]',
-  '[ "$verified" != true ]',
   // Fails closed while the fingerprint of the release key is not set.
   '! [[ "$RELEASE_KEY_FPR" =~ ^[0-9A-F]{40}$ ]]',
   '! signature="$(git verify-tag --raw "$tag_object" 2>&1)"',
@@ -68,7 +67,7 @@ function checkRelease(jobs: Record<string, Job>): void {
   expect(jobs['build']!['if'], 'release: repository guard').toBe(
     "github.repository == 'phawrylak/IntactWarden'",
   );
-  const tag = jobs['build']!.steps.find(s => s.run?.includes('.verification.verified'));
+  const tag = jobs['build']!.steps.find(s => s.run?.includes('git verify-tag --raw'));
   for (const condition of TAG_REFUSALS) {
     expect(tag?.run, `release: tag step refuses on ${condition}`).toMatch(
       new RegExp(`if ${literal(condition)}; then\\n[^\\n]*\\n\\s*exit 1\\n`),

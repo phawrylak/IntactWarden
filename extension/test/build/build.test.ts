@@ -127,13 +127,13 @@ describe('buildExtension', () => {
   });
 
   it('refuses bundled cores in a production build', async () => {
-    for (const options of [
-      {bootstrap: 'vaultwarden' as const},
-      {bootstrapData: syntheticBootstrap()},
-    ])
-      await expect(
-        buildExtension({...options, outRoot: join(root, 'refused'), localesDir: locales}),
-      ).rejects.toThrow(/test builds only/);
+    await expect(
+      buildExtension({
+        bootstrapData: syntheticBootstrap(),
+        outRoot: join(root, 'refused'),
+        localesDir: locales,
+      }),
+    ).rejects.toThrow(/test builds only/);
   });
 
   it('writes the builder fingerprint into the bundles', async () => {
