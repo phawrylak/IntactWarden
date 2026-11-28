@@ -275,6 +275,14 @@ describe('cloud core (bitwarden-cloud-v1)', async () => {
       },
     });
     await refused(cloudRequest({}, extra), /DeriveError/);
+    // Another script that embeds CACHE_TAG differs on the cloud: not derivable, never a mismatch.
+    const sso = buildReleaseZip({
+      override: {'connectors/sso.b9116a340807ff18cc2d.js': 'fetch("messages.json?cache=x");'},
+    });
+    await expect(builder.build(cloudRequest({}, sso))).rejects.toMatchObject({
+      code: 'derivation-failed',
+      message: expect.stringMatching(/sso\.b9116a340807ff18cc2d\.js embeds CACHE_TAG but is not/),
+    });
   });
 
   it('refuses an HTML slot outside a src or href value', async () => {

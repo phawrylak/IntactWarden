@@ -36,7 +36,7 @@ import type {AppProfile} from '@intactwarden/core/schema/profile.ts';
 import {bitwardenWeb, vaultwardenWeb} from '@intactwarden/profiles';
 import type {AssetPlan, BuilderApp} from './api.ts';
 import {classifyPath, compareStrings, manifestKey, RefusalError} from './files.ts';
-import {bytesOf, isCheckedPath} from './retain.ts';
+import {bytesOf, embedsCacheTag, isCheckedPath} from './retain.ts';
 
 /** What sets the two apps apart. */
 interface AppFacts {
@@ -85,7 +85,7 @@ export interface ReleaseFileInfo {
   readonly path: string;
   readonly size: number;
   readonly sha256: string;
-  /** Only for the files of retain.ts `isCheckedPath`. */
+  /** Only for the files of retain.ts `isCheckedPath` and `embedsCacheTag`. */
   readonly bytes?: Uint8Array;
 }
 
@@ -174,7 +174,8 @@ export async function loadRelease(
     if (files.has(key))
       throw new RefusalError(`two archive members map to ${key}`, 'archive-invalid');
     const info = {path: key, size: bytes.length, sha256: await sha256Hex(bytes)};
-    files.set(key, isCheckedPath(key) ? {...info, bytes} : info);
+    const keep = isCheckedPath(key) || embedsCacheTag(key, bytes);
+    files.set(key, keep ? {...info, bytes} : info);
   }
   for (const path of facts.versionFiles) {
     const version = readVersionFile(files.get(path), path);

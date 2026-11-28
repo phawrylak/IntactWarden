@@ -5,7 +5,8 @@
  * The cloud builds are not published. They are derived from the self-hosted
  * COMMERCIAL release zip with the closed derivation
  * (@intactwarden/core/derive/bitwarden-cloud-v1.ts) and the config files at the tag
- * commit. Files the derivation does not touch keep their exact entries. The six
+ * commit. Files the derivation does not touch keep their exact entries; a release where another
+ * script embeds CACHE_TAG is refused, as that script would differ on the cloud. The six
  * derived files become masked-hash templates whose only variable bytes are
  * the slots CACHE_TAG (a per-build random nonce) and MAIN / DUO_JS /
  * WEBAUTHN_FB_JS (content hashes in file names):
@@ -69,7 +70,7 @@ import {
   type LoadedRelease,
   type ReleaseFileInfo,
 } from '../release.ts';
-import {bytesOf} from '../retain.ts';
+import {bytesOf, embedsCacheTag} from '../retain.ts';
 
 export type CloudVariant = 'cloud-us' | 'cloud-eu';
 export type BitwardenCloudEnv = 'cloud' | 'euprd';
@@ -186,6 +187,11 @@ function locateInputs(files: ReadonlyMap<string, ReleaseFileInfo>): Inputs {
     }
     const file = found[0]!;
     scripts.set(spec.slot, {file, hash: file.path.slice(prefix.length, -3)});
+  }
+  const derived = new Set([...scripts.values()].map(s => s.file.path));
+  for (const f of files.values()) {
+    if (f.bytes !== undefined && !derived.has(f.path) && embedsCacheTag(f.path, f.bytes))
+      throw new RefusalError(`${f.path} embeds CACHE_TAG but is not derived`, 'derivation-failed');
   }
   return {html, scripts};
 }
