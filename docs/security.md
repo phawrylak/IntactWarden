@@ -94,7 +94,8 @@ package AMO serves with it.
   package).
 - **The maintainer.** A reproducible build shows that a package equals its tagged source, not that
   the source is benign. There is no external audit, and Firefox installs updates automatically, so a
-  malicious release could reach users before anyone has read it.
+  malicious release could reach users before anyone has read it. To read each version before it
+  runs, turn off automatic updates for IntactWarden ([how](guide.md#updates)).
 - **GitHub**, at the moment this browser first sees each vendor release.
 - **The vendors' source and release builds.** No release is rebuilt from source.
 
