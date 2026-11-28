@@ -5,9 +5,10 @@ What it stores and sends: [privacy policy](privacy.md).
 
 ## Install and set up
 
-IntactWarden runs only in desktop Firefox 153 or newer ([why](security.md#why-firefox-only)). To
-install it, see the [README](../README.md#install-and-try). Bitwarden Secrets Manager is part of the
-web vault and checked with it. The interface is Polish if Firefox is, otherwise English.
+IntactWarden runs only in desktop Firefox 153 or newer ([why](security.md#why-firefox-only)).
+Install it from [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/).
+Bitwarden Secrets Manager is part of the web vault and checked with it. The interface is Polish if
+Firefox is, otherwise English.
 
 The setup page opens after installation, and again if required access goes missing (IntactWarden
 icon → **Settings** → **Setup checklist**):
