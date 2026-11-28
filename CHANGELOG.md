@@ -24,6 +24,9 @@ All notable changes to this project are documented here. The project follows
   again (about 40–50 MB per release). This needs the access to `api.github.com` above: until you
   choose **Grant access**, every vault shows New build and, after 10 minutes, is blocked as Build
   not verified.
+- **Fixes**: a large script from a slow self-hosted server no longer loses protection after 60
+  seconds (the limit is now 5 minutes), and **Retry** on a Build not verified page answers at once
+  when the release has become known, instead of downloading it again.
 
 ## 1.0.0 (2026-11-25), the first release
 
