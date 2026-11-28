@@ -1413,9 +1413,6 @@
   "refusal_invalid_core": {
     "message": "the built manifest is invalid"
   },
-  "refusal_rebuild_differs": {
-    "message": "the manifest rebuilt from GitHub differs from the one in use; this is recorded as an incident, please report it"
-  },
   "refusal_size_mismatch": {
     "message": "size does not match"
   },

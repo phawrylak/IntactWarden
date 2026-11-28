@@ -454,7 +454,7 @@ describe('options', () => {
     ]);
   });
 
-  it('names the failure detail in the job list (a rebuild that differs)', () => {
+  it('names the failure detail in the job list (an invalid built manifest)', () => {
     const job: DeepVerifyJobView = {
       jobId: '0123456789abcdef',
       app: 'vaultwarden-web',
@@ -465,7 +465,7 @@ describe('options', () => {
       phase: 'failed',
       startedAt: Date.UTC(2026, 10, 6),
       failure: 'build-refused',
-      detail: 'rebuild-differs',
+      detail: 'invalid-core',
     };
     const m = trustModel(
       {
@@ -477,7 +477,7 @@ describe('options', () => {
       },
       Date.UTC(2026, 10, 6),
     );
-    expect(m.jobs[0]).toContain('differs from the one in use');
+    expect(m.jobs[0]).toContain('the built manifest is invalid');
     expect(m.summary).toContain(
       'The stored manifests could not be loaded: every protected page shows "Protection lost".',
     );

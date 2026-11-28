@@ -1,11 +1,9 @@
 import {beforeAll, describe, expect, it} from 'vitest';
 import {createCoreBuilder} from '@intactwarden/builders/coreBuilder.ts';
-import {canonicalBytes} from '@intactwarden/core/jcs/canonicalize.ts';
 import {
   LOCAL_KEYS,
   type CoreRef,
   type DeepVerifyJobView,
-  type NewIncident,
   type ReleaseKey,
 } from '../../src/contracts.ts';
 import {memoryExtensionDb, type MemoryDb} from '../helpers/memoryDb.ts';
@@ -84,12 +82,10 @@ function setup(options: Options = {}) {
     known: [] as CoreRef[][],
     disputed: [] as [ReleaseKey, string][],
     logs: [] as string[],
-    incidents: [] as NewIncident[],
   };
   const store = createLocalTrustStore({
     kv,
     db,
-    incident: async n => env.incidents.push(n),
     builder,
     builderFingerprint: options.fingerprint ?? 'f1',
     now: clock.now,
@@ -359,16 +355,12 @@ describe('trust store: local deep verify', () => {
     expect(third.fake.calls).toEqual([]);
   });
 
-  it('rebuilds a bundled release on user request, compares it and keeps nothing new', async () => {
-    const {emu, store, env, db} = setup();
-    publishVw(emu, BUNDLED);
+  it('answers a user request for a known release at once, without GitHub', async () => {
+    const {fake, store} = setup();
     const outcome = await store.ensureRelease({key: key(BUNDLED), trigger: 'user'});
-    expect(outcome.ok).toBe(true);
-    if (outcome.ok) expect(outcome.refs[0]).toMatchObject({source: 'bundled'});
-    expect(env.known).toEqual([]); // nothing new became known
-    expect(await db.cores.keys()).toEqual([]); // the rebuilt duplicate is not written
-    expect((await getCore(store, key(BUNDLED)))?.ref.source).toBe('bundled');
-    expect((await store.listJobs())[0]).toMatchObject({phase: 'done', trigger: 'user'});
+    expect(outcome).toMatchObject({ok: true, refs: [{source: 'bundled'}]});
+    expect(fake.calls).toEqual([]);
+    expect(await store.listJobs()).toEqual([]);
   });
 
   it('refuses builder output with a wrong identity or content address and writes nothing', async () => {
@@ -390,66 +382,6 @@ describe('trust store: local deep verify', () => {
       expect(await db.cores.keys()).toEqual([]);
       expect(env.known).toEqual([]);
     }
-  });
-
-  it('fails as rebuild-differs and writes a deep-verify-failed incident when the rebuild differs from the bundled core', async () => {
-    // The bundled core lists another hash for one script; its index entry and pins agree.
-    const honest = pkg.cores[0]!;
-    const core = JSON.parse(new TextDecoder().decode(honest.bytes)) as {
-      files: Record<string, {class: string; sha256: string}>;
-    };
-    const path = Object.keys(core.files).find(p => core.files[p]!.class === 'script')!;
-    core.files[path]!.sha256 = 'f'.repeat(64);
-    const bytes = canonicalBytes(core);
-    const tamperedSha = sha256(bytes);
-    const index = structuredClone(pkg.index);
-    const entry = {
-      ...index.cores[0]!,
-      sha256: tamperedSha,
-      size: bytes.length,
-      path: `data/bootstrap/cores/${tamperedSha}.json`,
-    };
-    const files = new Map<string, Uint8Array>([
-      [entry.path, bytes],
-      [
-        'data/bootstrap/index.json',
-        new TextEncoder().encode(JSON.stringify({...index, cores: [entry]})),
-      ],
-    ]);
-    const {emu, store, env} = setup({pkg: {files, index, cores: pkg.cores}});
-    publishVw(emu, BUNDLED); // GitHub serves the genuine release; digest and tag equal the pins
-    const outcome = await store.ensureRelease({key: key(BUNDLED), trigger: 'user'});
-    expect(outcome).toEqual({
-      ok: false,
-      failure: 'build-refused',
-      transient: false,
-      retryAt: null,
-      detail: 'rebuild-differs',
-    });
-    expect((await store.listJobs())[0]).toMatchObject({
-      phase: 'failed',
-      failure: 'build-refused',
-      detail: 'rebuild-differs',
-    });
-    // The bundled core stays in use; no binding changes.
-    expect((await getCore(store, key(BUNDLED)))?.ref).toMatchObject({
-      source: 'bundled',
-      sha256: tamperedSha,
-      status: 'current',
-    });
-    expect(env.disputed).toEqual([]);
-    expect(env.incidents).toEqual([
-      expect.objectContaining({
-        kind: 'deep-verify-failed',
-        origin: '',
-        path: '',
-        state: null,
-        reasons: ['rebuild-differs'],
-        buildId: `vaultwarden-web@${BUNDLED}+release`,
-        expected: tamperedSha,
-        observed: honest.sha256,
-      }),
-    ]);
   });
 });
 
@@ -486,7 +418,6 @@ describe('trust store: cores built by other builder code', () => {
       return createTrustStore({
         ext: env.ext,
         db,
-        incident: async () => undefined,
         builder: createCoreBuilder(),
         fetch: fake.fetch,
         now: () => Date.UTC(2026, 10, 15),
@@ -541,11 +472,12 @@ describe('trust store: cores built by other builder code', () => {
     first.emu.setTag(VW_REPO, VW_REPO_ID, broken.tag, idsFor(NEW));
     const refused = await first.store.ensureRelease({key: key(NEW), trigger: 'unknown-build'});
     expect(refused).toMatchObject({ok: false, failure: 'build-refused', transient: false});
-    // And a disputed one: the tag of a deep-verified release moved.
-    publishVw(first.emu, '2026.11.1');
+    // And a disputed one: the tag of a pinned release moved (its first download was other bytes).
+    const pinned = publishVw(first.emu, '2026.11.1');
+    first.emu.serveInstead(VW_REPO, pinned.tag, pinned.asset, junk);
     expect(
       (await first.store.ensureRelease({key: key('2026.11.1'), trigger: 'unknown-build'})).ok,
-    ).toBe(true);
+    ).toBe(false);
     first.emu.setTag(VW_REPO, VW_REPO_ID, 'v2026.11.1', {commit: 'c'.repeat(40)});
     expect(await first.store.ensureRelease({key: key('2026.11.1'), trigger: 'user'})).toMatchObject(
       {failure: 'disputed'},
@@ -603,8 +535,10 @@ describe('trust store: cores built by other builder code', () => {
 describe('trust store: pins and disputes', () => {
   it('disputes a moved tag, keeps the dispute sticky and stops contacting GitHub', async () => {
     const {emu, fake, store, env} = setup();
-    publishVw(emu, NEW);
-    expect((await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(true);
+    const a = publishVw(emu, NEW);
+    // The first download is other bytes: the release is pinned, not known.
+    emu.serveInstead(VW_REPO, a.tag, a.asset, new Uint8Array(a.tarball.length));
+    expect((await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(false);
     emu.setTag(VW_REPO, VW_REPO_ID, `v${NEW}`, {
       commit: 'c'.repeat(40),
       tagObject: idsFor(NEW).tagObject,
@@ -625,7 +559,6 @@ describe('trust store: pins and disputes', () => {
       reason: 'tag-moved',
       evidence,
     });
-    expect((await getCore(store, key(NEW)))?.ref.status).toBe('disputed');
     const calls = fake.calls.length;
     expect((await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(false);
     expect((await store.ensureRelease({key: key(NEW), trigger: 'user'})).ok).toBe(false);
@@ -635,8 +568,9 @@ describe('trust store: pins and disputes', () => {
   it('shows the two tag objects when a tag was re-created on the same commit', async () => {
     // The two commits are equal then: shown as recorded and observed, they would say nothing.
     const {emu, store} = setup();
-    publishVw(emu, NEW);
-    expect((await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(true);
+    const a = publishVw(emu, NEW);
+    emu.serveInstead(VW_REPO, a.tag, a.asset, new Uint8Array(a.tarball.length));
+    expect((await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(false);
     const recreated = 'd'.repeat(40);
     emu.setTag(VW_REPO, VW_REPO_ID, `v${NEW}`, {commit: idsFor(NEW).commit, tagObject: recreated});
     expect(await store.ensureRelease({key: key(NEW), trigger: 'user'})).toMatchObject({
@@ -653,8 +587,9 @@ describe('trust store: pins and disputes', () => {
 
   it('disputes a re-uploaded asset (digest differs from the local pin)', async () => {
     const {emu, store} = setup();
-    publishVw(emu, NEW);
-    await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'});
+    const a = publishVw(emu, NEW);
+    emu.serveInstead(VW_REPO, a.tag, a.asset, new Uint8Array(a.tarball.length));
+    expect((await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(false);
     const other = vwAssets(NEW);
     const changed = other.tarball.slice();
     flip(changed, 20, 1); // inside the gzip header mtime: still a different digest
@@ -666,25 +601,6 @@ describe('trust store: pins and disputes', () => {
     });
     const outcome = await store.ensureRelease({key: key(NEW), trigger: 'user'});
     expect(outcome).toMatchObject({ok: false, failure: 'disputed', dispute: 'pin-changed'});
-  });
-
-  it('disputes GitHub against a bundled pin and marks the bundled core disputed', async () => {
-    const {emu, store, env} = setup();
-    const a = vwAssets(BUNDLED);
-    emu.addRelease({
-      repoId: VW_REPO_ID,
-      repo: VW_REPO,
-      tag: a.tag,
-      assets: [{name: a.asset, bytes: a.tarball, digest: 'd'.repeat(64)}],
-    });
-    emu.setTag(VW_REPO, VW_REPO_ID, a.tag, idsFor(BUNDLED));
-    const outcome = await store.ensureRelease({key: key(BUNDLED), trigger: 'user'});
-    expect(outcome).toMatchObject({ok: false, failure: 'disputed', dispute: 'pin-changed'});
-    expect(env.disputed).toEqual([[key(BUNDLED), 'pin-changed']]);
-    expect((await getCore(store, key(BUNDLED)))?.ref).toMatchObject({
-      source: 'bundled',
-      status: 'disputed',
-    });
   });
 
   it('a rejected pin write does not lose the pin: the retry persists it and a re-upload is disputed', async () => {
@@ -713,8 +629,8 @@ describe('trust store: pins and disputes', () => {
     const persisted = inner.data.get(LOCAL_KEYS.pins) as {pins: {asset?: string}[]};
     expect(persisted.pins.map(p => p.asset)).toEqual([a.asset]);
 
-    // After a restart GitHub lists other bytes for the same tag and asset: a dispute.
-    const second = setup({kv, db: first.db});
+    // An update drops the local core; GitHub now lists other bytes for the same tag and asset.
+    const second = setup({kv, db: first.db, fingerprint: 'f2'});
     const changed = a.tarball.slice();
     flip(changed, 20, 1);
     second.emu.addRelease({
@@ -877,36 +793,31 @@ describe('trust store: pins and disputes', () => {
       reason: 'tag-moved',
     });
     kv.data.delete(LOCAL_KEYS.releases);
-    // Two: the pins stay unread until the next job reads them, which then raises the dispute.
+    // Two: the pins stay unread until the next job (of any release) reads them, which then raises
+    // the dispute.
     const second = setup({kv: flakyPins(2), db, fingerprint: 'f2', pkg: updatedPkg});
     await second.store.ready();
     expect(second.store.releaseState(key(NEW)).k).toBe('known');
-    publishVw(second.emu, NEW, {tagObject: 'c'.repeat(40)});
-    expect(await second.store.ensureRelease({key: key(NEW), trigger: 'user'})).toMatchObject({
-      ok: false,
-      failure: 'disputed',
-    });
+    publishVw(second.emu, '2026.11.1');
+    await second.store.ensureRelease({key: key('2026.11.1'), trigger: 'unknown-build'});
     expect(second.store.releaseState(key(NEW))).toMatchObject({k: 'disputed', reason: 'tag-moved'});
     expect(second.env.disputed).toContainEqual([key(NEW), 'tag-moved']);
   });
 
   it('a release record that cannot be read at start-up is never written over: a dispute survives', async () => {
-    // A start-up write after a failed read would erase a bundled release's dispute for good (the
-    // bundled pin is in force, so no local pin brings it back).
+    // A start-up write after a failed read would erase the stored disputes.
     const kv = memoryKv();
     const db = memoryExtensionDb();
     const first = setup({kv, db});
-    const a = vwAssets(BUNDLED);
-    first.emu.addRelease({
-      repoId: VW_REPO_ID,
-      repo: VW_REPO,
-      tag: a.tag,
-      assets: [{name: a.asset, bytes: a.tarball, digest: 'd'.repeat(64)}],
-    });
-    first.emu.setTag(VW_REPO, VW_REPO_ID, a.tag, idsFor(BUNDLED));
-    expect(await first.store.ensureRelease({key: key(BUNDLED), trigger: 'user'})).toMatchObject({
+    const a = publishVw(first.emu, NEW);
+    first.emu.serveInstead(VW_REPO, a.tag, a.asset, new Uint8Array(a.tarball.length));
+    expect((await first.store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(
+      false,
+    );
+    first.emu.setTag(VW_REPO, VW_REPO_ID, a.tag, {commit: 'c'.repeat(40)});
+    expect(await first.store.ensureRelease({key: key(NEW), trigger: 'user'})).toMatchObject({
       failure: 'disputed',
-      dispute: 'pin-changed',
+      dispute: 'tag-moved',
     });
     const stored = kv.data.get(LOCAL_KEYS.releases);
     let failures = 2;
@@ -923,8 +834,7 @@ describe('trust store: pins and disputes', () => {
     expect(kv.data.get(LOCAL_KEYS.releases)).toEqual(stored);
     const third = setup({kv, db});
     await third.store.ready();
-    expect(third.store.releaseState(key(BUNDLED))).toMatchObject({k: 'disputed'});
-    expect((await getCore(third.store, key(BUNDLED)))?.ref.status).toBe('disputed');
+    expect(third.store.releaseState(key(NEW))).toMatchObject({k: 'disputed'});
   });
 
   it('disputes a bundled release whose tag object differs from the one this browser recorded, same commit (tag-moved)', async () => {

@@ -1361,9 +1361,6 @@
   "refusal_invalid_core": {
     "message": "zbudowany manifest jest nieprawidłowy"
   },
-  "refusal_rebuild_differs": {
-    "message": "manifest odtworzony z GitHuba różni się od używanego; zapisano to jako incydent, prosimy o zgłoszenie"
-  },
   "refusal_size_mismatch": {
     "message": "rozmiar się nie zgadza"
   },

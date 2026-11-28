@@ -15,7 +15,6 @@ import {
   type DeepVerifyJobView,
   type ExtensionDb,
   type LocalStorageSchema,
-  type NewIncident,
 } from '../contracts.ts';
 import {broadcast} from '../platform/messaging.ts';
 import {logWarn} from '../platform/guard.ts';
@@ -32,8 +31,6 @@ import {createLocalTrustStore, type LocalTrustStore} from './store.ts';
 export interface TrustStoreDeps {
   readonly ext: Ext;
   readonly db: ExtensionDb;
-  /** The incident log (the engine's AlertBook). */
-  readonly incident: (n: NewIncident) => Promise<unknown>;
   readonly builder: CoreBuilder;
   /** GitHub, raw and asset downloads and package files go through it (credentials: 'omit'). */
   readonly fetch: typeof fetch;
@@ -80,7 +77,6 @@ export function createTrustStore(deps: TrustStoreDeps): LocalTrustStore {
   const store = createLocalTrustStore({
     kv,
     db: deps.db,
-    incident: deps.incident,
     builder: deps.builder,
     builderFingerprint: BUILDER_FINGERPRINT,
     now: deps.now,

@@ -72,7 +72,6 @@ export const BUILD_REFUSAL_LABEL: Readonly<Record<ReleaseDetail, string>> = Obje
   'derivation-failed': 'refusal_derivation_failed',
   'invalid-core': 'refusal_invalid_core',
   unsupported: 'refusal_unsupported',
-  'rebuild-differs': 'refusal_rebuild_differs',
 });
 
 export const JOB_PHASE_LABEL: Readonly<Record<JobPhase, string>> = Object.freeze({

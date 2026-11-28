@@ -262,11 +262,8 @@ export type ReleaseFailure =
 
 export type DisputeReason = 'pin-changed' | 'tag-moved';
 
-/**
- * Why a release failed in detail: a builder refusal, or `rebuild-differs` (a deep verify rebuilt
- * a core already in use and got other bytes; the store writes a `deep-verify-failed` incident).
- */
-export type ReleaseDetail = BuildRefusal | 'rebuild-differs';
+/** Why a release failed in detail: a builder refusal. */
+export type ReleaseDetail = BuildRefusal;
 
 export type ReleaseState =
   | {readonly k: 'unknown'}

@@ -61,7 +61,6 @@ function setup(bundledFiles = new Map<string, Uint8Array>()) {
   const store = createLocalTrustStore({
     kv,
     db,
-    incident: async () => undefined,
     builder,
     builderFingerprint: 'f1',
     now: clock.now,
