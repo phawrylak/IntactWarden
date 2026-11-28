@@ -19,6 +19,10 @@
  *    store adds, under `META-INF/` or not, is `extra`. An expected zip that
  *    contains `META-INF/` is an input error.
  * 4. Files are compared by path and SHA-256: `missing`, `extra`, `differs`.
+ *    manifest.json is compared by its JSON content (the SHA-256 of its RFC 8785
+ *    form): AMO rewrites it when it signs a package, with the same JSON written
+ *    differently (non-ASCII characters as \u escapes, no final newline). A
+ *    manifest.json that is not JSON is compared by its bytes.
  * 5. The tool prints how to check the expected zip's provenance with
  *    `gh attestation verify`, pinned to the release workflow and the release
  *    tag (`--source-ref refs/tags/v<version>`); it does not verify the
@@ -39,6 +43,7 @@ import {basename} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {parseArgs} from 'node:util';
 import {readZipDirectory, readZipEntry, ZipError} from '@intactwarden/core/archive/zip.ts';
+import {canonicalBytes} from '@intactwarden/core/jcs/canonicalize.ts';
 
 export const REPO = 'phawrylak/IntactWarden';
 /** Where stores put their signature files; never part of a release build. */
@@ -155,6 +160,19 @@ function manifestVersion(bytes: Uint8Array): string | null {
 }
 
 /**
+ * manifest.json by content: `json:` and the SHA-256 of its RFC 8785 form, which is the same for the
+ * same JSON however it is written; the SHA-256 of its bytes when it is not JSON.
+ */
+function manifestDigest(bytes: Uint8Array): string {
+  try {
+    const value = JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(bytes)) as unknown;
+    return `json:${sha256(canonicalBytes(value))}`;
+  } catch {
+    return sha256(bytes);
+  }
+}
+
+/**
  * The files of a zip, read with the strict reader. On the store side, AMO's
  * signature files are stripped; on the expected side `META-INF/` is an error.
  */
@@ -180,8 +198,12 @@ export async function zipFileSet(
         continue;
       }
       const data = await readZipEntry(bytes, entry);
-      if (entry.name === 'manifest.json') version = manifestVersion(data);
-      files.set(entry.name, sha256(data));
+      if (entry.name === 'manifest.json') {
+        version = manifestVersion(data);
+        files.set(entry.name, manifestDigest(data));
+      } else {
+        files.set(entry.name, sha256(data));
+      }
     }
     return {files, stripped: stripped.sort(compare), version};
   } catch (e) {

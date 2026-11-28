@@ -85,8 +85,8 @@ third-party code and is not minified, so the code you can read is the code that 
 
 **Reproducible packages.** A release is built only from a tag on `main` signed by the maintainer's
 release key, twice and byte-identical, with build provenance and `SHA256SUMS`
-([release](release.md#ci)). Only that zip is submitted to AMO, and once the add-on is listed a daily
-workflow compares the package AMO serves with it.
+([release](release.md#ci)). Only that zip is submitted to AMO, and a daily workflow compares the
+package AMO serves with it.
 
 **What you still trust:**
 
@@ -126,7 +126,7 @@ reveals: [privacy policy](privacy.md#network-requests).
 
 These checks show that a package was built from its tagged source and that the store gave you that
 package; only reading the code catches a malicious change in the source. You need Node.js 22.18 or
-newer, `git`, `gpg`, `sha256sum` and the GitHub CLI `gh`. Steps 2 to 4 need a published release.
+newer, `git`, `gpg`, `sha256sum` and the GitHub CLI `gh`.
 
 **1. Check the permissions.** In Extensions and Themes → IntactWarden → **Permissions and data**,
 the site switches must be the six required hosts plus one per server you added, and "Access your
@@ -141,9 +141,10 @@ gh attestation verify intactwarden-<version>-firefox.zip --repo phawrylak/Intact
   --source-ref refs/tags/v<version>
 ```
 
-**3. Compare the installed package with the release.** AMO re-signs every package; the tool ignores
-only its signature files. The installed file is in the profile folder (`about:support` →
-**Profile Folder**).
+**3. Compare the installed package with the release.** AMO re-signs every package and re-encodes
+its `manifest.json` (the same JSON, written differently). The tool ignores only the signature files
+and compares `manifest.json` by its JSON content, every other file byte for byte. The installed file
+is in the profile folder (`about:support` → **Profile Folder**).
 
 ```sh
 git clone https://github.com/phawrylak/IntactWarden && cd IntactWarden && npm ci --ignore-scripts

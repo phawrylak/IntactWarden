@@ -3,9 +3,10 @@
 All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/) from the first release on.
 
-## Unreleased
+## 1.0.0 (2026-11-25), the first release
 
-### 1.0.0, the first release (not published yet)
+Published on [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/) and as a
+[GitHub release](https://github.com/phawrylak/IntactWarden/releases/tag/v1.0.0).
 
 IntactWarden 1.0.0 checks, in desktop Firefox 153 or newer, that the web vault runs exactly the code
 of the vendor's GitHub release, and blocks code that does not match.

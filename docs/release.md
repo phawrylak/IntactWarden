@@ -19,7 +19,7 @@ A release is one `MAJOR.MINOR.PATCH` version, one signed tag
    ([how](security.md#check-it-yourself)), then publish the draft as an immutable GitHub release.
 4. **Submit** from the maintainer's computer: `bws run -- npm run publish:amo -- v<version>`. It
    checks the tag signature, `SHA256SUMS`, the provenance and the manifest, then uploads the attested
-   zip unchanged with the source tarball; `--dry-run` only checks. The first version is submitted on
+   zip unchanged with the source tarball; `--dry-run` only checks. The first version was submitted on
    AMO's website instead, with the listing text.
 5. **Compare** once AMO has approved it (after the first listing, set the repository variable
    `AMO_LISTED` to `true`): `gh workflow run store-diff.yml`, then smoke-test the live listing on the
@@ -36,7 +36,8 @@ Nothing CI produces reaches the extension at runtime.
   version, signed by the release key (`RELEASE_KEY_FPR`). It builds twice and compares, adds the
   source tarball and `SHA256SUMS`, attests both with GitHub build provenance and drafts the release.
 - `store-diff.yml` (daily, once the repository variable `AMO_LISTED` is `true`): compares the
-  package AMO serves with the attested release zip; only AMO's signature files may differ.
+  package AMO serves with the attested release zip. Only AMO's signature files may differ;
+  `manifest.json`, which AMO re-encodes, must hold the same JSON.
 
 ## Repository hardening
 

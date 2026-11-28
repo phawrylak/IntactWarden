@@ -13,9 +13,11 @@ visit. IntactWarden compares that code byte for byte with the vendor's GitHub re
 page can use it. **Code that does not match does not run.** Your browser does the whole check;
 there is no project server.
 
-**Status (November 2026):** version 1.0.0 is implemented and tested, but not published: there is no
-listing on addons.mozilla.org (AMO) and no GitHub release yet. One person maintains the project. It
-is independent: not affiliated with or endorsed by Bitwarden, Inc. or the Vaultwarden project.
+**[Get IntactWarden for Firefox](https://addons.mozilla.org/firefox/addon/intactwarden/)** from
+addons.mozilla.org (AMO). Version 1.0.0 is published there and as a
+[GitHub release](https://github.com/phawrylak/IntactWarden/releases). One person maintains the
+project. It is independent: not affiliated with or endorsed by Bitwarden, Inc. or the Vaultwarden
+project.
 
 ## What it looks like
 
@@ -56,7 +58,11 @@ most people.
 
 ## Install and try
 
-Until IntactWarden is on AMO, build it (Node.js 22.18 or newer) and load it as a temporary add-on:
+Install IntactWarden from
+[addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/). The
+[user guide](docs/guide.md) explains the rest.
+
+To try your own build instead, build it (Node.js 22.18 or newer) and load it as a temporary add-on:
 
 ```sh
 git clone https://github.com/phawrylak/IntactWarden.git && cd IntactWarden
@@ -65,8 +71,7 @@ npm run build:ext      # → extension/dist/firefox/
 ```
 
 In Firefox, open `about:debugging#/runtime/this-firefox`, choose "Load Temporary Add-on…" and select
-`extension/dist/firefox/manifest.json`. Firefox removes a temporary add-on when it restarts. The
-[user guide](docs/guide.md) explains the rest.
+`extension/dist/firefox/manifest.json`. Firefox removes a temporary add-on when it restarts.
 
 ## How it works
 
@@ -96,8 +101,8 @@ An extension like this runs next to your password vault, so do not take it on fa
 - There is no external audit. Please review the code yourself, by hand or with an AI assistant:
   give it the repository and [docs/security.md](docs/security.md), and ask how the extension could
   leak data, accept tampered code or raise a false alarm.
-- Builds are reproducible, every release zip comes with GitHub build provenance, and once the add-on
-  is on AMO a public workflow compares the package AMO serves with that zip every day
+- Builds are reproducible, every release zip comes with GitHub build provenance, and a public
+  workflow compares the package AMO serves with that zip every day
   ([how to check](docs/security.md#check-it-yourself)).
 - No third-party code, no remote code, no telemetry. It talks only to the protected sites and GitHub
   ([privacy policy](docs/privacy.md)) and never asks for access to all websites.

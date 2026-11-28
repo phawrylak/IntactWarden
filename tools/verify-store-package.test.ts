@@ -109,6 +109,40 @@ describe('verify-store-package: packages', () => {
     );
   });
 
+  it('a manifest.json that AMO re-encoded (the same JSON) is no difference', async () => {
+    const reencoded = {
+      ...FILES,
+      'manifest.json':
+        '{\n  "manifest_version": 3,\n  "name": "Intact\\u0057arden",\n  "version": "0.1.0"\n}',
+    };
+    const r = await run([
+      '--expected',
+      expected,
+      '--package',
+      file('reencoded.xpi', storeXpi(reencoded)),
+    ]);
+    expect(r.stderr).toBe('');
+    expect(r.code).toBe(EXIT.identical);
+    expect(r.stdout).toContain('result: PASS');
+  });
+
+  it('a manifest.json with another value is a difference', async () => {
+    const changed = {
+      ...FILES,
+      'manifest.json': '{"manifest_version":3,"name":"IntactWarden","version":"0.1.1"}',
+    };
+    const r = await run([
+      '--expected',
+      expected,
+      '--package',
+      file('manifest-changed.xpi', storeXpi(changed)),
+    ]);
+    expect(r.code).toBe(EXIT.different);
+    expect(r.stdout).toMatch(
+      /differs manifest\.json expected json:[0-9a-f]{64} actual json:[0-9a-f]{64}/,
+    );
+  });
+
   it('identical without any signature files too', async () => {
     const r = await run([
       '--expected',
