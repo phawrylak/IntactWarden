@@ -85,8 +85,8 @@ third-party code and is not minified, so the code you can read is the code that 
 
 **Reproducible packages.** A release is built only from a tag on `main` signed by the maintainer's
 release key, twice and byte-identical, with build provenance and `SHA256SUMS`
-([release](release.md#ci)). Only that zip is submitted to AMO, and from version 1.0.1 a daily
-workflow compares the package AMO serves with it.
+([release](release.md#ci)). Only that zip is submitted to AMO, and a daily workflow compares the
+package AMO serves with it.
 
 **What you still trust:**
 
