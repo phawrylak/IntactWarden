@@ -36,7 +36,9 @@ Nothing CI produces reaches the extension at runtime.
   version, signed by the release key (`RELEASE_KEY_FPR`). It builds twice and compares, adds the
   source tarball and `SHA256SUMS`, attests both with GitHub build provenance and drafts the release.
 - `store-diff.yml` (daily, once the repository variable `AMO_LISTED` is `true`): compares the
-  package AMO serves with the attested release zip; only AMO's signature files may differ.
+  package AMO serves with the attested release zip; only AMO's signature files may differ. AMO
+  rewrites `manifest.json` when it signs a package, so the build writes it in AMO's encoding
+  (`serializeManifest` in `extension/build/manifest.ts`).
 
 ## Repository hardening
 

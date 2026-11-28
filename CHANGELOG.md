@@ -14,6 +14,10 @@ All notable changes to this project are documented here. The project follows
   `github.com`, where you may be signed in, and Firefox no longer reports your browsing there to
   it. Deep verify makes one more GitHub API request per release, which counts towards GitHub's
   limit of 60 requests an hour.
+- **The package AMO serves is byte-identical to the release zip**: `manifest.json` is now written
+  the way AMO rewrites it when it signs a package (non-ASCII characters as `\u` escapes, no final
+  newline), so every file can be compared byte for byte. In 1.0.0 the two copies differed in this
+  encoding only.
 
 ### 1.0.0, the first release (not published yet)
 

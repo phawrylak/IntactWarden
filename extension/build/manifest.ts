@@ -76,9 +76,17 @@ export async function buildManifest(options: {
   return manifest;
 }
 
-/** Serialisation written to `manifest.json` (key order of extension/manifest.json, LF, final newline). */
+/**
+ * Serialisation written to `manifest.json`, in the encoding AMO writes it in when it signs a package
+ * (Python's `json.dumps(manifest, indent=2)`): key order of extension/manifest.json, two-space
+ * indent, every character outside printable ASCII as a `\u` escape, no final newline. The package
+ * AMO serves then holds the same bytes as the release zip, file for file.
+ */
 export function serializeManifest(manifest: JsonObject): string {
-  return `${JSON.stringify(manifest, null, 2)}\n`;
+  return JSON.stringify(manifest, null, 2).replace(
+    /[\u007f-\uffff]/g,
+    c => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`,
+  );
 }
 
 /** esbuild's syntax target: the manifest's minimum Firefox version, so the bundle never needs more. */
