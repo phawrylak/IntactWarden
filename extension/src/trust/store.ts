@@ -756,6 +756,17 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
         }
         // TOFU: pin what GitHub lists now, before downloading.
         if (resolved.observed !== null) await pins.recordAsset(resolved.observed);
+        // The download is an API request too: if the last answer used up the hourly limit, wait
+        // for the reset instead of a request GitHub refuses.
+        const back = deps.github.backoffUntil();
+        if (back !== null) {
+          return await failJob(viewRef.current, plan, {
+            ok: false,
+            failure: 'rate-limited',
+            transient: true,
+            retryAt: back,
+          });
+        }
         const result = await deps.jobHost.run({...resolved.spec, jobId}, onProgress);
         return await finishJob(viewRef.current, plan, result);
       } catch (e) {

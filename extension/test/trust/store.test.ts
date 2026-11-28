@@ -836,6 +836,33 @@ describe('trust store: failures and back-off', () => {
     expect((await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(true);
   });
 
+  it('does not download when the last API answer used up the rate limit', async () => {
+    const fake = createFakeFetch();
+    const clock = manualClock();
+    const kv = memoryKv();
+    const real = createGitHubClient({fetch: fake.fetch, now: clock.now, kv});
+    const reset = clock.now() + 900_000;
+    let exhausted = false;
+    const github: GitHubClient = {
+      ...real,
+      getTagRef: async (...args) => {
+        const r = await real.getTagRef(...args);
+        exhausted = true;
+        return r;
+      },
+      backoffUntil: () => (exhausted ? reset : real.backoffUntil()),
+    };
+    const {emu, store} = setup({fake, clock, kv, github});
+    publishVw(emu, NEW);
+    expect(await store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).toEqual({
+      ok: false,
+      failure: 'rate-limited',
+      transient: true,
+      retryAt: reset,
+    });
+    expect(emu.counts.download).toBe(0);
+  });
+
   it('backs off exponentially after network failures', async () => {
     const fake = createFakeFetch(); // no emulator: every request fails
     const {clock, store} = setup({fake, emu: {} as GitHubEmulator});
