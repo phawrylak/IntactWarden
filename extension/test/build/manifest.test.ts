@@ -114,11 +114,12 @@ describe('serializeManifest', () => {
     expect(serializeManifest(value)).toBe(python);
   });
 
-  it('keeps the committed manifest as it is, only encoded', () => {
+  it('the committed manifest is ASCII only, so the packaged one reads the same, without escapes', () => {
+    expect(readFileSync(MANIFEST_PATH, 'utf8')).toMatch(/^[\x20-\x7e\n]*$/);
     const text = serializeManifest(committed());
-    expect(text).toMatch(/^[\x20-\x7e\n]*$/);
+    expect(text).not.toContain('\\u');
     expect(text.endsWith('}')).toBe(true);
-    expect(text).toContain('"author": "Pawe\\u0142 Hawrylak"');
+    expect(text).toContain('"author": "Pawel Hawrylak"');
     expect(JSON.parse(text)).toEqual(committed());
   });
 });
