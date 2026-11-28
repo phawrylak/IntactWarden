@@ -20,7 +20,9 @@ A release is one `MAJOR.MINOR.PATCH` version, one signed tag
 4. **Submit** from the maintainer's computer: `bws run -- npm run publish:amo -- v<version>`. It
    checks the tag signature, `SHA256SUMS`, the provenance and the manifest, then uploads the attested
    zip unchanged with the source tarball; `--dry-run` only checks. The first version was submitted on
-   AMO's website instead, with the listing text.
+   AMO's website instead, with the listing text. publish-amo does not change the listing: if
+   `docs/privacy.md` changed, update the privacy policy on the AMO listing to match it once AMO has
+   approved the version.
 5. **Compare** once AMO has approved it: `gh workflow run store-diff.yml`, then smoke-test the live
    listing on the current Firefox ESR and the latest release. The repository variable `AMO_LISTED`
    gates manual runs too (the job is skipped while it is not `true`); it is set to `true` once AMO
