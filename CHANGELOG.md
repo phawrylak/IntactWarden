@@ -11,7 +11,10 @@ All notable changes to this project are documented here. The project follows
   needs no permission because it answers with CORS headers. So IntactWarden no longer has access to
   `github.com`, where you may be signed in, and Firefox no longer reports your browsing there to
   it. Deep verify makes one more GitHub API request per release, which counts towards GitHub's
-  limit of 60 requests an hour.
+  limit of 60 requests an hour. If you update from 1.0.0, Firefox does not grant the new access to
+  `api.github.com` by itself, so the setup page opens and you choose **Grant access**; the update
+  removes the old access to `github.com`, `objects.githubusercontent.com` and
+  `raw.githubusercontent.com`.
 - **The package AMO serves is byte-identical to the release zip**: `manifest.json` is now written
   the way AMO rewrites it when it signs a package (non-ASCII characters as `\u` escapes, no final
   newline), so every file can be compared byte for byte. In 1.0.0 the two copies differed in this

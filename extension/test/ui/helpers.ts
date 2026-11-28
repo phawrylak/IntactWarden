@@ -217,7 +217,10 @@ export function miniExt(options: {grantAll?: boolean} = {}): MiniExt {
         for (const o of p.origins ?? []) granted.add(o);
         return true;
       },
-      remove: async () => true,
+      remove: async (p: {origins?: string[]}) => {
+        calls.push({method: 'permissions.remove', args: p});
+        return true;
+      },
       onAdded: events.permissionsAdded,
       onRemoved: events.permissionsRemoved,
     },

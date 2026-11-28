@@ -5,7 +5,8 @@
  *   private-window access, toolbar pin state, and protected tabs that were
  *   open before IntactWarden watched them ("Reload to verify");
  * - onInstalled (install, or an update while a required host permission is
- *   missing) and browser start while one is missing: open onboarding.
+ *   missing) and browser start while one is missing: open onboarding. An
+ *   update also removes the GitHub host permissions 1.0.0 needed.
  *
  * Every listener is added synchronously inside registerUiHandlers, so
  * background/main.ts must call it before its first await (MV3 listener rule).
@@ -86,8 +87,20 @@ export function registerUiHandlers(router: Router, ext: Ext, registry: ProfileRe
   ext.runtime.onInstalled.addListener(details => {
     void (async () => {
       if (details.reason === 'install') await openOnboarding(ext);
-      else if (details.reason === 'update' && (await requiredMissing(registry)))
-        await openOnboarding(ext, '#permissions');
+      else if (details.reason === 'update') {
+        // 1.0.0 required these hosts and Firefox keeps them across an update. No server can be a
+        // GitHub host (serverAddress.ts), so this removes no server's access.
+        await ext.permissions
+          .remove({
+            origins: [
+              'https://github.com/*',
+              'https://objects.githubusercontent.com/*',
+              'https://raw.githubusercontent.com/*',
+            ],
+          })
+          .catch(() => false);
+        if (await requiredMissing(registry)) await openOnboarding(ext, '#permissions');
+      }
     })();
   });
 

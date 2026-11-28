@@ -323,6 +323,31 @@ describe('registerUiHandlers', () => {
     }
   });
 
+  it('removes the GitHub host permissions of 1.0.0 on update, and only then', async () => {
+    for (const reason of ['install', 'update'] as const) {
+      const m = miniExt();
+      registerUiHandlers(fakeRouter(), m.ext, fakeRegistry());
+      m.events.installed.fire({reason} as never);
+      await flush();
+      expect(
+        m.calls.filter(c => c.method === 'permissions.remove').map(c => c.args),
+        reason,
+      ).toEqual(
+        reason === 'update'
+          ? [
+              {
+                origins: [
+                  'https://github.com/*',
+                  'https://objects.githubusercontent.com/*',
+                  'https://raw.githubusercontent.com/*',
+                ],
+              },
+            ]
+          : [],
+      );
+    }
+  });
+
   it('reopens onboarding at browser start while required access is missing or unreadable', async () => {
     for (const granted of [false, 'fails'] as const) {
       const m = miniExt();
