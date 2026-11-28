@@ -3,12 +3,13 @@
  *
  * A document whose bytes match no known core: fetch the server's version hint, deep verify the
  * hinted release locally from GitHub (NEW_BUILD `catching-up` while it runs, `unavailable` while
- * GitHub cannot be reached), then VERIFIED retroactively, MISMATCH `release-differs` (the release
- * is known and the document differs at one of its manifest paths), DISPUTED `pin-changed` (GitHub
- * contradicts a pin) or BUILD_UNVERIFIED (`not-derivable`, `selfhost-unpublished`,
- * `image-only-release`; also a release still not fetched GIVE_UP_MS after its first deep verify,
- * whose due retries then run in the background). Missing data is never red: a build nobody can
- * explain stays amber.
+ * GitHub cannot be reached), then MISMATCH `release-differs` (the release is known and the
+ * document differs at one of its manifest paths), DISPUTED `pin-changed` (GitHub contradicts a
+ * pin) or BUILD_UNVERIFIED (`not-derivable`, `selfhost-unpublished`, `image-only-release`; also a
+ * release still not fetched GIVE_UP_MS after its first deep verify, whose due retries then run in
+ * the background). A release that becomes known verifies the next load of the page; a page let
+ * through by "Proceed once" stays BUILD_UNVERIFIED (flagged RETRO) or turns MISMATCH. Missing data
+ * is never red: a build nobody can explain stays amber.
  */
 
 import type {Contribution, DecideUnknownBuild, UnknownBuildInput} from '../contracts.ts';

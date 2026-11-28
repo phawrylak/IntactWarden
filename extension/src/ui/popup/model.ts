@@ -6,6 +6,7 @@
  */
 
 import {type AppId, type CoverageCounts, type TabStateRecord} from '../../contracts.ts';
+import {matchPatternFor} from '../../deployments/serverAddress.ts';
 import {tn} from '../../i18n/plural.ts';
 import {t} from '../../i18n/t.ts';
 import {
@@ -13,7 +14,6 @@ import {
   formatDateTime,
   formatTime,
   isVersion,
-  matchPatternForOrigin,
   releaseName,
   releaseUrl,
 } from '../shared/format.ts';
@@ -211,7 +211,7 @@ function limits(record: TabStateRecord): string[] {
 
 function buttons(record: TabStateRecord): PopupButtons {
   const alert = record.alert;
-  const pattern = record.origin ? matchPatternForOrigin(record.origin) : null;
+  const pattern = record.origin ? matchPatternFor(record.origin) : null;
   const top = record.top;
   const style = top?.serverStyle ?? null;
   const allowedStyles = record.allowances?.serverStyles ?? [];

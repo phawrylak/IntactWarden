@@ -110,15 +110,13 @@ export function unknownBuildView(
   const d = ub.decision;
   const phase =
     d === null || d.k === 'fetch-hint' ? 'hint' : d.k === 'final' ? 'final' : 'deep-verify';
-  let jobId: string | null = null;
   // What the last decision saw (it includes a spent deep-verify budget), then the store's state.
   let failure: ReleaseFailure | null =
     ub.attempts.find(a => a.failure !== undefined)?.failure ?? null;
   const key = origin === null ? null : hintedKey(s, origin);
   if (key !== null) {
     const st = trust.releaseState(key);
-    if (st.k === 'working') jobId = st.jobId;
     if (st.k === 'failed' && failure === null) failure = st.failure;
   }
-  return {phase, jobId, failure};
+  return {phase, failure};
 }

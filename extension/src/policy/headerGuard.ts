@@ -116,6 +116,7 @@ export const headerGuard: HeaderGuard = input => {
   const cores =
     binding === null ? candidates : candidates.filter(c => c.ref.sha256 === binding.coreSha256);
   const pool = cores.length > 0 ? cores : candidates;
+  const sp = classifyServerPath(origin, request.url, request.type);
 
   // Location (any 3xx but 304, which is a revalidation and no redirect).
   if (response.status >= 300 && response.status < 400 && response.status !== 304) {
@@ -129,15 +130,14 @@ export const headerGuard: HeaderGuard = input => {
         target = null;
       }
       if (target !== null && isDocument) {
-        const cls = classifyServerPath(origin, request.url, request.type);
         const tPath = pathOfUrl(target);
         const sameOrigin = originOfUrl(target) === origin.origin;
         // A declared auth-flow page redirects to its identity provider and back, on any origin.
-        if (cls.k === 'server-rendered' && cls.class === 'auth-flow') ok = true;
+        if (sp.k === 'server-rendered' && sp.class === 'auth-flow') ok = true;
         // Any other server-rendered page redirects as server code does (the admin portal to its
         // login page). A same-origin target is a navigation of its own, judged on its own: a
         // server-rendered target is denied as NOT_COVERED, a release path is verified.
-        else if (cls.k === 'server-rendered' && sameOrigin) ok = true;
+        else if (sp.k === 'server-rendered' && sameOrigin) ok = true;
         // A same-origin redirect to exactly the deployment's base path (a reverse proxy's "/vw"
         // to "/vw/", Vaultwarden's "/index.html" to "/"): the landing document is hashed and
         // bound like any other navigation.
@@ -165,22 +165,17 @@ export const headerGuard: HeaderGuard = input => {
 
   // A document of the build is shown, never saved: an attachment would leave the tab on the page
   // that started the navigation while the verified download's state stood for that tab.
-  if (
-    isDocument &&
-    header(headers, 'content-disposition') !== null &&
-    classifyServerPath(origin, request.url, request.type).k === 'build'
-  ) {
+  if (isDocument && header(headers, 'content-disposition') !== null && sp.k === 'build') {
     strip.push('content-disposition');
   }
 
   // Content type per entry class (only for 2xx with a known class).
   const ctype = header(headers, 'content-type');
   let cls: ItemClass | null = null;
-  const sp = classifyServerPath(origin, request.url, request.type);
   if (response.status >= 200 && response.status < 300) {
     if (sp.k === 'server-style') cls = 'server-style';
     else if (sp.k === 'dynamic') {
-      if (isExecutableContentType(ctype) && violation === null) violation = 'content-type';
+      if (isExecutableContentType(ctype)) violation = 'content-type';
     } else if (sp.k === 'build') {
       for (const c of pool) {
         const r = mapUrl(request.url, c.core.routing, c.fileIndex, response.status, {
@@ -194,7 +189,7 @@ export const headerGuard: HeaderGuard = input => {
       }
       if (cls === null && isDocument) cls = 'document';
     }
-    if (cls !== null && violation === null && !contentTypeAllowed(cls, ctype)) {
+    if (cls !== null && !contentTypeAllowed(cls, ctype)) {
       violation = ctype !== null && !charsetOk(ctype) ? 'charset' : 'content-type';
     }
   }

@@ -1109,11 +1109,9 @@ export interface TabStateRecord {
   readonly hint: HintResult | null;
   readonly unknownBuild: {
     readonly phase: 'hint' | 'deep-verify' | 'final';
-    readonly jobId: string | null;
     readonly failure: ReleaseFailure | null;
   } | null;
   readonly alert: OriginAlert | null;
-  readonly incidentId: string | null;
   readonly allowances: TabAllowances | null;
   readonly permissionMissing: boolean;
 }

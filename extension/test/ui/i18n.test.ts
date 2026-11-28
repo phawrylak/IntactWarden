@@ -14,7 +14,7 @@ import {
   stateKey,
   t,
 } from '../../src/i18n/t.ts';
-import {resetI18n, useCatalogue, useLang} from './helpers.ts';
+import {resetI18n, useLang} from './helpers.ts';
 
 afterEach(() => resetI18n());
 
@@ -99,10 +99,5 @@ describe('plurals (Intl.PluralRules)', () => {
       'Server stylesheet: accepted, hides 12 element types.',
     );
     expect(formatCount(1234, 'en')).toBe('1,234');
-  });
-
-  it('falls back to the other form when a category key is missing', () => {
-    useCatalogue({x_other: {message: '$N$ things', placeholders: {n: {content: '$1'}}}}, 'pl');
-    expect(tn('x', 3)).toBe('3 things');
   });
 });

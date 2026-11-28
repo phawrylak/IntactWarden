@@ -26,15 +26,15 @@ import {
   type TabStateSink,
 } from '../../contracts.ts';
 import {t} from '../../i18n/t.ts';
-import {actionIconPaths} from '../../platform/iconPaths.ts';
+import {actionIconPaths, type ActionIcon} from '../../platform/iconPaths.ts';
 import type {Ext} from '../../platform/webext.ts';
 import {uiWarn} from '../shared/log.ts';
 import {isTabStateRecord, unacknowledgedCount} from '../shared/records.ts';
-import {actionTitle, toolbarIconFor, type ToolbarIcon} from '../shared/stateText.ts';
+import {actionTitle, toolbarIconFor} from '../shared/stateText.ts';
 
 /** What the toolbar shows for a tab; pure (exported for tests). */
 export interface ToolbarView {
-  readonly icon: ToolbarIcon;
+  readonly icon: ActionIcon;
   readonly title: string;
 }
 
@@ -116,14 +116,9 @@ export function createActionController(
       const view = toolbarViewFor(await readTabState(ext, tab));
       try {
         await ext.action.setIcon({tabId: tab, path: actionIconPaths(view.icon)});
-      } catch (error) {
-        // A closed tab rejects; anything else is logged.
-        uiWarn('set-icon-failed', error);
-      }
-      try {
         await ext.action.setTitle({tabId: tab, title: view.title});
-      } catch (error) {
-        uiWarn('set-title-failed', error);
+      } catch {
+        // The tab was closed.
       }
     },
   };

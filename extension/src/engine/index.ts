@@ -438,7 +438,6 @@ class EngineImpl implements EngineRuntime {
         hint: null,
         unknownBuild: null,
         alert: this.#alerts.get(po.origin),
-        incidentId: null,
         allowances: this.#allow.get(t.id),
         permissionMissing: !po.granted,
       };
@@ -1942,7 +1941,7 @@ class EngineImpl implements EngineRuntime {
     if (tab < 0) return;
     // A removed server's documents show nothing (the default icon), like any unregistered site.
     const live = this.#sessions.byTab(tab).filter(s => s.alive && this.#origin(s) !== null);
-    // Origin, alert, incident and build view follow the document buildTabState shows on top.
+    // Origin, alert and build view follow the document buildTabState shows on top.
     const top = tabTop(live);
     const po = top === undefined ? null : this.#origin(top);
     for (const s of live) await this.#coreFor(s);
@@ -1952,7 +1951,6 @@ class EngineImpl implements EngineRuntime {
       sessions: live,
       origin: po,
       alert: top === undefined ? null : this.#alerts.get(top.origin),
-      incidentId: top?.incidentId ?? null,
       allowances: this.#allow.get(tab),
       permissionMissing: po !== null && !po.granted,
       cores: this.#cores,
@@ -2236,9 +2234,6 @@ class EngineImpl implements EngineRuntime {
       return;
     }
     await this.#allow.add(tab, allowance);
-    if (top !== undefined && allowance.k === 'proceed-once') {
-      await this.#incident(top, 'proceed-once', await this.#evaluate(top));
-    }
     await this.#publishTab(tab);
   }
 

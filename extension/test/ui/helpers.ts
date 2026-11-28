@@ -313,7 +313,6 @@ export function tabRecord(partial: Partial<TabStateRecord> = {}): TabStateRecord
     hint: null,
     unknownBuild: null,
     alert: null,
-    incidentId: null,
     allowances: null,
     permissionMissing: false,
     ...partial,
