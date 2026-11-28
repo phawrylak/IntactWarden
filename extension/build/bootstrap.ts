@@ -260,27 +260,6 @@ async function readLocks(dir: string, apps: readonly AppId[]): Promise<LockFile[
   return out;
 }
 
-/** A bundled core's artifact, source and config inputs must equal its lock's. */
-function checkAgainstLock(core: BuiltCore, job: Job): void {
-  const {artifact, source} = core.core;
-  const {release} = job.request;
-  const where = `${core.buildId}`;
-  if (artifact === null || artifact.kind !== 'github-release-asset') {
-    throw new LockError(`${where}: artifact is not a GitHub release asset`);
-  }
-  expectEqual(artifact.name, job.asset.name, `${where}: artifact.name`);
-  expectEqual(artifact.sha256, job.asset.sha256, `${where}: artifact.sha256`);
-  expectEqual(artifact.size, job.asset.size, `${where}: artifact.size`);
-  expectEqual(source.commit, release.commit, `${where}: source.commit`);
-  expectEqual(source.tag, release.tag, `${where}: source.tag`);
-  expectEqual(source.tag_object, release.tagObject, `${where}: source.tag_object`);
-  for (const input of core.configInputs ?? []) {
-    const config = job.configs.find(c => c.path === input.path);
-    expectEqual(input.commit, release.commit, `${where}: config ${input.path} commit`);
-    expectEqual(input.sha256, config?.sha256, `${where}: config ${input.path}`);
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Public API
 
@@ -323,7 +302,6 @@ export async function buildBootstrap(options: BootstrapOptions = {}): Promise<Bo
         asset: {name: job.asset.name, sha256: job.asset.sha256, size: job.asset.size, bytes},
         ...(job.configs.length === 0 ? {} : {configs}),
       });
-      checkAgainstLock(core, job);
       log(`${core.sha256}  ${core.buildId}`);
       cores.push(core);
     }

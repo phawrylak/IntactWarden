@@ -73,9 +73,7 @@ export function parseInstanceInput(input: string): ParsedInstance {
   }
   if (u.protocol !== 'https:' && u.protocol !== 'http:') return {ok: false, code: 'invalid-input'};
   let path = u.pathname;
-  if (path.includes('/../') || path.includes('/./') || path.includes('//')) {
-    return {ok: false, code: 'invalid-input'};
-  }
+  if (path.includes('//')) return {ok: false, code: 'invalid-input'};
   if (path.endsWith('/index.html')) path = path.slice(0, -'index.html'.length);
   if (!path.endsWith('/')) path += '/';
   return {ok: true, origin: u.origin, basePath: path};

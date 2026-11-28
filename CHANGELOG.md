@@ -19,6 +19,9 @@ All notable changes to this project are documented here. The project follows
   the way AMO rewrites it when it signs a package (non-ASCII characters as `\u` escapes, no final
   newline), so every file can be compared byte for byte. In 1.0.0 the two copies differed in this
   encoding only.
+- **Manifests are built again once**: the code that builds manifests changed, so after the update
+  IntactWarden builds the manifest of each release again, and the first visit to each vault checks
+  its release on GitHub again.
 
 ## 1.0.0 (2026-11-25), the first release
 
