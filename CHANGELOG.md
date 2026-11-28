@@ -14,10 +14,10 @@ All notable changes to this project are documented here. The project follows
   Firefox does not grant the new access to `api.github.com` by itself, so the setup page opens and
   you choose **Grant access**; the update removes the old access to `github.com`,
   `objects.githubusercontent.com` and `raw.githubusercontent.com`.
-- **The package AMO serves is byte-identical to the release zip**: `manifest.json` is now written
-  the way AMO rewrites it when it signs a package (non-ASCII characters as `\u` escapes, no final
-  newline), so every file can be compared byte for byte. In 1.0.0 the two copies differed in this
-  encoding only.
+- **Every file AMO serves, apart from its signature, matches the release zip byte for byte**:
+  `manifest.json` is now written the way AMO rewrites it when it signs a package (non-ASCII
+  characters as `\u` escapes, no final newline), so every file can be compared byte for byte. In
+  1.0.0 the two copies differed in this encoding only.
 - **Manifests are built again once**: the code that builds manifests changed, so the update drops
   the manifests built by 1.0.0, and the next visit to each vault downloads its release from GitHub
   again (about 40–50 MB per release). This needs the access to `api.github.com` above: until you
