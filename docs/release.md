@@ -21,9 +21,9 @@ A release is one `MAJOR.MINOR.PATCH` version, one signed tag
    checks the tag signature, `SHA256SUMS`, the provenance and the manifest, then uploads the attested
    zip unchanged with the source tarball; `--dry-run` only checks. The first version was submitted on
    AMO's website instead, with the listing text.
-5. **Compare** once AMO has approved it (after the first listing, set the repository variable
-   `AMO_LISTED` to `true`): `gh workflow run store-diff.yml`, then smoke-test the live listing on the
-   current Firefox ESR and the latest release.
+5. **Compare** once AMO has approved it: `gh workflow run store-diff.yml` (the daily run needs the
+   repository variable `AMO_LISTED` set to `true`, from 1.0.1 on), then smoke-test the live listing
+   on the current Firefox ESR and the latest release.
 
 ## CI
 
@@ -36,8 +36,7 @@ Nothing CI produces reaches the extension at runtime.
   version, signed by the release key (`RELEASE_KEY_FPR`). It builds twice and compares, adds the
   source tarball and `SHA256SUMS`, attests both with GitHub build provenance and drafts the release.
 - `store-diff.yml` (daily, once the repository variable `AMO_LISTED` is `true`): compares the
-  package AMO serves with the attested release zip. Only AMO's signature files may differ;
-  `manifest.json`, which AMO re-encodes, must hold the same JSON.
+  package AMO serves with the attested release zip; only AMO's signature files may differ.
 
 ## Repository hardening
 

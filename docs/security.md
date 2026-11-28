@@ -85,8 +85,8 @@ third-party code and is not minified, so the code you can read is the code that 
 
 **Reproducible packages.** A release is built only from a tag on `main` signed by the maintainer's
 release key, twice and byte-identical, with build provenance and `SHA256SUMS`
-([release](release.md#ci)). Only that zip is submitted to AMO, and a daily workflow compares the
-package AMO serves with it.
+([release](release.md#ci)). Only that zip is submitted to AMO, and from version 1.0.1 a daily
+workflow compares the package AMO serves with it.
 
 **What you still trust:**
 
@@ -141,10 +141,11 @@ gh attestation verify intactwarden-<version>-firefox.zip --repo phawrylak/Intact
   --source-ref refs/tags/v<version>
 ```
 
-**3. Compare the installed package with the release.** AMO re-signs every package and re-encodes
-its `manifest.json` (the same JSON, written differently). The tool ignores only the signature files
-and compares `manifest.json` by its JSON content, every other file byte for byte. The installed file
-is in the profile folder (`about:support` → **Profile Folder**).
+**3. Compare the installed package with the release.** AMO re-signs every package; the tool ignores
+only its signature files and compares every other file byte for byte. (In 1.0.0 only, AMO's
+`manifest.json` differs too: AMO wrote the `ł` in the author's name as `\u0142` and dropped the
+final newline. From 1.0.1 the release writes it that way itself.) The installed file is in the
+profile folder (`about:support` → **Profile Folder**).
 
 ```sh
 git clone https://github.com/phawrylak/IntactWarden && cd IntactWarden && npm ci --ignore-scripts

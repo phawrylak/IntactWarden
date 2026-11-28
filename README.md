@@ -101,8 +101,8 @@ An extension like this runs next to your password vault, so do not take it on fa
 - There is no external audit. Please review the code yourself, by hand or with an AI assistant:
   give it the repository and [docs/security.md](docs/security.md), and ask how the extension could
   leak data, accept tampered code or raise a false alarm.
-- Builds are reproducible, every release zip comes with GitHub build provenance, and a public
-  workflow compares the package AMO serves with that zip every day
+- Builds are reproducible, every release zip comes with GitHub build provenance, and from version
+  1.0.1 a public workflow compares the package AMO serves with that zip every day
   ([how to check](docs/security.md#check-it-yourself)).
 - No third-party code, no remote code, no telemetry. It talks only to the protected sites and GitHub
   ([privacy policy](docs/privacy.md)) and never asks for access to all websites.

@@ -7,8 +7,7 @@
 # - The release tag's commit must be on refs/heads/main, and the release zip's build provenance must
 #   come from release-extension.yml at that tag and commit (`gh attestation verify`).
 # - tools/verify-store-package.ts then compares the AMO package with the attested zip (the files
-#   AMO adds when it signs the package are the only accepted difference; manifest.json, which AMO
-#   re-encodes, must hold the same JSON).
+#   AMO adds when it signs the package are the only accepted difference).
 name: store-diff
 
 on:
