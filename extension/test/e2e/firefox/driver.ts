@@ -836,10 +836,6 @@ api.tabs.update(tab, {active: true})
         await this.#d.wait(until.elementLocated(By.css('.state-title')), 15_000);
         return this.#d.executeScript<string>('return document.body.innerText;');
       },
-      hasButton: async label => {
-        await this.#d.switchTo().window(popupHandle);
-        return (await this.#d.findElements(By.xpath(buttonXpath(label)))).length > 0;
-      },
       click: async label => {
         await this.#d.switchTo().window(popupHandle);
         const button = await this.#d.wait(

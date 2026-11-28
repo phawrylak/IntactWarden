@@ -210,8 +210,6 @@ export interface E2EDriver {
 export interface PopupHandle {
   /** The popup's text as shown, once its verdict (`.state-title`) has rendered. */
   text(): Promise<string>;
-  /** Whether a button with exactly this label is shown. */
-  hasButton(label: string): Promise<boolean>;
   /** Clicks the button with exactly this label (waits for it). */
   click(label: string): Promise<void>;
   /** Closes the popup's tab if it is still open. */
@@ -452,6 +450,12 @@ function summary(t: TabStateRecord): string {
   );
 }
 
+const DEEP_VERIFY_HOSTS = [
+  'api.github.com',
+  'release-assets.githubusercontent.com',
+  'raw.githubusercontent.com',
+];
+
 /**
  * The deep-verify requests the GitHub mirror answered carry nothing about the user or the vault:
  * no Cookie, no Referer, an Origin that is the extension's own, `null` (after a redirect) or none,
@@ -460,12 +464,6 @@ function summary(t: TabStateRecord): string {
  * commit), to api.github.com, release-assets and raw only (never github.com): no release
  * signature, no signed data. Returns an evidence line.
  */
-const DEEP_VERIFY_HOSTS = [
-  'api.github.com',
-  'release-assets.githubusercontent.com',
-  'raw.githubusercontent.com',
-];
-
 function expectPrivateGitHub(
   requests: readonly MirrorRequest[],
   vaults: readonly string[],
