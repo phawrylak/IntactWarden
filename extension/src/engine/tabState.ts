@@ -115,7 +115,6 @@ export interface TabStateInput {
   readonly sessions: readonly SessionRec[];
   readonly origin: ProtectedOrigin | null;
   readonly alert: OriginAlert | null;
-  readonly incidentId: string | null;
   readonly allowances: TabAllowances | null;
   readonly permissionMissing: boolean;
   readonly cores: ReadonlyMap<string, LoadedCore>;
@@ -182,7 +181,6 @@ export function buildTabState(i: TabStateInput): TabStateRecord | null {
     hint: top.binding === null ? (top.unknownBuild?.hint ?? null) : null,
     unknownBuild: i.unknownBuild,
     alert: i.alert,
-    incidentId: i.incidentId,
     allowances: i.allowances,
     permissionMissing: i.permissionMissing,
   };

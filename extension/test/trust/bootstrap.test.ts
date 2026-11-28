@@ -22,7 +22,7 @@ function withIndex(change: (index: {-readonly [K in keyof BootstrapIndex]: unkno
 }
 
 describe('loadBootstrap', () => {
-  it('loads and verifies every bundled core and the bundled pins', async () => {
+  it('loads and verifies every bundled core', async () => {
     const r = await loadBootstrap(packageReader(pkg.files));
     expect(r.error).toBeNull();
     expect(r.skipped).toEqual([]);
@@ -32,7 +32,6 @@ describe('loadBootstrap', () => {
     ]);
     expect(r.cores[0]!.parsed.core.build_id).toBe('vaultwarden-web@2026.10.1+release');
     expect(r.cores[0]!.parsed.fileIndex.lookup('/index.html')).not.toBeNull();
-    expect(r.pins).toHaveLength(2);
   });
 
   it('skips a tampered core and still loads the others', async () => {
@@ -120,7 +119,7 @@ describe('loadBootstrap', () => {
 
   it('a package without an index (the shipping package) has no bundled cores, without an error or a log', async () => {
     const logs: string[] = [];
-    const none = {cores: [], pins: [], skipped: [], error: null};
+    const none = {cores: [], skipped: [], error: null};
     expect(await loadBootstrap(packageReader(new Map()), code => logs.push(code))).toEqual(none);
     const unreadable = async (): Promise<Uint8Array> => {
       throw new Error('boom');

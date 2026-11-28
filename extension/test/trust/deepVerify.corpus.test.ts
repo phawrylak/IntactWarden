@@ -70,7 +70,6 @@ describe.runIf(CORPUS_ENABLED)('local deep verify on the corpus releases', () =>
     store = createLocalTrustStore({
       kv,
       db,
-      incident: async () => undefined,
       builder,
       builderFingerprint: 'f1',
       now: clock.now,

@@ -153,10 +153,8 @@ export interface MiniExt {
 export const HOST_PERMISSIONS = [
   'https://vault.bitwarden.com/*',
   'https://vault.bitwarden.eu/*',
-  'https://github.com/*',
+  'https://api.github.com/*',
   'https://release-assets.githubusercontent.com/*',
-  'https://objects.githubusercontent.com/*',
-  'https://raw.githubusercontent.com/*',
 ];
 
 /** A memory-backed Ext with the members the UI background code calls; every call is recorded. */
@@ -219,7 +217,10 @@ export function miniExt(options: {grantAll?: boolean} = {}): MiniExt {
         for (const o of p.origins ?? []) granted.add(o);
         return true;
       },
-      remove: async () => true,
+      remove: async (p: {origins?: string[]}) => {
+        calls.push({method: 'permissions.remove', args: p});
+        return true;
+      },
       onAdded: events.permissionsAdded,
       onRemoved: events.permissionsRemoved,
     },
@@ -312,7 +313,6 @@ export function tabRecord(partial: Partial<TabStateRecord> = {}): TabStateRecord
     hint: null,
     unknownBuild: null,
     alert: null,
-    incidentId: null,
     allowances: null,
     permissionMissing: false,
     ...partial,

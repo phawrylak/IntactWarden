@@ -17,8 +17,7 @@
  *   (memory, never written to disk), the last-seen build is not recorded, and all of it is purged
  *   when the last private tab closes.
  *
- * The trust store logs through the same book (background/main.ts), so all writes of the log are
- * serialised here.
+ * All writes of the log are serialised here.
  */
 
 import {rankOf} from '@intactwarden/core/verdict/states.ts';

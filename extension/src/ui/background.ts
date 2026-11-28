@@ -5,7 +5,9 @@
  *   private-window access, toolbar pin state, and protected tabs that were
  *   open before IntactWarden watched them ("Reload to verify");
  * - onInstalled (install, or an update while a required host permission is
- *   missing) and browser start while one is missing: open onboarding.
+ *   missing) and browser start while one is missing: open onboarding;
+ * - every background start removes the GitHub host permissions 1.0.0 needed
+ *   (an update installed while IntactWarden was disabled fires no onInstalled).
  *
  * Every listener is added synchronously inside registerUiHandlers, so
  * background/main.ts must call it before its first await (MV3 listener rule).
@@ -83,11 +85,26 @@ async function openOnboarding(ext: Ext, fragment = ''): Promise<void> {
 export function registerUiHandlers(router: Router, ext: Ext, registry: ProfileRegistry): void {
   router.handle('UI_GET_ONBOARDING', async () => onboardingStatus(ext, registry));
 
+  // 1.0.0 required these hosts and Firefox keeps them across an update. An update installed while
+  // IntactWarden was disabled fires no onInstalled when it is enabled again, so this runs at every
+  // start; removing hosts that are already gone does nothing. No server can be a GitHub host
+  // (serverAddress.ts), so this removes no server's access.
+  void ext.permissions
+    .remove({
+      origins: [
+        'https://github.com/*',
+        'https://objects.githubusercontent.com/*',
+        'https://raw.githubusercontent.com/*',
+      ],
+    })
+    .catch(() => false);
+
   ext.runtime.onInstalled.addListener(details => {
     void (async () => {
       if (details.reason === 'install') await openOnboarding(ext);
-      else if (details.reason === 'update' && (await requiredMissing(registry)))
+      else if (details.reason === 'update' && (await requiredMissing(registry))) {
         await openOnboarding(ext, '#permissions');
+      }
     })();
   });
 

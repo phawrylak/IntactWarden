@@ -28,7 +28,6 @@ import type {
   ExtensionDb,
   JobPhase,
   LoadedCore,
-  NewIncident,
   ReleaseDetail,
   ReleaseFailure,
   ReleaseKey,
@@ -42,12 +41,7 @@ import type {
 } from '../contracts.ts';
 import {buildIdOf, LOCAL_KEYS} from '../contracts.ts';
 import {profileByApp} from '@intactwarden/profiles';
-import {
-  loadBootstrap,
-  profileAssurance,
-  type BootstrapResult,
-  type PackageReader,
-} from './bootstrap.ts';
+import {loadBootstrap, profileAssurance, type PackageReader} from './bootstrap.ts';
 import {
   compareVersions,
   isRecord,
@@ -64,7 +58,7 @@ import {createCoresDb, verifyCoreBytes, type CoresDb} from './coresDb.ts';
 import type {GitHubClient} from './github.ts';
 import type {JobHost} from './jobHost.ts';
 import type {JobProgress} from './job.ts';
-import {createPinStore, disputeEvidence, type PinStore} from './pins.ts';
+import {createPinStore, type PinStore} from './pins.ts';
 import {resolveRelease} from './resolve.ts';
 
 export const MAX_JOBS = 50;
@@ -78,8 +72,6 @@ export const PERMISSION_RETRY_MS = 10 * 60_000;
 export interface StoreDeps {
   readonly kv: Kv;
   readonly db: ExtensionDb;
-  /** The incident log (the engine's AlertBook): a rebuild that differs is logged there. */
-  readonly incident: (n: NewIncident) => Promise<unknown>;
   readonly builder: CoreBuilder;
   /** Builder fingerprint (fingerprint.ts): local cores built by other code are dropped. */
   readonly builderFingerprint: string;
@@ -270,7 +262,6 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
   let writes: Promise<void> = Promise.resolve();
   let isReady = false;
   let initFailed = false;
-  let bundledCores: BootstrapResult['cores'] = [];
   /**
    * The stored release record could not be read at start-up, or start-up failed: memory may lack
    * its disputes, failures and local cores, so it is never written over (a write would erase a
@@ -343,41 +334,6 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
 
   // ----- start-up
 
-  /**
-   * A bundled core that contradicts the asset pin this browser recorded first is a dispute
-   * (bundled pins win). Runs at start-up, and again once local pins that could not be
-   * read then are read. Returns the releases it newly disputed.
-   */
-  function disputeBundledAgainstLocalPins(now: number): {key: ReleaseKey; reason: DisputeReason}[] {
-    const out: {key: ReleaseKey; reason: DisputeReason}[] = [];
-    for (const {entry, parsed} of bundledCores) {
-      if (states.get(entry.build_id)?.k === 'disputed') continue;
-      const {artifact, source} = parsed.core;
-      const repo = /^https:\/\/github\.com\/(.+)$/.exec(source.repo)?.[1];
-      const pin =
-        repo === undefined || source.tag === undefined
-          ? null
-          : pins.findLocalAsset(repo, source.tag, artifact.name);
-      if (pin === null) continue;
-      const changed = pin.sha256 !== artifact.sha256 || pin.size !== artifact.size;
-      const sameTag =
-        pin.tag_commit === source.commit &&
-        (pin.tag_object ?? null) === (source.tag_object ?? null);
-      if (!changed && sameTag) continue;
-      const reason: DisputeReason = changed ? 'pin-changed' : 'tag-moved';
-      const evidence = disputeEvidence(reason, pin, {
-        sha256: artifact.sha256,
-        commit: source.commit,
-        tagObject: source.tag_object,
-      });
-      log('trust.pins.bundled-contradicts-local', {build: entry.build_id, reason});
-      states.set(entry.build_id, {k: 'disputed', reason, at: now, evidence});
-      refs.set(entry.build_id, {...refs.get(entry.build_id)!, status: 'disputed'});
-      out.push({key: {app: entry.app, variant: entry.variant, version: entry.version}, reason});
-    }
-    return out;
-  }
-
   async function init(): Promise<void> {
     const [releasesRaw, jobsRaw] = await Promise.all([
       deps.kv
@@ -391,8 +347,7 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
     ]);
     await deps.github.load();
     const boot = await loadBootstrap(deps.readPackageFile, log);
-    bundledCores = boot.cores;
-    await pins.load(boot.pins);
+    await pins.load();
 
     const persistedCores =
       isRecord(releasesRaw) && isRecord(releasesRaw['cores']) ? releasesRaw['cores'] : {};
@@ -465,7 +420,6 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
         if (ref !== undefined) refs.set(id, {...ref, status: 'disputed'});
       }
     }
-    if (disputeBundledAgainstLocalPins(now).length > 0) dirty = true;
     if (await deps.hasGitHubPermission().catch(() => false)) {
       for (const [id, st] of states) {
         if (st.k === 'failed' && st.failure === 'permission-missing') {
@@ -637,27 +591,7 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
     for (const key of keys) emitDisputed(key, reason);
   }
 
-  /**
-   * A deep verify rebuilt a core in use and got other bytes: an incident with both hashes and no
-   * origin (it concerns the release, not a page). The binding does not change.
-   */
-  async function recordRebuildDiffers(existing: CoreRef, rebuilt: Sha256Hex): Promise<void> {
-    await deps.incident({
-      kind: 'deep-verify-failed',
-      origin: '',
-      path: '',
-      state: null,
-      reasons: ['rebuild-differs'],
-      buildId: existing.buildId,
-      expected: existing.sha256,
-      observed: rebuilt,
-    });
-  }
-
-  /**
-   * Checks the core a job built: a new release's core is written to IndexedDB and announced; a
-   * known release's core must be byte-identical to the one in use (nothing is written).
-   */
+  /** Checks the core a job built, then writes it to IndexedDB and announces it. */
   async function finishJob(
     view: DeepVerifyJobView,
     plan: AssetPlan,
@@ -690,13 +624,6 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
       version: plan.version,
     });
     if (assurance === null || !check.ok) return refused('invalid-core');
-    const existing = refs.get(buildId);
-    if (existing !== undefined && existing.sha256 !== built.sha256) {
-      // Rebuilt bytes differ from the core in use (bundled, or built by this builder code).
-      log('trust.job.rebuild-differs', {build: buildId, source: existing.source});
-      await recordRebuildDiffers(existing, built.sha256);
-      return refused('rebuild-differs');
-    }
     // Config inputs the core was derived from must be the files the job fetched.
     const inputs = check.parsed.core.derivation?.inputs ?? [];
     for (const input of inputs) {
@@ -706,30 +633,28 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
     }
     const dispute = disputeOf(plan);
     if (dispute !== null) return failJob(view, plan, disputedOutcome(dispute));
-    if (existing === undefined) {
-      // They become local pins (by commit), then the core is stored and registered.
-      for (const input of inputs) {
-        await pins.recordConfig(plan.repo, input.commit, input.path, input.sha256);
-      }
-      try {
-        await coresDb.put(built.bytes, check.parsed, built.sha256, deps.now());
-      } catch {
-        log('trust.cores.write-failed', {build: buildId});
-        return failJob(view, plan, {ok: false, failure: 'network', transient: true, retryAt: null});
-      }
-      refs.set(buildId, {
-        buildId,
-        app: plan.app,
-        variant: plan.variant,
-        version: plan.version,
-        assurance,
-        sha256: built.sha256,
-        size: built.bytes.length,
-        source: 'deep-verify',
-        addedAt: deps.now(),
-        status: 'current',
-      });
+    // They become local pins (by commit), then the core is stored and registered.
+    for (const input of inputs) {
+      await pins.recordConfig(plan.repo, input.commit, input.path, input.sha256);
     }
+    try {
+      await coresDb.put(built.bytes, check.parsed, built.sha256, deps.now());
+    } catch {
+      log('trust.cores.write-failed', {build: buildId});
+      return failJob(view, plan, {ok: false, failure: 'network', transient: true, retryAt: null});
+    }
+    refs.set(buildId, {
+      buildId,
+      app: plan.app,
+      variant: plan.variant,
+      version: plan.version,
+      assurance,
+      sha256: built.sha256,
+      size: built.bytes.length,
+      source: 'deep-verify',
+      addedAt: deps.now(),
+      status: 'current',
+    });
     setState(plan, null);
     attempts.delete(buildId);
     await persistReleases();
@@ -743,8 +668,8 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
       },
       true,
     );
-    log('trust.job.done', {fresh: existing === undefined});
-    if (existing === undefined) emitKnown([refs.get(buildId)!]);
+    log('trust.job.done');
+    emitKnown([refs.get(buildId)!]);
     return {ok: true};
   }
 
@@ -818,13 +743,8 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
           });
         }
         // The local pins must be in memory before one is checked or recorded (a failed read at
-        // start-up is retried here; while it fails, the job fails as transient). Read now, they
-        // may contradict a bundled core.
-        if (await pins.reload()) {
-          const disputed = disputeBundledAgainstLocalPins(deps.now());
-          if (disputed.length > 0) await persistReleases();
-          for (const d of disputed) emitDisputed(d.key, d.reason);
-        }
+        // start-up is retried here; while it fails, the job fails as transient).
+        await pins.reload();
         const dispute = disputeOf(plan);
         if (dispute !== null) return await failJob(viewRef.current, plan, disputedOutcome(dispute));
         const resolved = await resolveRelease(plan, {github: deps.github, pins});
@@ -836,6 +756,17 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
         }
         // TOFU: pin what GitHub lists now, before downloading.
         if (resolved.observed !== null) await pins.recordAsset(resolved.observed);
+        // The download is an API request too: if the last answer used up the hourly limit, wait
+        // for the reset instead of a request GitHub refuses.
+        const back = deps.github.backoffUntil();
+        if (back !== null) {
+          return await failJob(viewRef.current, plan, {
+            ok: false,
+            failure: 'rate-limited',
+            transient: true,
+            retryAt: back,
+          });
+        }
         const result = await deps.jobHost.run({...resolved.spec, jobId}, onProgress);
         return await finishJob(viewRef.current, plan, result);
       } catch (e) {
@@ -872,7 +803,7 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
     const id = buildIdOf(key);
     const before = releaseState(key);
     if (before.k === 'disputed') return disputedOutcome(before.reason);
-    if (before.k === 'known' && !user) return {ok: true, refs: before.refs};
+    if (before.k === 'known') return {ok: true, refs: before.refs};
     if (!user && before.k === 'failed') {
       const due = before.transient && (before.retryAt === null || before.retryAt <= deps.now());
       if (!due) return failureOf(before);
@@ -887,29 +818,21 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
     }
     const back = deps.github.backoffUntil();
     if (back !== null && !inflight.has(id)) {
-      const outcome: JobFailure = {
-        ok: false,
+      setState(plan, {
+        k: 'failed',
         failure: 'rate-limited',
         transient: true,
+        at: deps.now(),
         retryAt: back,
-      };
-      if (before.k !== 'known') {
-        setState(plan, {
-          k: 'failed',
-          failure: 'rate-limited',
-          transient: true,
-          at: deps.now(),
-          retryAt: back,
-        });
-        await persistReleases();
-      }
-      return outcome;
+      });
+      await persistReleases();
+      return {ok: false, failure: 'rate-limited', transient: true, retryAt: back};
     }
 
     const job = await startJob(plan, trigger);
     const after = releaseState(key);
     if (after.k === 'disputed') return disputedOutcome(after.reason);
-    if (!job.ok && (user || after.k !== 'known')) return job;
+    if (!job.ok) return job;
     if (after.k === 'known') return {ok: true, refs: after.refs};
     if (after.k === 'failed') return failureOf(after);
     log('trust.store.unexpected-state', {state: after.k, build: id});

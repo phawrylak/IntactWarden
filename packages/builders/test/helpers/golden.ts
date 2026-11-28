@@ -10,11 +10,11 @@
 
 export const GOLDEN_CORES: Readonly<Record<string, string>> = Object.freeze({
   'bitwarden-web@2026.10.1+selfhosted-commercial':
-    '6b43a747b1ae4f2ff8925b159ce1b24e263b230fb9eb78be700a81b852e82719',
+    '69f3650f025800fd2be65a3d9ede40da7ea34621c2b97f5e2cb08ea836a0849f',
   'bitwarden-web@2026.10.1+cloud-us':
     '40eaed9c10b200eaae067de95c908ad8fa5313ac01f689f00dee4bed9b36bf39',
   'bitwarden-web@2026.10.1+cloud-eu':
     '33ea05523e1c7595b32d39179ff291951aa6f060cc8c23bea6e474d88c66afb7',
   'vaultwarden-web@2026.10.1+release':
-    '4da7abfbf52dfd18cd966201b3a73a7e402342b5bcaa2c005868ce9cce232c29',
+    '2e297f6762a446de58fad3c1045bc042df5f25a183d36b482e309fee970a638a',
 });

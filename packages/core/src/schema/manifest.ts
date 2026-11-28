@@ -12,7 +12,6 @@
 
 import {createFileIndex, placeholderNames, templateSlotResolver} from '../routing/fileIndex.ts';
 import {checkRoutingConfig, type Hosting} from '../routing/mapUrl.ts';
-import {normalizePath} from '../routing/normalizePath.ts';
 import type {Template} from '../template/build.ts';
 import {validateTemplate} from '../template/match.ts';
 import {pathProblem} from './validate.ts';
@@ -34,13 +33,7 @@ export interface TemplateEntry {
   readonly template: Template;
 }
 
-/** Server-generated data file (e.g. Bitwarden self-hosted /app-id.json): never code. */
-export interface DynamicEntry {
-  readonly class: 'data';
-  readonly dynamic: true;
-}
-
-export type FileEntry = ExactEntry | TemplateEntry | DynamicEntry;
+export type FileEntry = ExactEntry | TemplateEntry;
 
 export interface Source {
   /** "https://github.com/<owner>/<repo>". */
@@ -104,10 +97,6 @@ export function isTemplateEntry(entry: FileEntry): entry is TemplateEntry {
   return 'template' in entry;
 }
 
-export function isDynamicEntry(entry: FileEntry): entry is DynamicEntry {
-  return 'dynamic' in entry;
-}
-
 export function isExactEntry(entry: FileEntry): entry is ExactEntry {
   return 'sha256' in entry;
 }
@@ -121,14 +110,7 @@ function keyProblem(key: string): string | null {
   if (names === null) return 'malformed "{SLOT}" placeholder (at most one per segment)';
   let probe = key;
   for (const name of names) probe = probe.replace(`{${name}}`, 'x');
-  const problem = pathProblem(probe);
-  if (problem !== null) return problem;
-  try {
-    const canonical = normalizePath(probe);
-    return canonical === probe ? null : `not in canonical form (${JSON.stringify(canonical)})`;
-  } catch (e) {
-    return e instanceof Error ? e.message : 'not a path';
-  }
+  return pathProblem(probe);
 }
 
 function templateProblem(key: string, template: Template): string | null {

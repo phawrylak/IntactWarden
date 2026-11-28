@@ -51,6 +51,7 @@ class IncidentsPage {
       ),
     );
     await this.load();
+    if (this.focusId) document.getElementById(`incident-${this.focusId}`)?.scrollIntoView();
     this.ctx.bridge.onBroadcast(type => {
       if (type === 'STATE_UPDATED') void this.load();
     });
@@ -134,7 +135,6 @@ class IncidentsPage {
         ),
       ),
     );
-    if (this.focusId) document.getElementById(`incident-${this.focusId}`)?.scrollIntoView();
   }
 
   private renderLog(): void {

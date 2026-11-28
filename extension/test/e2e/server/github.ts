@@ -1,13 +1,15 @@
 /**
  * A local mirror of the GitHub endpoints that local deep verify uses (api.github.com release,
- * git-ref and tag-object JSON by repository id, with asset digests, release downloads with their 302 to
- * release-assets, raw files by commit), serving the cached real release assets. It is the trust
+ * release-asset, git-ref and tag-object JSON by repository id, with asset digests; the asset
+ * download's 302 to release-assets; raw files by commit), serving the cached real release assets. It is the trust
  * tests' emulator (extension/test/trust/helpers/githubEmulator.ts) behind a real HTTP server, so the
  * same responses reach the extension over the network: Firefox reaches it over TLS through the
  * CONNECT proxy (proxy.ts), with the real host names in SNI and `Host`.
  *
- * api.github.com answers with GitHub's CORS headers (the extension reads the rate-limit headers
- * from a background fetch without a host permission). Release-asset downloads can be held until the
+ * As on GitHub, api.github.com and raw.githubusercontent.com answer with CORS headers and
+ * release-assets.githubusercontent.com with none, so a download works only with the host
+ * permissions of both api.github.com and release-assets. github.com and objects.githubusercontent.com
+ * are mirrored only so that a request to them is recorded: deep verify must send none. Release-asset downloads can be held until the
  * test releases them, so the amber phase of an unknown build is observable.
  */
 
@@ -15,6 +17,7 @@ import type {IncomingMessage, ServerResponse} from 'node:http';
 import {createFakeFetch} from '../../trust/helpers/fakeFetch.ts';
 import {createGitHubEmulator, type GitHubEmulator} from '../../trust/helpers/githubEmulator.ts';
 import type {Handler} from './http.ts';
+import {fetchPinned} from '../../../../tools/corpus.ts';
 import {bitwardenRelease, vaultwardenRelease} from './releases.ts';
 
 export const GITHUB_MIRROR_HOSTS: readonly string[] = Object.freeze([
@@ -88,6 +91,16 @@ export async function startGitHubMirror(): Promise<GitHubMirror> {
   emulator.setTag(bw.lock.release.repo, BITWARDEN_REPO_ID, bw.lock.release.tag, {
     commit: bw.lock.release.commit,
   });
+  // The config files a Bitwarden cloud build is derived with, on raw at the tag's commit.
+  for (const name of ['base', 'cloud', 'euprd'] as const) {
+    const file = bw.lock.config[name];
+    emulator.setRaw(
+      bw.lock.release.repo,
+      file.commit,
+      file.path,
+      await fetchPinned(file.url, file.sha256),
+    );
+  }
   const vw = await vaultwardenRelease();
   emulator.addRelease({
     repoId: vw.lock.release.repo_id,
@@ -177,7 +190,12 @@ export async function startGitHubMirror(): Promise<GitHubMirror> {
       res.end('not found');
       return;
     }
-    const out: Record<string, string> = host === 'api.github.com' ? {...API_CORS} : {};
+    const out: Record<string, string> =
+      host === 'api.github.com'
+        ? {...API_CORS}
+        : host === 'raw.githubusercontent.com'
+          ? {'access-control-allow-origin': '*'}
+          : {};
     r.headers.forEach((value, name) => (out[name] = value));
     const bytes = r.body === null ? new Uint8Array() : new Uint8Array(await r.arrayBuffer());
     if (r.status !== 204) out['content-length'] = String(bytes.length);

@@ -45,7 +45,6 @@ function syntheticBootstrap(): BootstrapData {
         path,
       },
     ],
-    pins: {schema: 'intactwarden.localpins/1', pins: []},
   };
   const indexBytes = enc.encode(JSON.stringify(index));
   return {
@@ -112,7 +111,7 @@ describe('buildExtension', () => {
         'LICENSE.txt',
       ]),
     );
-    // The shipping package bundles no cores and no pins.
+    // The shipping package bundles no cores.
     expect(first.files.filter(f => f.startsWith('data/'))).toEqual([]);
     expect(first.files).toEqual(expect.arrayContaining(ACTION_ICONS.map(i => actionIconFile(i))));
     expect(first.files.filter(f => f.endsWith('.png') && f.includes('/state/'))).toEqual([]);
@@ -127,13 +126,13 @@ describe('buildExtension', () => {
   });
 
   it('refuses bundled cores in a production build', async () => {
-    for (const options of [
-      {bootstrap: 'vaultwarden' as const},
-      {bootstrapData: syntheticBootstrap()},
-    ])
-      await expect(
-        buildExtension({...options, outRoot: join(root, 'refused'), localesDir: locales}),
-      ).rejects.toThrow(/test builds only/);
+    await expect(
+      buildExtension({
+        bootstrapData: syntheticBootstrap(),
+        outRoot: join(root, 'refused'),
+        localesDir: locales,
+      }),
+    ).rejects.toThrow(/test builds only/);
   });
 
   it('writes the builder fingerprint into the bundles', async () => {

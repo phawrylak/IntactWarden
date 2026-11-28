@@ -28,6 +28,7 @@ async function httpsViaProxy(
   net: MappedNetwork,
   host: string,
   path: string,
+  accept?: string,
 ): Promise<{status: number; headers: Record<string, string>; body: string}> {
   const {status, socket} = await tunnel(net.proxy.port, `${host}:443`);
   if (status !== 200) return {status, headers: {}, body: ''};
@@ -36,7 +37,8 @@ async function httpsViaProxy(
     tls.once('secureConnect', () => resolve());
     tls.once('error', reject);
   });
-  tls.write(`GET ${path} HTTP/1.1\r\nHost: ${host}\r\nConnection: close\r\n\r\n`);
+  const extra = accept === undefined ? '' : `Accept: ${accept}\r\n`;
+  tls.write(`GET ${path} HTTP/1.1\r\nHost: ${host}\r\n${extra}Connection: close\r\n\r\n`);
   const chunks: Buffer[] = [];
   for await (const c of tls) chunks.push(c as Buffer);
   const text = Buffer.concat(chunks).toString('latin1');
@@ -80,15 +82,36 @@ describe.runIf(E2E_ENABLED)('e2e network plumbing (no browser)', () => {
     );
   });
 
-  it('a release download answers 302 to release-assets', async () => {
+  it('an asset download through the API answers 302 to release-assets, with CORS', async () => {
     const vw = await vaultwardenRelease();
+    const {repo_id: repoId, tag, asset: name} = vw.lock.release;
+    const listed = await httpsViaProxy(
+      net,
+      'api.github.com',
+      `/repositories/${repoId}/releases/tags/${tag}`,
+    );
+    const release = JSON.parse(listed.body) as {assets: {id: number; name: string}[]};
+    const id = release.assets.find(a => a.name === name)!.id;
     const r = await httpsViaProxy(
       net,
-      'github.com',
-      `/${vw.lock.release.repo}/releases/download/${vw.lock.release.tag}/${vw.lock.release.asset}`,
+      'api.github.com',
+      `/repositories/${repoId}/releases/assets/${id}`,
+      'application/octet-stream',
     );
     expect(r.status).toBe(302);
-    expect(new URL(r.headers['location']!).host).toBe('release-assets.githubusercontent.com');
+    expect(r.headers['access-control-allow-origin']).toBe('*');
+    const file = await httpsViaProxy(
+      net,
+      'release-assets.githubusercontent.com',
+      new URL(r.headers['location']!).pathname,
+    );
+    expect(file.status).toBe(200);
+    expect(file.headers['access-control-allow-origin']).toBeUndefined();
+  });
+
+  it('raw files answer with CORS', async () => {
+    const r = await httpsViaProxy(net, 'raw.githubusercontent.com', '/no/such/file');
+    expect(r.headers['access-control-allow-origin']).toBe('*');
   });
 
   it('every other host is refused at the proxy', async () => {

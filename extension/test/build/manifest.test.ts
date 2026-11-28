@@ -7,6 +7,7 @@ import {
   generatedHostPermissions,
   officialMatchPatterns,
   originMatchPattern,
+  serializeManifest,
   TEST_HOST_PERMISSIONS,
   type JsonObject,
 } from '../../build/manifest.ts';
@@ -30,17 +31,22 @@ describe('host permissions', () => {
     }
   });
 
-  it('is the official origins plus the four GitHub hosts (and loopback in test builds)', () => {
+  it('is the official origins plus the API and release-assets (and loopback in test builds)', () => {
     const production = generatedHostPermissions({test: false});
     expect(production).toEqual([
       'https://vault.bitwarden.com/*',
       'https://vault.bitwarden.eu/*',
-      'https://github.com/*',
+      'https://api.github.com/*',
       'https://release-assets.githubusercontent.com/*',
-      'https://objects.githubusercontent.com/*',
-      'https://raw.githubusercontent.com/*',
     ]);
-    expect(production).not.toContain('https://api.github.com/*');
+    // raw answers with CORS headers, and github.com is never contacted.
+    for (const host of [
+      'raw.githubusercontent.com',
+      'github.com',
+      'objects.githubusercontent.com',
+    ]) {
+      expect(production).not.toContain(`https://${host}/*`);
+    }
     expect(generatedHostPermissions({test: true})).toEqual([
       ...production,
       ...TEST_HOST_PERMISSIONS,
@@ -85,6 +91,36 @@ describe('extension/manifest.json', () => {
         data_collection_permissions: {required: ['none']},
       },
     });
+  });
+});
+
+describe('serializeManifest', () => {
+  // AMO rewrites manifest.json with Python's json.dumps(manifest, indent=2) when it signs a package.
+  // Written in that encoding already, the file AMO serves is the release's, byte for byte.
+  it("writes AMO's encoding: Python json.dumps(indent=2), ASCII only, no final newline", () => {
+    const value: JsonObject = {
+      author: 'Paweł Hawrylak',
+      name: 'zażółć 😀',
+      ctl: 'a\u007fb\tc\u0001"/\\',
+      empty: [],
+      none: {},
+      nested: {a: [1, 'é', true, null]},
+    };
+    // python3 -c 'import json; print(json.dumps(json.dumps(VALUE, indent=2)))'
+    const python =
+      '{\n  "author": "Pawe\\u0142 Hawrylak",\n  "name": "za\\u017c\\u00f3\\u0142\\u0107 \\ud83d\\ude00",\n' +
+      '  "ctl": "a\\u007fb\\tc\\u0001\\"/\\\\",\n  "empty": [],\n  "none": {},\n  "nested": {\n    "a": [\n' +
+      '      1,\n      "\\u00e9",\n      true,\n      null\n    ]\n  }\n}';
+    expect(serializeManifest(value)).toBe(python);
+  });
+
+  it('the committed manifest is ASCII only, so the packaged one reads the same, without escapes', () => {
+    expect(readFileSync(MANIFEST_PATH, 'utf8')).toMatch(/^[\x20-\x7e\n]*$/);
+    const text = serializeManifest(committed());
+    expect(text).not.toContain('\\u');
+    expect(text.endsWith('}')).toBe(true);
+    expect(text).toContain('"author": "Pawel Hawrylak"');
+    expect(JSON.parse(text)).toEqual(committed());
   });
 });
 

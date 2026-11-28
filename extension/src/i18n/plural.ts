@@ -10,7 +10,7 @@
  * substitutions follow as `$2`..`$9`.
  */
 
-import {currentLang, hasMessage, t, type Lang} from './t.ts';
+import {currentLang, t, type Lang} from './t.ts';
 
 export type PluralCategory = 'one' | 'few' | 'many' | 'other';
 
@@ -29,8 +29,7 @@ export function pluralCategory(n: number, lang: Lang = currentLang()): PluralCat
 
 /** The key `tn` uses for `n` (exported for tests). */
 export function pluralKey(base: string, n: number, lang: Lang = currentLang()): string {
-  const key = `${base}_${pluralCategory(n, lang)}`;
-  return hasMessage(key) ? key : `${base}_other`;
+  return `${base}_${pluralCategory(n, lang)}`;
 }
 
 export function formatCount(n: number, lang: Lang = currentLang()): string {

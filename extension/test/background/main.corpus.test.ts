@@ -115,10 +115,7 @@ describe.runIf(CORPUS_ENABLED)('Firefox background on the real Vaultwarden relea
     }) as typeof fetch;
     await import('../../src/background/main.ts');
     await settle();
-    const added = (await ask('UI_ADD_INSTANCE', {
-      input: ORIGIN,
-      lookalikeConfirmed: false,
-    })) as {ok: boolean};
+    const added = (await ask('UI_ADD_INSTANCE', {input: ORIGIN})) as {ok: boolean};
     expect(added).toMatchObject({ok: true, value: {ok: true}});
     await settle();
   }, 600_000);

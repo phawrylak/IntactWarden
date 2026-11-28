@@ -6,7 +6,7 @@
  * - R2. An unknown tab, frame or document gives PROTECTION_LOST `untracked`.
  * - R3. A document whose bytes did not verify is PROTECTION_LOST, except an unknown build (R12)
  *   and the declared NOT_COVERED pages.
- * - R4. A request pending over 30 s (60 s for scripts and `xmlhttprequest`) is `timeout`.
+ * - R4. A request pending over 30 s (5 min for scripts and `xmlhttprequest`) is `timeout`.
  * - R5. A trust store that failed to start gives PROTECTION_LOST `internal-error`.
  * - R6. A document's state only rises, except that NEW_BUILD resolves and RECOVERING ends with its
  *   alert.
@@ -149,7 +149,7 @@ describe('fail-closed rules R1–R14', () => {
 
   it('R4 limits; a pending item withholds green; an unverifiable timeout item is PROTECTION_LOST', () => {
     expect([r4Ms('script'), r4Ms('xmlhttprequest'), r4Ms('stylesheet')]).toEqual([
-      60_000, 60_000, 30_000,
+      300_000, 300_000, 30_000,
     ]);
     const pending = {r9: {path: '/app/main.js', type: 'script' as const, since: 0}};
     expect(ev({}, {pending})).toMatchObject({state: 'VERIFIED', flags: ['CHECKING']});

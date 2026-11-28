@@ -52,7 +52,6 @@ export function formatBytes(n: number, lang: Lang = currentLang()): string {
   }).format(value);
 }
 
-/** First `n` hex digits of a sha256 followed by an ellipsis; '—' for anything that is not 64 lowercase hex (R9). */
 /** The whole sha256 when it is one (64 hex digits), else "—". */
 export function fullHash(sha256: string | null | undefined): string {
   return typeof sha256 === 'string' && HEX64.test(sha256) ? sha256 : '—';
@@ -108,21 +107,4 @@ export function releaseName(
 /** True for an "x.y.z" version (the only form a hint or a binding carries). */
 export function isVersion(value: unknown): value is string {
   return typeof value === 'string' && /^\d{1,9}\.\d{1,9}\.\d{1,9}$/.test(value);
-}
-
-/**
- * The host-permission pattern for an origin: "https://<host>/*" (or
- * "http://<host>/*"), without the port, since a match pattern cannot carry
- * one. Null for anything that is not an http(s) origin.
- */
-export function matchPatternForOrigin(origin: string): string | null {
-  let url: URL;
-  try {
-    url = new URL(origin);
-  } catch {
-    return null;
-  }
-  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
-  if (url.hostname === '') return null;
-  return `${url.protocol}//${url.hostname}/*`;
 }

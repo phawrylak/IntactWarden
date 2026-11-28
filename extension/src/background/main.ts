@@ -38,12 +38,11 @@ export async function main(): Promise<void> {
   const registry = createRegistry({ext, fetch: fetchFn, now});
   // IndexedDB can be unavailable: each call then fails (idb.ts).
   const db = deferredExtensionDb(openExtensionDb());
-  // Origin alerts and the incident log: the engine and the trust store write it.
+  // Origin alerts and the incident log: the engine writes it.
   const alerts = new AlertBook(createLocalStore(ext), now, createSessionStore(ext));
   const trust = createTrustStore({
     ext,
     db,
-    incident: n => alerts.incident(n),
     builder: createCoreBuilder(),
     fetch: fetchFn,
     now,

@@ -8,7 +8,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {sha256Hex} from '@intactwarden/core/hash/sha256.ts';
 import {isOwnRequest} from '../../src/backends/firefox/index.ts';
-import {SESSION_LIMITS} from '../../src/contracts.ts';
+import {r4Ms, SESSION_LIMITS} from '../../src/contracts.ts';
 import {popupView} from '../../src/ui/popup/model.ts';
 import type {WebRequestDetails} from '../../src/platform/webext.ts';
 import {details, FakeArea, FakeTimers, type FakeStreamFilter} from '../engine/helpers/fakeExt.ts';
@@ -970,7 +970,7 @@ describe('Firefox backend', () => {
     });
     await w.env.webRequest.onBeforeRequest.fire(d);
     const f = w.env.filters.get('slow')!;
-    w.timers.advance(61_000);
+    w.timers.advance(r4Ms('script') + 1_000);
     await w.settle();
     expect(f.closed).toBe(true);
     expect(f.written).toHaveLength(0);

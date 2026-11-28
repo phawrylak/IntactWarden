@@ -14,15 +14,12 @@ import {FLAG_LABEL} from './labels.ts';
 import {hasMessage, reasonKey, stateDescKey, stateKey, t} from '../../i18n/t.ts';
 import type {ActionIcon} from '../../platform/iconPaths.ts';
 
-/** Lattice icon plus the grey spinner shown while CHECKING withholds green. */
-export type ToolbarIcon = ActionIcon;
-
 /**
  * The icon for a tab state. While CHECKING withholds green the icon is never
  * green: a grey spinner unless a state of rank ≥ 4 applies, whose own icon is
  * shown instead.
  */
-export function toolbarIconFor(state: VerdictState, flags: readonly VerdictFlag[]): ToolbarIcon {
+export function toolbarIconFor(state: VerdictState, flags: readonly VerdictFlag[]): ActionIcon {
   if (flags.includes('CHECKING') && rankOf(state) < 4) return 'grey-spinner';
   return stateRow(state).icon;
 }

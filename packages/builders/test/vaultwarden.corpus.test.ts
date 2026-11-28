@@ -12,7 +12,7 @@
 import {beforeAll, describe, expect, it} from 'vitest';
 import {fileIndexOf} from '@intactwarden/core/routing/fileIndex.ts';
 import {mapUrl} from '@intactwarden/core/routing/mapUrl.ts';
-import {coreProblem, isDynamicEntry, isExactEntry} from '@intactwarden/core/schema/manifest.ts';
+import {coreProblem, isExactEntry} from '@intactwarden/core/schema/manifest.ts';
 import {
   CORPUS_ENABLED,
   fetchVaultwardenTarball,
@@ -124,12 +124,10 @@ describe.runIf(CORPUS_ENABLED)('vaultwarden builder on bw_web_builds v2026.10.1'
     expect(entries.some(([, e]) => 'areas' in e)).toBe(false);
     expect(entries.filter(([, e]) => e.class === 'sourcemap')).toHaveLength(LOCK.files.sourcemaps);
     expect(entries.filter(([p]) => !p.endsWith('.map'))).toHaveLength(LOCK.files.non_map_files);
-    // The server answers /app-id.json itself; everything else is exact.
-    expect(entries.filter(([, e]) => isDynamicEntry(e)).map(([p]) => p)).toEqual(['/app-id.json']);
+    expect(entries.filter(([, e]) => !isExactEntry(e))).toEqual([]);
     for (const [path, digest] of Object.entries(LOCK.files.sample)) {
       const e = core.files[path]!;
-      if (path !== '/app-id.json')
-        expect({path, sha256: isExactEntry(e) && e.sha256}).toEqual({path, sha256: digest});
+      expect({path, sha256: isExactEntry(e) && e.sha256}).toEqual({path, sha256: digest});
     }
     expect(core.files['/css/vaultwarden.css']).toBeUndefined();
   });

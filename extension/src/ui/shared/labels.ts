@@ -72,7 +72,6 @@ export const BUILD_REFUSAL_LABEL: Readonly<Record<ReleaseDetail, string>> = Obje
   'derivation-failed': 'refusal_derivation_failed',
   'invalid-core': 'refusal_invalid_core',
   unsupported: 'refusal_unsupported',
-  'rebuild-differs': 'refusal_rebuild_differs',
 });
 
 export const JOB_PHASE_LABEL: Readonly<Record<JobPhase, string>> = Object.freeze({
@@ -91,7 +90,6 @@ export const PROBE_REFUSAL_LABEL: Readonly<Record<AddInstanceRefusal, string>> =
   'invalid-input': 'options_add_refusal_invalid_input',
   'refused-official-origin': 'options_add_refusal_official_origin',
   'http-not-loopback': 'options_add_refusal_http_not_loopback',
-  'lookalike-unconfirmed': 'options_add_refusal_lookalike_unconfirmed',
   'permission-denied': 'options_add_refusal_permission_denied',
   unreachable: 'options_add_refusal_unreachable',
   'no-server': 'options_add_refusal_no_server',

@@ -15,13 +15,13 @@ import type {BuildRefusal} from './api.ts';
 
 /**
  * A release or core the builders refuse. `refusal` is the stable code that
- * CoreBuilder.build reports as BuildError.code (src/api.ts); every throw site
- * in this package sets it. The message is for logs only.
+ * CoreBuilder.build reports as BuildError.code (src/api.ts). The message is
+ * for logs only.
  */
 export class RefusalError extends Error {
   override name = 'RefusalError';
-  readonly refusal: BuildRefusal | undefined;
-  constructor(message: string, refusal?: BuildRefusal) {
+  readonly refusal: BuildRefusal;
+  constructor(message: string, refusal: BuildRefusal) {
     super(message);
     this.refusal = refusal;
   }

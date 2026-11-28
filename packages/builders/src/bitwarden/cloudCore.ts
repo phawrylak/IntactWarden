@@ -5,7 +5,8 @@
  * The cloud builds are not published. They are derived from the self-hosted
  * COMMERCIAL release zip with the closed derivation
  * (@intactwarden/core/derive/bitwarden-cloud-v1.ts) and the config files at the tag
- * commit. Files the derivation does not touch keep their exact entries. The six
+ * commit. Files the derivation does not touch keep their exact entries; a release where another
+ * script embeds CACHE_TAG is refused, as that script would differ on the cloud. The six
  * derived files become masked-hash templates whose only variable bytes are
  * the slots CACHE_TAG (a per-build random nonce) and MAIN / DUO_JS /
  * WEBAUTHN_FB_JS (content hashes in file names):
@@ -34,11 +35,7 @@
  *   `?cache=<CACHE_TAG>"` site or in the final `//` comment line; in HTML,
  *   inside a double-quoted src/href value;
  * - buildTemplate's byte checks (charset, neighbours, allowlist,
- *   round trip);
- * - a variation self-test: the files are derived a second time with other
- *   slot values (another CACHE_TAG length included), and every template must
- *   match the new bytes and extract exactly those values. So the derivation
- *   differs between deployments at the slots and nowhere else.
+ *   round trip).
  *
  * The source maps of the three derived scripts differ on the cloud and
  * cannot be derived; they are left out (source maps are never executed).
@@ -57,7 +54,6 @@ import {
   type SlotOccurrence,
   type Template,
 } from '@intactwarden/core/template/build.ts';
-import {matchTemplate} from '@intactwarden/core/template/match.ts';
 import {checkHtmlSlots, checkJsSlots} from '../contexts.ts';
 import {compareStrings, RefusalError} from '../files.ts';
 import {
@@ -69,7 +65,7 @@ import {
   type LoadedRelease,
   type ReleaseFileInfo,
 } from '../release.ts';
-import {bytesOf} from '../retain.ts';
+import {bytesOf, embedsCacheTag} from '../retain.ts';
 
 export type CloudVariant = 'cloud-us' | 'cloud-eu';
 export type BitwardenCloudEnv = 'cloud' | 'euprd';
@@ -120,21 +116,13 @@ const SCRIPTS: readonly ScriptSpec[] = [
 
 const HASH = /^[0-9a-f]{20}$/;
 
-/** Two complete sets of slot values that differ in every slot (CACHE_TAG also in length). */
-const PLACEHOLDERS: readonly [SlotValues, SlotValues] = [
-  {
-    CACHE_TAG: 'intact0a',
-    MAIN: '0123456789abcdef0123',
-    DUO_JS: '1123456789abcdef0123',
-    WEBAUTHN_FB_JS: '2123456789abcdef0123',
-  },
-  {
-    CACHE_TAG: 'intact1bcde',
-    MAIN: 'fedcba9876543210fedc',
-    DUO_JS: 'edcba9876543210fedcb',
-    WEBAUTHN_FB_JS: 'dcba9876543210fedcba',
-  },
-];
+/** The slot values the files are derived with; the templates mask them. */
+const PLACEHOLDERS: SlotValues = {
+  CACHE_TAG: 'intact0a',
+  MAIN: '0123456789abcdef0123',
+  DUO_JS: '1123456789abcdef0123',
+  WEBAUTHN_FB_JS: '2123456789abcdef0123',
+};
 
 const strictUtf8 = new TextDecoder('utf-8', {fatal: true});
 
@@ -187,6 +175,11 @@ function locateInputs(files: ReadonlyMap<string, ReleaseFileInfo>): Inputs {
     const file = found[0]!;
     scripts.set(spec.slot, {file, hash: file.path.slice(prefix.length, -3)});
   }
+  const derived = new Set([...scripts.values()].map(s => s.file.path));
+  for (const f of files.values()) {
+    if (f.bytes !== undefined && !derived.has(f.path) && embedsCacheTag(f.path, f.bytes))
+      throw new RefusalError(`${f.path} embeds CACHE_TAG but is not derived`, 'derivation-failed');
+  }
   return {html, scripts};
 }
 
@@ -235,10 +228,6 @@ function deriveAll(inputs: Inputs, cfg: BitwardenConfigs, values: SlotValues): D
   return out.sort((a, b) => compareStrings(a.key, b.key));
 }
 
-function slotsOf(t: Template): SlotName[] {
-  return [...new Set(t.parts.flatMap(p => ('slot' in p ? [p.slot as SlotName] : [])))];
-}
-
 /**
  * Template for one derived file: context check, then buildTemplate (byte
  * checks and the round trip).
@@ -247,24 +236,6 @@ async function templateFor(d: Derived): Promise<Template> {
   if (d.lang === 'js') checkJsSlots(d.bytes, d.occurrences);
   else checkHtmlSlots(d.bytes, d.occurrences);
   return buildTemplate(d.bytes, d.occurrences);
-}
-
-/** The variation self-test: `template` must match `d` and extract exactly `values`. */
-async function checkVariation(template: Template, d: Derived, values: SlotValues): Promise<void> {
-  const bound: Record<string, string> = {};
-  for (const slot of slotsOf(template)) bound[slot] = values[slot];
-  const r = await matchTemplate(template, d.bytes, bound);
-  if (!r.ok) {
-    throw new RefusalError(
-      `${d.key}: derivation differs outside the slots (${r.reason})`,
-      'derivation-failed',
-    );
-  }
-  const same =
-    Object.keys(r.slots).length === Object.keys(bound).length &&
-    Object.entries(bound).every(([k, v]) => r.slots[k] === v);
-  if (!same)
-    throw new RefusalError(`${d.key}: self-test extracted other slot values`, 'derivation-failed');
 }
 
 /**
@@ -286,8 +257,7 @@ export async function cloudCore(
     envName: env,
   };
   const inputs = locateInputs(loaded.files);
-  const derived = deriveAll(inputs, cfg, PLACEHOLDERS[0]);
-  const variation = deriveAll(inputs, cfg, PLACEHOLDERS[1]);
+  const derived = deriveAll(inputs, cfg, PLACEHOLDERS);
 
   const files: Record<string, FileEntry> = {};
   const replaced = new Set(derived.map(d => d.selfhostedPath));
@@ -296,10 +266,8 @@ export async function cloudCore(
     if (replaced.has(path) || sourceMapOfDerived) continue;
     files[path] = exactEntry(loaded.files.get(path)!);
   }
-  for (const [i, d] of derived.entries()) {
-    const template = await templateFor(d);
-    await checkVariation(template, variation[i]!, PLACEHOLDERS[1]);
-    files[d.key] = {class: d.cls, template};
+  for (const d of derived) {
+    files[d.key] = {class: d.cls, template: await templateFor(d)};
   }
 
   const {plan} = loaded;

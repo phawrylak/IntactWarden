@@ -20,10 +20,13 @@ A release is one `MAJOR.MINOR.PATCH` version, one signed tag
 4. **Submit** from the maintainer's computer: `bws run -- npm run publish:amo -- v<version>`. It
    checks the tag signature, `SHA256SUMS`, the provenance and the manifest, then uploads the attested
    zip unchanged with the source tarball; `--dry-run` only checks. The first version was submitted on
-   AMO's website instead, with the listing text.
-5. **Compare** once AMO has approved it: `gh workflow run store-diff.yml` (the daily run needs the
-   repository variable `AMO_LISTED` set to `true`, from 1.0.1 on), then smoke-test the live listing
-   on the current Firefox ESR and the latest release.
+   AMO's website instead, with the listing text. publish-amo does not change the listing: if
+   `docs/privacy.md` changed, update the privacy policy on the AMO listing to match it once AMO has
+   approved the version.
+5. **Compare** once AMO has approved it: `gh workflow run store-diff.yml`, then smoke-test the live
+   listing on the current Firefox ESR and the latest release. The repository variable `AMO_LISTED`
+   gates manual runs too (the job is skipped while it is not `true`); it is set to `true` once AMO
+   serves 1.0.1, the first version whose files match the release zip byte for byte.
 
 ## CI
 
@@ -36,7 +39,9 @@ Nothing CI produces reaches the extension at runtime.
   version, signed by the release key (`RELEASE_KEY_FPR`). It builds twice and compares, adds the
   source tarball and `SHA256SUMS`, attests both with GitHub build provenance and drafts the release.
 - `store-diff.yml` (daily, once the repository variable `AMO_LISTED` is `true`): compares the
-  package AMO serves with the attested release zip; only AMO's signature files may differ.
+  package AMO serves with the attested release zip; only AMO's signature files may differ. AMO
+  rewrites `manifest.json` when it signs a package, so the build writes it in AMO's encoding
+  (`serializeManifest` in `extension/build/manifest.ts`).
 
 ## Repository hardening
 

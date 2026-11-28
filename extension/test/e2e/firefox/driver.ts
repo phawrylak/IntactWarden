@@ -17,8 +17,8 @@
  *   tab) and then load the vault through WebDriver navigation, as typing the URL does. In a vault
  *   tab WebDriver runs page scripts only to read or set a marker or to do what the page itself
  *   would do (each helper says what it imitates).
- * - The toolbar popup and the blocked page are driven through their own buttons (`popupText`,
- *   `popup`, `proceedOnce`).
+ * - The toolbar popup and the blocked page are driven through their own buttons (`popup`,
+ *   `proceedOnce`).
  * - Host permissions: Firefox MV3 lets users withhold them, so the onboarding page's "Grant" button
  *   is clicked (a WebDriver click is user input; `extensions.webextOptionalPermissionPrompts`
  *   false answers the prompt) when a required pattern is missing, and an instance's pattern
@@ -554,33 +554,6 @@ export class RealFirefox implements E2EDriver {
     }
   }
 
-  async popupText(tab: number): Promise<string> {
-    await this.#d.switchTo().window(this.#control);
-    const url = `${this.baseUrl}ui/popup.html`;
-    // The control tab navigates itself a moment later, once `tab` is the active tab again, so
-    // the popup's `tabs.query({active: true, currentWindow: true})` finds the vault tab.
-    await this.#d.executeScript('setTimeout(() => { location.href = arguments[0]; }, 1000);', url);
-    await this.#api(['tabs', 'update'], tab, {active: true});
-    await new Promise(res => setTimeout(res, 2500));
-    const handle = this.#control;
-    await this.#d.switchTo().window(handle);
-    const until = Date.now() + 15_000;
-    for (;;) {
-      const now = await this.#d.getCurrentUrl().catch(() => '');
-      const text = await this.#d
-        .executeScript<string>(
-          "return document.querySelector('.state-title') ? document.body.innerText : '';",
-        )
-        .catch(() => '');
-      if (now === url && text !== '') {
-        await this.#openControl('ui/options.html');
-        return text;
-      }
-      if (Date.now() > until) throw new Error('firefox: the popup never rendered');
-      await new Promise(res => setTimeout(res, 200));
-    }
-  }
-
   async closeTab(tab: number): Promise<void> {
     await this.#api(['tabs', 'remove'], tab);
     this.#handles.delete(tab);
@@ -724,19 +697,26 @@ export class RealFirefox implements E2EDriver {
   }
 
   async frameState(tab: number, marker: string): Promise<FrameState> {
-    await this.#inTab(tab);
-    await this.#d.switchTo().frame(0);
-    try {
-      return await this.#d.executeScript<FrameState>(
-        `return {
-          ran: self[arguments[0]] === true,
-          elements: document.querySelectorAll('*').length,
-          error: (/^about:neterror\\?e=([^&]*)/.exec(document.documentURI) || [])[1] || null,
-        };`,
-        marker,
-      );
-    } finally {
-      await this.#d.switchTo().defaultContent();
+    // While Firefox replaces the frame's document (with its own error page, for example), the
+    // script can come back with null: read the new document instead.
+    for (let attempt = 1; ; attempt++) {
+      await this.#inTab(tab);
+      await this.#d.switchTo().frame(0);
+      try {
+        const state = await this.#d.executeScript<FrameState | null>(
+          `return {
+            ran: self[arguments[0]] === true,
+            elements: document.querySelectorAll('*').length,
+            error: (/^about:neterror\\?e=([^&]*)/.exec(document.documentURI) || [])[1] || null,
+          };`,
+          marker,
+        );
+        if (state !== null) return state;
+      } finally {
+        await this.#d.switchTo().defaultContent();
+      }
+      if (attempt === 20) throw new Error('frameState: the frame never returned its state');
+      await new Promise(r => setTimeout(r, 100));
     }
   }
 
@@ -853,11 +833,8 @@ api.tabs.update(tab, {active: true})
     return {
       text: async () => {
         await this.#d.switchTo().window(popupHandle);
+        await this.#d.wait(until.elementLocated(By.css('.state-title')), 15_000);
         return this.#d.executeScript<string>('return document.body.innerText;');
-      },
-      hasButton: async label => {
-        await this.#d.switchTo().window(popupHandle);
-        return (await this.#d.findElements(By.xpath(buttonXpath(label)))).length > 0;
       },
       click: async label => {
         await this.#d.switchTo().window(popupHandle);

@@ -1,10 +1,7 @@
 import {describe, expect, it} from 'vitest';
 import {
-  checkServerStyle,
   checkVaultwardenCss,
   MAX_SERVER_STYLE_BYTES,
-  STYLE_VALIDATORS,
-  type StyleValidator,
   VAULTWARDEN_STOCK_HIDE_SELECTORS,
 } from '../src/style/serverStyle.ts';
 import {utf8} from '../src/hash/sha256.ts';
@@ -36,7 +33,7 @@ const STOCK =
   '.providers-2fa-1,.providers-2fa-3,.providers-2fa-7{display:none !important}' +
   ICON;
 
-describe('vaultwarden-css/v1: accepted', () => {
+describe('checkVaultwardenCss: accepted', () => {
   it('accepts the stock compressed output', () => {
     const r = check(STOCK);
     expect(r.ok).toBe(true);
@@ -111,7 +108,7 @@ describe('vaultwarden-css/v1: accepted', () => {
   });
 });
 
-describe('vaultwarden-css/v1: hiding selectors outside the stock list', () => {
+describe('checkVaultwardenCss: hiding selectors outside the stock list', () => {
   // Hiding stops lazy-loaded images (/icons/<host>/icon.png) and
   // virtual-scroll fetches, so a selector that depends on vault data tells
   // the server what is on the page through requests that never arrive.
@@ -154,7 +151,7 @@ describe('vaultwarden-css/v1: hiding selectors outside the stock list', () => {
   });
 });
 
-describe('vaultwarden-css/v1: custom rules', () => {
+describe('checkVaultwardenCss: custom rules', () => {
   const custom = [
     'x{color:red}',
     'x{display:block}',
@@ -181,7 +178,7 @@ describe('vaultwarden-css/v1: custom rules', () => {
   });
 });
 
-describe('vaultwarden-css/v1: malformed', () => {
+describe('checkVaultwardenCss: malformed', () => {
   const malformed: Array<[string, string]> = [
     ['@import url(https://evil.example/x.css);', 'at-rules'],
     ['@font-face{font-family:x;src:url(https://evil.example/f)}', 'at-rules'],
@@ -228,16 +225,8 @@ describe('vaultwarden-css/v1: malformed', () => {
     expect(check(big)).toMatchObject({ok: false, reason: 'malformed'});
     expect(check(rule.repeat(Math.floor(MAX_SERVER_STYLE_BYTES / rule.length))).ok).toBe(true);
   });
-});
 
-describe('checkServerStyle', () => {
-  it('dispatches on the closed validator list and never throws', () => {
-    expect([...STYLE_VALIDATORS]).toEqual(['vaultwarden-css/v1']);
-    expect(checkServerStyle('vaultwarden-css/v1', utf8(STOCK)).ok).toBe(true);
-    expect(checkServerStyle('other/v1' as StyleValidator, utf8(STOCK))).toMatchObject({
-      ok: false,
-      reason: 'malformed',
-    });
+  it('never throws on a non-Uint8Array', () => {
     expect(checkVaultwardenCss('x{}' as unknown as Uint8Array)).toMatchObject({ok: false});
   });
 });

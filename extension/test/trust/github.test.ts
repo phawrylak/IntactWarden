@@ -6,7 +6,7 @@ import {
   SECONDARY_BACKOFF_MS,
 } from '../../src/trust/github.ts';
 import {createFakeFetch, jsonResponse} from './helpers/fakeFetch.ts';
-import {createGitHubEmulator} from './helpers/githubEmulator.ts';
+import {createGitHubEmulator, emuAssetId} from './helpers/githubEmulator.ts';
 import {manualClock, memoryKv} from './helpers/memory.ts';
 import {publishVw, sha256, VW_REPO_ID} from './helpers/vaultwarden.ts';
 
@@ -31,6 +31,7 @@ describe('GitHub REST client', () => {
     if (r.k !== 'ok') return;
     expect(r.value.tag).toBe('v2026.11.0');
     expect(r.value.assets.find(x => x.name === a.asset)).toEqual({
+      id: emuAssetId(VW_REPO_ID, 'v2026.11.0', a.asset),
       name: a.asset,
       size: a.tarball.length,
       sha256: sha256(a.tarball),
@@ -203,12 +204,16 @@ describe('reduceRelease', () => {
     const r = reduceRelease({
       tag_name: 't',
       assets: [
-        {name: 'a', size: 1, digest: `sha256:${'a'.repeat(64)}`, browser_download_url: 'u'},
-        {name: 'b', size: 1, digest: `sha256:${'A'.repeat(64)}`, browser_download_url: 'u'},
-        {name: 'c', size: 1, digest: null, browser_download_url: 'u'},
-        {name: 'd', size: 1, digest: `sha512:${'a'.repeat(128)}`, browser_download_url: 'u'},
-        {name: 'e', size: -1, browser_download_url: 'u'},
-        {name: 'f', size: 1, browser_download_url: 'u', state: 'starter'},
+        {id: 1, name: 'a', size: 1, digest: `sha256:${'a'.repeat(64)}`, browser_download_url: 'u'},
+        {id: 2, name: 'b', size: 1, digest: `sha256:${'A'.repeat(64)}`, browser_download_url: 'u'},
+        {id: 3, name: 'c', size: 1, digest: null, browser_download_url: 'u'},
+        {id: 4, name: 'd', size: 1, digest: `sha512:${'a'.repeat(128)}`, browser_download_url: 'u'},
+        {id: 5, name: 'e', size: -1, browser_download_url: 'u'},
+        {id: 6, name: 'f', size: 1, browser_download_url: 'u', state: 'starter'},
+        // No usable asset id: the asset cannot be downloaded through the API.
+        {name: 'g', size: 1, browser_download_url: 'u'},
+        {id: 0, name: 'h', size: 1, browser_download_url: 'u'},
+        {id: '7', name: 'i', size: 1, browser_download_url: 'u'},
       ],
     });
     expect(r?.assets.map(a => [a.name, a.sha256, a.uploaded])).toEqual([

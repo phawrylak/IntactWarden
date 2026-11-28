@@ -85,8 +85,8 @@ third-party code and is not minified, so the code you can read is the code that 
 
 **Reproducible packages.** A release is built only from a tag on `main` signed by the maintainer's
 release key, twice and byte-identical, with build provenance and `SHA256SUMS`
-([release](release.md#ci)). Only that zip is submitted to AMO, and from version 1.0.1 a daily
-workflow compares the package AMO serves with it.
+([release](release.md#ci)). Only that zip is submitted to AMO, and a daily workflow compares the
+package AMO serves with it.
 
 **What you still trust:**
 
@@ -94,7 +94,8 @@ workflow compares the package AMO serves with it.
   package).
 - **The maintainer.** A reproducible build shows that a package equals its tagged source, not that
   the source is benign. There is no external audit, and Firefox installs updates automatically, so a
-  malicious release could reach users before anyone has read it.
+  malicious release could reach users before anyone has read it. To read each version before it
+  runs, turn off automatic updates for IntactWarden ([how](guide.md#updates)).
 - **GitHub**, at the moment this browser first sees each vendor release.
 - **The vendors' source and release builds.** No release is rebuilt from source.
 
@@ -113,10 +114,12 @@ and to contain no third-party code, `eval`, remote scripts or source maps
 | `storage` | Settings, servers, alerts, incidents, manifests |
 | `notifications` | A notification for each new red state (can be turned off) |
 
-Site access: `vault.bitwarden.com`, `vault.bitwarden.eu`, and the GitHub hosts that serve release
-downloads and configuration files. Access to other sites is requested one site at a time, when you
-add a server; Firefox's "Access your data for all websites" must stay off. Not requested: `tabs`,
-`cookies`, `history`, `debugger`, `<all_urls>`.
+Site access: `vault.bitwarden.com`, `vault.bitwarden.eu`, `api.github.com` and
+`release-assets.githubusercontent.com`, where a release download starts and ends.
+`raw.githubusercontent.com` answers with CORS headers and needs no access; `github.com` is never
+contacted. Access to other sites is requested one site at a time, when you add a server; Firefox's
+"Access your data for all websites" must stay off. Not requested: `tabs`, `cookies`, `history`,
+`debugger`, `<all_urls>`.
 
 Every network request follows a page that runs a release IntactWarden does not have, **Retry** on a
 blocked page, or adding a server; nothing runs on a schedule. The full list, with what each request
@@ -129,7 +132,7 @@ package; only reading the code catches a malicious change in the source. You nee
 newer, `git`, `gpg`, `sha256sum` and the GitHub CLI `gh`.
 
 **1. Check the permissions.** In Extensions and Themes → IntactWarden → **Permissions and data**,
-the site switches must be the six required hosts plus one per server you added, and "Access your
+the site switches must be the four required hosts plus one per server you added, and "Access your
 data for all websites" must be off.
 
 **2. Check checksums and provenance** of the release files:
@@ -144,7 +147,8 @@ gh attestation verify intactwarden-<version>-firefox.zip --repo phawrylak/Intact
 **3. Compare the installed package with the release.** AMO re-signs every package; the tool ignores
 only its signature files and compares every other file byte for byte. (In 1.0.0 only, AMO's
 `manifest.json` differs too: AMO wrote the `ł` in the author's name as `\u0142` and dropped the
-final newline. From 1.0.1 the release writes it that way itself.) The installed file is in the
+final newline. From 1.0.1 the release writes `manifest.json` in AMO's encoding itself, and the
+author's name is plain ASCII.) The installed file is in the
 profile folder (`about:support` → **Profile Folder**).
 
 ```sh

@@ -25,6 +25,13 @@ icon → **Settings** → **Setup checklist**):
 The first visit to a vault, and the first after each vault release, is blocked as **New build**
 while your browser fetches the release from GitHub ([deep verify](#new-releases-and-deep-verify)).
 
+### Updates
+
+Firefox installs new versions of IntactWarden automatically. To read each version before it runs,
+open Extensions and Themes → IntactWarden and set "Allow automatic updates" to **Off**, then install
+updates yourself (gear menu → "Check for Updates"). New Bitwarden and Vaultwarden releases are still
+checked without an update, but fixes to IntactWarden reach you only when you install them.
+
 ## The toolbar icon
 
 | Icon | State of the current tab |

@@ -321,7 +321,7 @@ describe('popupView', () => {
       deploymentId: 'self-hosted',
       top: topDoc({binding: null}),
       hint: {version: '2026.11.0', at: 1},
-      unknownBuild: {phase: 'deep-verify', jobId: 'j1', failure: null},
+      unknownBuild: {phase: 'deep-verify', failure: null},
     });
     const v = popupView(r, EXT_VERSION);
     expect(v.provenance?.version).toBe('2026.11.0 (according to the server)');

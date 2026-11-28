@@ -86,7 +86,7 @@ export function jobRow(job: DeepVerifyJobView): string {
 }
 
 export function pinRow(pin: LocalPin): string {
-  const source = pin.source === 'bundled' ? t('trust_pin_bundled') : t('trust_pin_local');
+  const source = t('trust_pin_local');
   if (pin.kind === 'release-asset') {
     return t('trust_pin_asset', [
       `${pin.repo} ${pin.tag}`,

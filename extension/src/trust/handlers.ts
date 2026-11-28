@@ -44,15 +44,11 @@ export function registerTrustHandlers(
     if (
       !isRecord(payload) ||
       typeof payload.input !== 'string' ||
-      payload.input.length > MAX_INPUT ||
-      typeof payload.lookalikeConfirmed !== 'boolean'
+      payload.input.length > MAX_INPUT
     ) {
       badMessage();
     }
-    return registry.addInstance({
-      input: payload.input,
-      lookalikeConfirmed: payload.lookalikeConfirmed,
-    });
+    return registry.addInstance({input: payload.input});
   });
 
   router.handle('UI_REMOVE_INSTANCE', async payload => {

@@ -66,15 +66,8 @@ function stubs() {
     ],
     permissionStatus: async () => [
       {
-        pattern: 'https://github.com/*',
-        origin: 'https://github.com',
-        purpose: 'deep-verify',
-        required: true,
-        granted: true,
-      },
-      {
-        pattern: 'https://raw.githubusercontent.com/*',
-        origin: 'https://raw.githubusercontent.com',
+        pattern: 'https://release-assets.githubusercontent.com/*',
+        origin: 'https://release-assets.githubusercontent.com',
         purpose: 'deep-verify',
         required: true,
         granted: false,
@@ -104,7 +97,7 @@ describe('registerTrustHandlers', () => {
     }
   });
 
-  it('builds the trust panel view, with the GitHub permission only when every host is granted', async () => {
+  it('builds the trust panel view, with the GitHub permission only when it is granted', async () => {
     const {router, call} = captureRouter();
     const {trust, registry} = stubs();
     registerTrustHandlers(router, trust, registry);
@@ -138,19 +131,13 @@ describe('registerTrustHandlers', () => {
     const {router, call} = captureRouter();
     const {calls, trust, registry} = stubs();
     registerTrustHandlers(router, trust, registry);
-    expect(
-      await call('UI_ADD_INSTANCE', {input: 'vw.example', lookalikeConfirmed: false, extra: 1}),
-    ).toEqual({ok: false, code: 'duplicate-instance'});
+    expect(await call('UI_ADD_INSTANCE', {input: 'vw.example', extra: 1})).toEqual({
+      ok: false,
+      code: 'duplicate-instance',
+    });
     await call('UI_REMOVE_INSTANCE', {id: '0123456789abcdef'});
-    expect(calls).toEqual([
-      'add {"input":"vw.example","lookalikeConfirmed":false}',
-      'remove 0123456789abcdef',
-    ]);
-    for (const bad of [
-      {input: 'x'.repeat(5000), lookalikeConfirmed: false},
-      {input: 'vw.example'},
-      {input: 1, lookalikeConfirmed: false},
-    ]) {
+    expect(calls).toEqual(['add {"input":"vw.example"}', 'remove 0123456789abcdef']);
+    for (const bad of [{input: 'x'.repeat(5000)}, {input: 1}]) {
       await expect(call('UI_ADD_INSTANCE', bad)).rejects.toBeInstanceOf(MessageError);
     }
     await expect(call('UI_REMOVE_INSTANCE', {id: '../x'})).rejects.toBeInstanceOf(MessageError);

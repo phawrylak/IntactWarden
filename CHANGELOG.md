@@ -3,6 +3,30 @@
 All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/) from the first release on.
 
+## 1.0.1 (not published yet)
+
+- **Two GitHub permissions instead of four**: release files are downloaded through the GitHub API
+  (`api.github.com`), which redirects to `release-assets.githubusercontent.com`. IntactWarden no
+  longer contacts `github.com` or `objects.githubusercontent.com`, and `raw.githubusercontent.com`
+  needs no permission because it answers with CORS headers. So IntactWarden no longer has access to
+  `github.com`, where you may be signed in. Deep verify makes one more GitHub API request per
+  release, which counts towards GitHub's limit of 60 requests an hour. If you update from 1.0.0,
+  Firefox does not grant the new access to `api.github.com` by itself, so the setup page opens and
+  you choose **Grant access**; the update removes the old access to `github.com`,
+  `objects.githubusercontent.com` and `raw.githubusercontent.com`.
+- **Every file AMO serves, apart from its signature, matches the release zip byte for byte**:
+  `manifest.json` is now written the way AMO rewrites it when it signs a package (non-ASCII
+  characters as `\u` escapes, no final newline), so every file can be compared byte for byte. In
+  1.0.0 the two copies differed in this encoding only.
+- **Manifests are built again once**: the code that builds manifests changed, so the update drops
+  the manifests built by 1.0.0, and the next visit to each vault downloads its release from GitHub
+  again (about 40–50 MB per release). This needs the access to `api.github.com` above: until you
+  choose **Grant access**, every vault shows New build and, after 10 minutes, is blocked as Build
+  not verified.
+- **Fixes**: a large script from a slow self-hosted server no longer loses protection after 60
+  seconds (the limit is now 5 minutes), and **Retry** on a Build not verified page answers at once
+  when the release has become known, instead of downloading it again.
+
 ## 1.0.0 (2026-11-25), the first release
 
 Published on [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/) and as a

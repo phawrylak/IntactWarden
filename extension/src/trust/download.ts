@@ -83,6 +83,8 @@ function contentLength(res: Response): number | null {
 
 export interface DownloadOptions {
   readonly url: string;
+  /** The request's Accept header, if any. */
+  readonly accept?: string;
   /** Lowercase hex sha256 the bytes must hash to (GitHub's listed digest). */
   readonly sha256: string;
   /** Exact size the bytes must have (GitHub's listed size). */
@@ -133,6 +135,7 @@ export async function downloadVerified(
     try {
       res = await fetchFn(options.url, {
         method: 'GET',
+        ...(options.accept === undefined ? {} : {headers: {Accept: options.accept}}),
         credentials: 'omit',
         cache: 'no-store',
         redirect: 'follow',

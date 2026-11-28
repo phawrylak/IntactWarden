@@ -74,7 +74,7 @@ function checkOccurrence(bytes: Uint8Array, o: SlotOccurrence): void {
 // JavaScript
 
 /** `?cache=`, the bytes before every CACHE_TAG site of the derivation. */
-const CACHE_SITE = '?cache=';
+export const CACHE_SITE = '?cache=';
 /**
  * The start of the last line, the only site of a content-hash slot. A template, so the bundle
  * holds no literal source-map comment (AMO's linter reads one as minified code).
@@ -182,7 +182,7 @@ function startsWithAscii(bytes: Uint8Array, pos: number, ascii: string, caseless
   return true;
 }
 
-function indexOfAscii(bytes: Uint8Array, ascii: string, from: number): number {
+export function indexOfAscii(bytes: Uint8Array, ascii: string, from: number): number {
   const first = ascii.charCodeAt(0);
   for (let i = bytes.indexOf(first, from); i >= 0; i = bytes.indexOf(first, i + 1)) {
     if (startsWithAscii(bytes, i, ascii)) return i;

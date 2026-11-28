@@ -46,8 +46,8 @@ function statusOf(granted: boolean | 'fails'): Pick<ProfileRegistry, 'permission
       if (granted === 'fails') throw new Error('not ready');
       return [
         {
-          pattern: 'https://github.com/*',
-          origin: 'https://github.com',
+          pattern: 'https://release-assets.githubusercontent.com/*',
+          origin: 'https://release-assets.githubusercontent.com',
           purpose: 'deep-verify',
           required: true,
           granted,
@@ -231,8 +231,8 @@ function fakeRegistry(
           granted: true,
         },
         {
-          pattern: 'https://github.com/*',
-          origin: 'https://github.com',
+          pattern: 'https://release-assets.githubusercontent.com/*',
+          origin: 'https://release-assets.githubusercontent.com',
           purpose: 'deep-verify',
           required: true,
           granted: githubGranted,
@@ -284,7 +284,9 @@ describe('registerUiHandlers', () => {
     expect(
       status.permissions.find(p => p.pattern === 'https://vault.bitwarden.com/*'),
     ).toMatchObject({granted: true, purpose: 'official'});
-    expect(status.permissions.find(p => p.pattern === 'https://github.com/*')).toMatchObject({
+    expect(
+      status.permissions.find(p => p.pattern === 'https://release-assets.githubusercontent.com/*'),
+    ).toMatchObject({
       granted: false,
       purpose: 'deep-verify',
     });
@@ -318,6 +320,28 @@ describe('registerUiHandlers', () => {
         m.calls.some(c => c.method === 'tabs.create'),
         String(granted),
       ).toBe(opened);
+    }
+  });
+
+  it('removes the GitHub host permissions of 1.0.0 once at every start, whatever the reason', async () => {
+    // An update installed while IntactWarden was disabled starts it with no onInstalled.
+    for (const reason of ['install', 'update', null] as const) {
+      const m = miniExt();
+      registerUiHandlers(fakeRouter(), m.ext, fakeRegistry());
+      if (reason !== null) m.events.installed.fire({reason} as never);
+      await flush();
+      expect(
+        m.calls.filter(c => c.method === 'permissions.remove').map(c => c.args),
+        String(reason),
+      ).toEqual([
+        {
+          origins: [
+            'https://github.com/*',
+            'https://objects.githubusercontent.com/*',
+            'https://raw.githubusercontent.com/*',
+          ],
+        },
+      ]);
     }
   });
 

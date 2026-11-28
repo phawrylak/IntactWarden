@@ -614,10 +614,10 @@ describe('engine: retro binding, CHECKING and dispute evidence', () => {
     w.env.filters.get(s.requestId)!.respond(MAIN);
     await w.settle();
     w.trust.cores.push(vwCore('2026.11.0', {'/index.html': PAGE, [MAIN_PATH]: MAIN}));
-    // An unrelated evaluation (an allowance) runs while the retro pass awaits its hashes.
+    // An unrelated evaluation (an acknowledgement) runs while the retro pass awaits its hashes.
     await Promise.all([
       w.engine.releaseKnown(w.trust.cores.map(c => c.ref)),
-      w.engine.allowForTab(1, {k: 'proceed-once', sha256: 'ab'.repeat(32)}),
+      w.engine.acknowledgeAlert(VW_ORIGIN),
     ]);
     await w.settle();
     const t = await w.tab(1);

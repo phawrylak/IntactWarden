@@ -71,19 +71,11 @@ export interface GzipMember {
 const HEADER_SIZE = 10;
 const TRAILER_SIZE = 8;
 const CM_DEFLATE = 8;
-const U32_MAX = 0xffffffff;
-/**
- * Deflate cannot expand data by more than 1032:1 (a 258-byte match costs at
- * least two bits); ISIZE beyond this bound plus slack is a lie, refused
- * before anything is inflated.
- */
-const MAX_DEFLATE_RATIO = 1032;
-const RATIO_SLACK = 4096;
 
 /** Parses and checks the header and trailer of a single-member gzip file (nothing is inflated). */
 export function readGzipMember(gz: Uint8Array, limits: GzipLimits = {}): GzipMember {
   if (!(gz instanceof Uint8Array)) throw new TypeError('readGzipMember: input must be bytes');
-  const maxOutputSize = checkLimits(limits);
+  const maxOutputSize = limits.maxOutputSize ?? DEFAULT_GZIP_LIMITS.maxOutputSize;
   if (gz.length < 2 || gz[0] !== 0x1f || gz[1] !== 0x8b) {
     throw new GzipError('not-gzip', 'not a gzip file (missing 1f 8b)');
   }
@@ -102,18 +94,11 @@ export function readGzipMember(gz: Uint8Array, limits: GzipLimits = {}): GzipMem
   }
   const end = gz.length - TRAILER_SIZE;
   const trailer = new DataView(gz.buffer, gz.byteOffset + end, TRAILER_SIZE);
-  const deflateLength = end - HEADER_SIZE;
   const isize = trailer.getUint32(4, true);
   if (isize > maxOutputSize) {
     throw new GzipError(
       'limit-exceeded',
       `${isize} decompressed bytes exceed the limit of ${maxOutputSize}`,
-    );
-  }
-  if (isize > deflateLength * MAX_DEFLATE_RATIO + RATIO_SLACK) {
-    throw new GzipError(
-      'size-mismatch',
-      `ISIZE ${isize} is more than ${deflateLength} deflate bytes can produce`,
     );
   }
   return {crc32: trailer.getUint32(0, true), isize, deflate: gz.subarray(HEADER_SIZE, end)};
@@ -180,12 +165,4 @@ export async function* inflateGzip(
     );
   }
   if (crc !== member.crc32) throw new GzipError('crc-mismatch', 'CRC-32 mismatch');
-}
-
-function checkLimits(limits: GzipLimits): number {
-  const max = limits.maxOutputSize ?? DEFAULT_GZIP_LIMITS.maxOutputSize;
-  if (!Number.isSafeInteger(max) || max < 0 || max > U32_MAX) {
-    throw new TypeError('maxOutputSize must be an integer between 0 and 2^32 - 1');
-  }
-  return max;
 }

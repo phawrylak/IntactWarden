@@ -319,8 +319,8 @@ describe('onboarding', () => {
         granted: true,
       },
       {
-        pattern: 'https://github.com/*',
-        origin: 'https://github.com',
+        pattern: 'https://release-assets.githubusercontent.com/*',
+        origin: 'https://release-assets.githubusercontent.com',
         purpose: 'deep-verify',
         required: true,
         granted: false,
@@ -342,9 +342,9 @@ describe('onboarding', () => {
     const m = onboardingModel(status);
     expect(m.permissions.map(p => [p.pattern, p.status])).toEqual([
       ['https://vault.bitwarden.com/*', 'granted'],
-      ['https://github.com/*', 'not granted'],
+      ['https://release-assets.githubusercontent.com/*', 'not granted'],
     ]);
-    expect(m.missing).toEqual(['https://github.com/*']);
+    expect(m.missing).toEqual(['https://release-assets.githubusercontent.com/*']);
     expect(m.protection).toMatch(/^IntactWarden checks every file before/);
     expect(m.protectionDetail).toMatch(/only in Firefox with IntactWarden/);
     expect(m.pin).toBe('Make sure the IntactWarden icon is pinned to the toolbar.');
@@ -434,7 +434,7 @@ describe('options', () => {
             asset: 'bw_web_v2026.10.1.tar.gz',
             sha256: SHA_B,
             size: 41793283,
-            source: 'bundled',
+            source: 'local',
           },
         ],
       },
@@ -450,11 +450,11 @@ describe('options', () => {
       source: 'Bundled with IntactWarden',
     });
     expect(m.pins).toEqual([
-      `dani-garcia/bw_web_builds v2026.10.1 · bw_web_v2026.10.1.tar.gz · sha256 ${SHA_B} · bundled`,
+      `dani-garcia/bw_web_builds v2026.10.1 · bw_web_v2026.10.1.tar.gz · sha256 ${SHA_B} · first seen by this browser`,
     ]);
   });
 
-  it('names the failure detail in the job list (a rebuild that differs)', () => {
+  it('names the failure detail in the job list (an invalid built manifest)', () => {
     const job: DeepVerifyJobView = {
       jobId: '0123456789abcdef',
       app: 'vaultwarden-web',
@@ -465,7 +465,7 @@ describe('options', () => {
       phase: 'failed',
       startedAt: Date.UTC(2026, 10, 6),
       failure: 'build-refused',
-      detail: 'rebuild-differs',
+      detail: 'invalid-core',
     };
     const m = trustModel(
       {
@@ -477,7 +477,7 @@ describe('options', () => {
       },
       Date.UTC(2026, 10, 6),
     );
-    expect(m.jobs[0]).toContain('differs from the one in use');
+    expect(m.jobs[0]).toContain('the built manifest is invalid');
     expect(m.summary).toContain(
       'The stored manifests could not be loaded: every protected page shows "Protection lost".',
     );

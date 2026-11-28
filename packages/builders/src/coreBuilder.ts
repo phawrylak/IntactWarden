@@ -1,13 +1,11 @@
 /**
  * The CoreBuilder of api.ts. `plan` comes from the bundled profiles and the cloud table of
  * cloudCore.ts, never from the network. `build` checks the request against its plan, loads the
- * asset (size and sha256 before anything parses the bytes), builds the one requested variant and
- * checks the core's identity.
+ * asset (size and sha256 before anything parses the bytes) and builds the one requested variant.
  *
  * Every refusal is a BuildError whose code comes from the throw site (RefusalError.refusal), from
  * the error class of @intactwarden/core (archive readers: `archive-invalid`; derivation and
- * template checks: `derivation-failed`), or, for anything unexpected, from the phase that failed
- * (request `unsupported`, load `archive-invalid`, build `derivation-failed`).
+ * template checks: `derivation-failed`), or, for anything unexpected, is `unsupported`.
  */
 
 import {GzipError} from '@intactwarden/core/archive/gzip.ts';
@@ -39,23 +37,14 @@ const APP_OF: Readonly<Record<BuilderVariant, BuilderApp>> = {
 
 const OBJECT_ID = /^[0-9a-f]{40}$/;
 
-type Phase = 'request' | 'load' | 'build';
-
-const PHASE_FALLBACK: Readonly<Record<Phase, BuildRefusal>> = {
-  request: 'unsupported',
-  load: 'archive-invalid',
-  build: 'derivation-failed',
-};
-
 function refuse(code: BuildRefusal, message: string): never {
   throw new BuildError(code, message);
 }
 
 /** Maps anything a loader or builder throws to a BuildError (see the module comment). */
-export function toBuildError(error: unknown, fallback: BuildRefusal): BuildError {
+export function toBuildError(error: unknown): BuildError {
   if (error instanceof BuildError) return error;
-  if (error instanceof RefusalError)
-    return new BuildError(error.refusal ?? fallback, error.message);
+  if (error instanceof RefusalError) return new BuildError(error.refusal, error.message);
   const message = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
   if (error instanceof ZipError || error instanceof TarError || error instanceof GzipError) {
     return new BuildError('archive-invalid', message);
@@ -63,7 +52,7 @@ export function toBuildError(error: unknown, fallback: BuildRefusal): BuildError
   if (error instanceof DeriveError || error instanceof TemplateError) {
     return new BuildError('derivation-failed', message);
   }
-  return new BuildError(fallback, message);
+  return new BuildError('unsupported', message);
 }
 
 /** The fetch plan of one variant and version (CoreBuilder.plan). */
@@ -88,10 +77,7 @@ function planOf(app: BuilderApp, variant: BuilderVariant, version: string): Asse
 }
 
 /** Builds the one variant of a request (CoreBuilder.build, before error mapping). */
-async function buildChecked(
-  request: BuildRequest,
-  setPhase: (phase: Phase) => void,
-): Promise<BuiltCore> {
+async function buildChecked(request: BuildRequest): Promise<BuiltCore> {
   const plan = planOf(request.app, request.variant, request.version);
   const {release, asset} = request;
   if (release.tag !== plan.tag) {
@@ -111,10 +97,7 @@ async function buildChecked(
     refuse('unsupported', 'tag object must be the 40-hex id of an annotated tag, not the commit');
   }
 
-  setPhase('load');
   const loaded = await loadRelease(plan, release, asset);
-
-  setPhase('build');
   const build: CoreBuild = isCloudVariant(plan.variant)
     ? await cloudCore(loaded, plan.variant, request.configs ?? {})
     : await releaseCore(loaded);
@@ -124,33 +107,23 @@ async function buildChecked(
 /** Creates the CoreBuilder over the bundled profiles. Stateless; safe to share. */
 export function createCoreBuilder(): CoreBuilder {
   const build = async (request: BuildRequest): Promise<BuiltCore> => {
-    let phase: Phase = 'request';
     try {
-      return await buildChecked(request, p => (phase = p));
+      return await buildChecked(request);
     } catch (e) {
-      throw toBuildError(e, PHASE_FALLBACK[phase]);
+      throw toBuildError(e);
     }
   };
   return Object.freeze({plan: planOf, build});
 }
 
-/** The BuiltCore of one variant, after checking that the core names what was asked for. */
+/** The BuiltCore of one variant. releaseCore and cloudCore name the core after the plan. */
 function builtCore(plan: AssetPlan, build: CoreBuild): BuiltCore {
   const {core} = build;
-  const buildId = `${plan.app}@${plan.version}+${plan.variant}`;
-  if (
-    core.build_id !== buildId ||
-    core.app !== plan.app ||
-    core.variant !== plan.variant ||
-    core.version.label !== plan.version
-  ) {
-    refuse('invalid-core', `built ${core.build_id}, expected ${buildId}`);
-  }
   const inputs = core.derivation?.inputs;
   return Object.freeze({
     app: plan.app,
     variant: plan.variant,
-    buildId,
+    buildId: `${plan.app}@${plan.version}+${plan.variant}`,
     version: plan.version,
     assurance: APPS[plan.app].profile.variants[plan.variant]!.assurance,
     core,

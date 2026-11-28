@@ -4,6 +4,7 @@
  * - Pages fail closed when the background does not answer: a list that
  *   did not load is never shown as empty ("No open alerts."), and Options never shows the default
  *   settings as if they were the user's.
+ * - Options asks for a look-alike server's permission only once the user confirmed it.
  * - The blocked page renders a denied document, and on NEW_BUILD the deep verify it waits
  *   for: it reloads the vault once that job is done, and while no job runs it says so and
  *   "Check now" loads the vault again. A final view the background returns later replaces it for
@@ -64,12 +65,16 @@ class FakeNode {
   removeAttribute(n: string): void {
     this.attributes.delete(n);
   }
-  readonly listeners = new Map<string, (() => void)[]>();
-  addEventListener(type: string, fn: () => void): void {
+  readonly listeners = new Map<string, ((event?: unknown) => void)[]>();
+  addEventListener(type: string, fn: (event?: unknown) => void): void {
     this.listeners.set(type, [...(this.listeners.get(type) ?? []), fn]);
   }
   click(): void {
     for (const fn of this.listeners.get('click') ?? []) fn();
+  }
+  /** Fires `type` with an event whose target is `target` (an input's value or checked). */
+  fire(type: string, target: Record<string, unknown>): void {
+    for (const fn of this.listeners.get(type) ?? []) fn({target});
   }
   focus(): void {
     (g.document as {activeElement?: FakeNode}).activeElement = this;
@@ -154,6 +159,7 @@ async function openPage(page: string, answer: {current: Answer}, hash = '') {
   let closed = 0;
   g.window = {close: () => void closed++};
   const reloaded: unknown[][] = [];
+  const requested: unknown[] = [];
   // The blocked page polls every 60 s; the tests drive it by broadcasts instead.
   g.setInterval = () => 0;
   const listeners: ((m: unknown, s: {id: string}) => void)[] = [];
@@ -171,7 +177,15 @@ async function openPage(page: string, answer: {current: Answer}, hash = '') {
       },
     },
     i18n: {getMessage, getUILanguage: () => 'en'},
-    permissions: {onAdded: noop, onRemoved: noop, contains: async () => true},
+    permissions: {
+      onAdded: noop,
+      onRemoved: noop,
+      contains: async () => true,
+      request: async (p: unknown) => {
+        requested.push(p);
+        return false;
+      },
+    },
     tabs: {
       query: async () => [{id: 7}],
       reload: async (...args: unknown[]) => void reloaded.push(args),
@@ -183,6 +197,7 @@ async function openPage(page: string, answer: {current: Answer}, hash = '') {
     app,
     assigned,
     reloaded,
+    requested,
     closed: () => closed,
     title: () => (g.document as {title: string}).title,
     async broadcast(type: string, payload: unknown = {}): Promise<void> {
@@ -293,6 +308,22 @@ describe('Options when only the server list fails to load', () => {
     const {app} = await openPage('options', {current: answer});
     expect(app.textContent).toContain('your browser downloads it from GitHub (about 40–50 MB)');
     expect(app.textContent).toContain('The trust data could not be loaded.');
+  });
+});
+
+describe('Options add server', () => {
+  it('asks for a look-alike host only once the user confirmed it', async () => {
+    const answer: Answer = type =>
+      type === 'UI_GET_SETTINGS'
+        ? {ok: true, value: DEFAULT_SETTINGS}
+        : {ok: false, error: 'internal-error'};
+    const {app, requested} = await openPage('options', {current: answer});
+    app.find('instance-origin')!.fire('input', {value: 'https://vault.bitwarnem.com'});
+    app.button('Add server')!.click();
+    expect(requested).toEqual([]);
+    app.find('confirm-lookalike')!.fire('change', {checked: true});
+    app.button('Add server')!.click();
+    expect(requested).toEqual([{origins: ['https://vault.bitwarnem.com/*']}]);
   });
 });
 

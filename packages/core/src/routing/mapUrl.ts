@@ -56,7 +56,7 @@
  *   (template `404.hbs`), never `not_found`. Paths the server generates itself
  *   (`/css/vaultwarden.css`, `/app-id.json`, `/api/**`, ...) are profile data:
  *   the caller classifies them (profile `resources.server_styles` and
- *   `dynamic_same_origin`, manifest dynamic entries) before it asks mapUrl, so
+ *   `dynamic_same_origin`) before it asks mapUrl, so
  *   here they are ordinary paths and content for one that the core does not
  *   list maps to key null.
  */

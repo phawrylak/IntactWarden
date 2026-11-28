@@ -1,6 +1,7 @@
 /**
- * Instance input parsing and the look-alike check. Pure: the options page also runs both before it
- * requests the host permission.
+ * Instance input parsing and the look-alike check. Pure: the options page runs both before it
+ * requests the host permission, and the background parses the input again where the instance is
+ * stored (deployments/index.ts).
  *
  * - https always; http only for this computer (loopback), where Firefox gives the vault the
  *   secure context its crypto needs.
@@ -8,21 +9,26 @@
  *   of deep verify) are refused by host name, on any port: an instance there would share the
  *   required permission pattern, and removing the instance's permission would remove the
  *   required one.
- * - Look-alike hosts need an explicit confirmation, here in the page and again where the
- *   instance is stored (deployments/index.ts).
+ * - Look-alike hosts need an explicit confirmation in the options page before the host
+ *   permission is requested.
  */
 
 import {OFFICIAL_ORIGINS} from '@intactwarden/profiles';
-import {GITHUB_HOSTS, type Origin, type AddInstanceRefusal} from '../contracts.ts';
+import {type Origin, type AddInstanceRefusal} from '../contracts.ts';
 
 const OFFICIAL_HOSTS: readonly string[] = OFFICIAL_ORIGINS.map(o => new URL(o).hostname);
 /** "bitwarden.com", "bitwarden.eu": the official hosts without their first label. */
 const OFFICIAL_DOMAINS: readonly string[] = [
   ...new Set(OFFICIAL_HOSTS.map(h => h.split('.').slice(1).join('.')).filter(d => d.includes('.'))),
 ];
-const GITHUB_HOST_NAMES: ReadonlySet<string> = new Set(
-  Object.values(GITHUB_HOSTS).map(o => new URL(o).hostname),
-);
+/** GitHub's own hosts: never a vault server. */
+const GITHUB_HOST_NAMES: ReadonlySet<string> = new Set([
+  'github.com',
+  'api.github.com',
+  'raw.githubusercontent.com',
+  'release-assets.githubusercontent.com',
+  'objects.githubusercontent.com',
+]);
 
 /** localhost, *.localhost, 127.0.0.0/8 and [::1], as `URL.hostname` spells them. */
 function isLoopbackHost(hostname: string): boolean {
@@ -67,9 +73,7 @@ export function parseInstanceInput(input: string): ParsedInstance {
   }
   if (u.protocol !== 'https:' && u.protocol !== 'http:') return {ok: false, code: 'invalid-input'};
   let path = u.pathname;
-  if (path.includes('/../') || path.includes('/./') || path.includes('//')) {
-    return {ok: false, code: 'invalid-input'};
-  }
+  if (path.includes('//')) return {ok: false, code: 'invalid-input'};
   if (path.endsWith('/index.html')) path = path.slice(0, -'index.html'.length);
   if (!path.endsWith('/')) path += '/';
   return {ok: true, origin: u.origin, basePath: path};

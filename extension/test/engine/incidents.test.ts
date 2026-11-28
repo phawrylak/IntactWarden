@@ -73,14 +73,14 @@ describe('incident log', () => {
     await load(w, 'script', MAIN_PATH, bytes('evil()'));
     const before = await w.tab(1);
     expect(before?.state).toBe('MISMATCH');
-    expect(before?.incidentId).not.toBeNull();
+    expect(before?.alert?.incident_id).toBeDefined();
     expect(stored(local)).toHaveLength(1);
     for (let restart = 0; restart < 3; restart++) {
       const again = await createWorld({cores, session, local, timers});
       await again.settle();
       // Activity on the still-open red document after the restart.
       await load(again, 'script', '/app/other.js', bytes('more()'));
-      expect((await again.tab(1))?.incidentId).toBe(before?.incidentId);
+      expect((await again.tab(1))?.alert?.incident_id).toBe(before?.alert?.incident_id);
       expect(stored(local)).toHaveLength(1);
     }
   });

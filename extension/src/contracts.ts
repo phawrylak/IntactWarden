@@ -150,8 +150,6 @@ export type AddInstanceRefusal =
   | 'refused-official-origin'
   /** http other than this computer (loopback). */
   | 'http-not-loopback'
-  /** A look-alike host the user did not confirm as their own server. */
-  | 'lookalike-unconfirmed'
   | 'permission-denied'
   | 'unreachable'
   /** `{base}api/config` is not the JSON a Bitwarden or Vaultwarden server answers. */
@@ -161,8 +159,6 @@ export type AddInstanceRefusal =
 export interface AddInstanceRequest {
   /** What the user typed: origin and base path. */
   readonly input: string;
-  /** The user confirmed that a look-alike host is their own server. */
-  readonly lookalikeConfirmed: boolean;
 }
 
 export type AddInstanceResult =
@@ -180,9 +176,10 @@ export interface ProfileRegistry {
   protectedOrigins(): ProtectedOrigins;
   instances(): readonly InstanceRecord[];
   /**
-   * Parses the typed address, checks the refusal list, the look-alike confirmation and the host
-   * permission (requested by the options page inside the click handler), asks `{base}api/config`
-   * which app the server runs (one credential-less GET), then persists and announces the instance.
+   * Parses the typed address, checks the refusal list and the host permission (requested by the
+   * options page inside the click handler, after its look-alike confirmation), asks
+   * `{base}api/config` which app the server runs (one credential-less GET), then persists and
+   * announces the instance.
    */
   addInstance(request: AddInstanceRequest): Promise<AddInstanceResult>;
   removeInstance(id: string): Promise<void>;
@@ -262,11 +259,8 @@ export type ReleaseFailure =
 
 export type DisputeReason = 'pin-changed' | 'tag-moved';
 
-/**
- * Why a release failed in detail: a builder refusal, or `rebuild-differs` (a deep verify rebuilt
- * a core already in use and got other bytes; the store writes a `deep-verify-failed` incident).
- */
-export type ReleaseDetail = BuildRefusal | 'rebuild-differs';
+/** Why a release failed in detail: a builder refusal. */
+export type ReleaseDetail = BuildRefusal;
 
 export type ReleaseState =
   | {readonly k: 'unknown'}
@@ -328,8 +322,13 @@ export interface ReleaseJobSpec {
   readonly plan: AssetPlan;
   readonly commit: string;
   readonly tagObject?: string;
-  /** Downloaded from github.com/<repo>/releases/download/<tag>/<asset> (302 to release-assets). */
+  /**
+   * Downloaded from api.github.com/repositories/<repoId>/releases/assets/<id>, which redirects to
+   * release-assets.
+   */
   readonly asset: {
+    /** GitHub's numeric asset id. */
+    readonly id: number;
     readonly name: string;
     /** GitHub's listed digest (already compared with the local pin, if any). */
     readonly sha256: Sha256Hex;
@@ -365,7 +364,7 @@ export interface DeepVerifyJobView {
   readonly detail?: ReleaseDetail;
 }
 
-/** A release-asset pin: what this browser (or a test package) saw on GitHub for a release asset. */
+/** A release-asset pin: what this browser saw on GitHub for a release asset. */
 export interface ReleaseAssetPin {
   readonly kind: 'release-asset';
   readonly repo: string;
@@ -375,8 +374,8 @@ export interface ReleaseAssetPin {
   readonly asset: string;
   readonly sha256: Sha256Hex;
   readonly size: number;
-  /** bundled: data of a test package; local: first seen by this browser (TOFU). */
-  readonly source: 'bundled' | 'local';
+  /** First seen by this browser (TOFU). */
+  readonly source: 'local';
 }
 
 /** Config file content at a commit (cloud derivation input). */
@@ -386,15 +385,14 @@ export interface ConfigFilePin {
   readonly commit: string;
   readonly path: string;
   readonly sha256: Sha256Hex;
-  readonly source: 'bundled' | 'local';
+  readonly source: 'local';
 }
 
 export type LocalPin = ReleaseAssetPin | ConfigFilePin;
 
 /**
- * storage.local `l:v1:pins` (local pins) and the bundled `pins` of a test
- * package's bootstrap index. A local storage layout, not an interchange format.
- * Bundled pins win; a local pin is never replaced, only disputed.
+ * storage.local `l:v1:pins`. A local storage layout, not an interchange format.
+ * A local pin is never replaced, only disputed.
  */
 export interface LocalPins {
   readonly schema: 'intactwarden.localpins/1';
@@ -420,7 +418,6 @@ export interface BootstrapIndex {
     /** Package path of the core's exact JCS bytes, "data/bootstrap/cores/<sha256>.json". */
     readonly path: string;
   }[];
-  readonly pins: LocalPins;
 }
 
 export const BOOTSTRAP_INDEX_PATH = 'data/bootstrap/index.json';
@@ -1016,11 +1013,12 @@ export const SESSION_LIMITS = Object.freeze({
 });
 
 /**
- * R4: how long a request may stay pending before it is
- * `unverifiable:timeout`: 60 s for scripts and fetches (workers, lazy chunks), else 30 s.
+ * R4: how long a request may stay pending, transfer included, before it is
+ * `unverifiable:timeout`: 5 min for scripts and fetches (workers, lazy chunks of up to 18 MB
+ * from servers that do not compress them), else 30 s.
  */
 export function r4Ms(type: ResType): number {
-  return type === 'script' || type === 'xmlhttprequest' ? 60_000 : 30_000;
+  return type === 'script' || type === 'xmlhttprequest' ? 300_000 : 30_000;
 }
 
 /**
@@ -1109,11 +1107,9 @@ export interface TabStateRecord {
   readonly hint: HintResult | null;
   readonly unknownBuild: {
     readonly phase: 'hint' | 'deep-verify' | 'final';
-    readonly jobId: string | null;
     readonly failure: ReleaseFailure | null;
   } | null;
   readonly alert: OriginAlert | null;
-  readonly incidentId: string | null;
   readonly allowances: TabAllowances | null;
   readonly permissionMissing: boolean;
 }
@@ -1620,19 +1616,24 @@ export const MANIFEST_MESSAGE_KEYS = Object.freeze([
   'actionTitle',
 ] as const);
 
-/** Hosts the deep verify contacts (required host permissions, except api.github.com, which sends ACAO *). */
+/**
+ * Hosts the deep verify contacts. A release file is downloaded through api.github.com, which
+ * redirects to release-assets.githubusercontent.com: both need a host permission, because
+ * release-assets sends no CORS headers and Firefox applies CORS to a whole redirect chain that
+ * starts at a host without one. raw.githubusercontent.com answers with
+ * `Access-Control-Allow-Origin: *` and needs none. github.com is never contacted.
+ */
 export const GITHUB_HOSTS = Object.freeze({
   api: 'https://api.github.com',
-  web: 'https://github.com',
   releaseAssets: 'https://release-assets.githubusercontent.com',
-  objects: 'https://objects.githubusercontent.com',
   raw: 'https://raw.githubusercontent.com',
 });
 
-/** Host-permission patterns of the GitHub hosts deep verify needs (required; users can revoke them). */
+/**
+ * Host-permission patterns deep verify needs (required; users can revoke them). Without them, deep
+ * verify sends no request to GitHub at all.
+ */
 export const GITHUB_PERMISSION_PATTERNS: readonly string[] = Object.freeze([
-  `${GITHUB_HOSTS.web}/*`,
+  `${GITHUB_HOSTS.api}/*`,
   `${GITHUB_HOSTS.releaseAssets}/*`,
-  `${GITHUB_HOSTS.objects}/*`,
-  `${GITHUB_HOSTS.raw}/*`,
 ]);
