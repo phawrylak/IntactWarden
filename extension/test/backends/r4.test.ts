@@ -15,6 +15,7 @@ import {
   type Observation,
   type ObservationSink,
   type UnverifiableReason,
+  r4Ms,
 } from '../../src/contracts.ts';
 import type {BlockingResponse} from '../../src/platform/webext.ts';
 import {
@@ -31,6 +32,7 @@ const flush = async (n = 20): Promise<void> => {
 };
 
 const BODY = bytes('console.log("app");');
+const R4 = r4Ms('script');
 
 function filterHooks(
   timers: FakeTimers,
@@ -45,7 +47,7 @@ function filterHooks(
     done: () => finished,
     hooks: {
       req: 'r1',
-      timeoutMs: 60_000,
+      timeoutMs: R4,
       maxBytes: 1 << 20,
       body: b => {
         bodies.push(b);
@@ -71,7 +73,7 @@ describe('StreamFilter R4 (attachFilter)', () => {
       const h = filterHooks(timers, () => new Promise<Decision>(r => (decide = r)));
       attachFilter(f, h.hooks);
       if (stopFirst) f.respond(BODY);
-      timers.advance(60_001);
+      timers.advance(R4 + 1);
       await flush();
       expect(h.reasons).toEqual(['timeout']);
       expect(f.closed).toBe(true);
@@ -142,7 +144,7 @@ describe('Firefox backend: nothing is held past R4, whatever the engine does', (
     timers.advance(10_000);
     const answer = headersOf(env, SCRIPT);
     await flush();
-    timers.advance(49_999);
+    timers.advance(R4 - 10_001);
     await flush();
     expect(answer()).toBeNull();
     timers.advance(2);
@@ -172,7 +174,7 @@ describe('Firefox backend: nothing is held past R4, whatever the engine does', (
           : {}),
       });
       env.webRequest.onBeforeRequest.emit(SCRIPT);
-      timers.advance(60_001);
+      timers.advance(R4 + 1);
       await flush();
       const answer = headersOf(env, SCRIPT);
       await flush();
@@ -193,10 +195,10 @@ describe('Firefox backend: nothing is held past R4, whatever the engine does', (
     });
     env.webRequest.onBeforeRequest.emit(xhr);
     expect(env.filters.has('x1')).toBe(false);
-    timers.advance(90_000);
+    timers.advance(R4 + 30_000);
     const answer = headersOf(env, xhr);
     await flush();
-    timers.advance(59_999);
+    timers.advance(R4 - 1);
     await flush();
     expect(answer()).toBeNull();
     timers.advance(2);
@@ -222,7 +224,7 @@ describe('Firefox backend: nothing is held past R4, whatever the engine does', (
       env.webRequest.onBeforeRequest.emit(orphan)[0] as
         BlockingResponse | Promise<BlockingResponse>,
     ).then(r => (out = r));
-    timers.advance(59_999);
+    timers.advance(R4 - 1);
     await flush();
     expect(out).toBeNull();
     timers.advance(2);
@@ -235,7 +237,7 @@ describe('Firefox backend: nothing is held past R4, whatever the engine does', (
       headers: () => Promise.reject(new Error('engine failed')),
       push: o =>
         o.k === 'body'
-          ? new Promise<Decision>(r => timers.set(() => r({act: 'allow'}), 120_000))
+          ? new Promise<Decision>(r => timers.set(() => r({act: 'allow'}), 2 * R4))
           : Promise.resolve({act: 'allow'}),
     });
     env.webRequest.onBeforeRequest.emit(SCRIPT);
@@ -245,12 +247,12 @@ describe('Firefox backend: nothing is held past R4, whatever the engine does', (
     expect(answer()).toEqual({cancel: true});
     f.respond(BODY);
     await flush();
-    timers.advance(60_001);
+    timers.advance(R4 + 1);
     await flush();
     expect(f.written).toHaveLength(0);
     expect(f.closed).toBe(true);
-    // The late 'allow' (at 120 s) changes nothing.
-    timers.advance(120_000);
+    // The late 'allow' (at twice R4) changes nothing.
+    timers.advance(2 * R4);
     await flush();
     expect(f.written).toHaveLength(0);
   });
@@ -331,7 +333,7 @@ describe('Firefox backend: no undeclared redirect is followed when a header deci
       timers.advance(1_000);
       const answer = respond(env, SCRIPT, status, [...headers]);
       await flush();
-      timers.advance(59_001);
+      timers.advance(R4 - 999);
       await flush();
       expect(answer(), what).toEqual({cancel: true});
     }
@@ -396,8 +398,8 @@ describe('Firefox backend: no undeclared redirect is followed when a header deci
 describe('Firefox backend: a timed-out redirect hop is recorded', () => {
   it('an unanswered redirect hop reports unverifiable:timeout and is cancelled', async () => {
     for (const [d, r4] of [
-      [DOC, 30_000],
-      [SCRIPT, 60_000],
+      [DOC, r4Ms('main_frame')],
+      [SCRIPT, R4],
     ] as const) {
       const {env, timers, pushed} = await backendWith({
         headers: () => never<HeaderDecision>(),
@@ -430,7 +432,7 @@ describe('Firefox backend: a timed-out redirect hop is recorded', () => {
     });
     await flush();
     // The old hop's filter is dropped by Firefox; its R4 timer still fires.
-    timers.advance(60_001);
+    timers.advance(R4 + 1);
     await flush();
     expect(pushed.filter(o => o.k === 'unverifiable' && o.req === 's1')).toEqual([]);
   });

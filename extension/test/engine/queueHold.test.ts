@@ -10,7 +10,7 @@
 
 import {sha256Hex} from '@intactwarden/core/hash/sha256.ts';
 import {describe, expect, it} from 'vitest';
-import type {HintResult, LoadedCore} from '../../src/contracts.ts';
+import {r4Ms, type HintResult, type LoadedCore} from '../../src/contracts.ts';
 import {details, type FakeStreamFilter} from './helpers/fakeExt.ts';
 import {
   bwCloudOrigin,
@@ -145,12 +145,12 @@ describe('unknown-build resolution and the document queue', () => {
       expect(ah().answered).toBe(false);
       // Script B starts while the queue is held.
       const b = await startScript(w, VW_ORIGIN, 'jsB', '/app/polyfills.0123456789abcdef0123.js');
-      w.timers.advance(59_999);
+      w.timers.advance(r4Ms('script') - 1);
       await flush();
       expect(ah().answered).toBe(false);
       w.timers.advance(2);
       await flush();
-      // R4 (60 s for scripts): A's header decision is answered without the engine (cancelled),
+      // R4 for scripts: A's header decision is answered without the engine (cancelled),
       // and the bodies are never released.
       const expected = {answered: true, cancel: true};
       expect(ah()).toEqual(expected);

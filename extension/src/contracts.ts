@@ -1021,11 +1021,12 @@ export const SESSION_LIMITS = Object.freeze({
 });
 
 /**
- * R4: how long a request may stay pending before it is
- * `unverifiable:timeout`: 60 s for scripts and fetches (workers, lazy chunks), else 30 s.
+ * R4: how long a request may stay pending, transfer included, before it is
+ * `unverifiable:timeout`: 5 min for scripts and fetches (workers, lazy chunks of up to 18 MB
+ * from servers that do not compress them), else 30 s.
  */
 export function r4Ms(type: ResType): number {
-  return type === 'script' || type === 'xmlhttprequest' ? 60_000 : 30_000;
+  return type === 'script' || type === 'xmlhttprequest' ? 300_000 : 30_000;
 }
 
 /**

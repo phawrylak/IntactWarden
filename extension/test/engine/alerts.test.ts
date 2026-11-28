@@ -7,6 +7,7 @@
 
 import {sha256Hex} from '@intactwarden/core/hash/sha256.ts';
 import {describe, expect, it} from 'vitest';
+import {r4Ms} from '../../src/contracts.ts';
 import {details, FakeArea, FakeTimers, type FakeStreamFilter} from './helpers/fakeExt.ts';
 import {bytes, createWorld, VW_ORIGIN, vwCore, type World} from './helpers/world.ts';
 
@@ -183,7 +184,7 @@ describe('origin alerts', () => {
     });
     await w.env.webRequest.onBeforeRequest.fire(d);
     await w.env.webRequest.onHeadersReceived.fire({...d, statusCode: 200, responseHeaders: JS});
-    w.timers.advance(61_000);
+    w.timers.advance(r4Ms('script') + 1_000);
     await w.settle();
     expect(w.env.filters.get(d.requestId)!.written).toHaveLength(0);
     expect(await w.tab(1)).toMatchObject({state: 'PROTECTION_LOST', reasons: ['timeout']});
