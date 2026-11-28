@@ -1,6 +1,6 @@
 /**
  * The R4 bound in the Firefox backend: every response
- * the backend holds, at the header stage, in a StreamFilter or at the R2 stage, is denied by its R4 deadline,
+ * the backend holds, at the header stage or in a StreamFilter, is denied by its R4 deadline,
  * whatever the engine does (it hangs, rejects or answers late); no byte is released without the
  * engine's 'allow'. The engine still hears `unverifiable:timeout` (PROTECTION_LOST) on a path that
  * does not wait for the request's own pending decisions.
@@ -209,27 +209,6 @@ describe('Firefox backend: nothing is held past R4, whatever the engine does', (
     expect(pushed).toContainEqual(
       expect.objectContaining({k: 'unverifiable', req: 'x1', reason: 'timeout'}),
     );
-  });
-
-  it('an R2 decision (no document) the engine never gives is denied at R4', async () => {
-    const {env, timers} = await backendWith({});
-    const orphan = details({
-      requestId: 'w1',
-      url: `${VW_ORIGIN}/app/main.0123456789abcdef0123.js`,
-      type: 'script',
-      tabId: -1,
-    });
-    let out: BlockingResponse | null = null;
-    void Promise.resolve(
-      env.webRequest.onBeforeRequest.emit(orphan)[0] as
-        BlockingResponse | Promise<BlockingResponse>,
-    ).then(r => (out = r));
-    timers.advance(R4 - 1);
-    await flush();
-    expect(out).toBeNull();
-    timers.advance(2);
-    await flush();
-    expect(out).toEqual({cancel: true});
   });
 
   it('an engine that rejects or answers late never makes the backend release', async () => {

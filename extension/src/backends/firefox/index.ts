@@ -14,10 +14,10 @@
  * for hosts the extension may access) and decide per origin from the registry, read at request
  * time, after the engine is ready.
  *
- * R4 bounds every hold, whatever the engine does: a header decision, a StreamFilter decision and an
- * R2 decision that have not come by the request's R4 deadline are answered without the engine
- * (cancelled or closed empty), and the engine is told `unverifiable:timeout` on a path that does
- * not wait for that request's own pending decisions. Firefox answers an extension's blocking
+ * R4 bounds every hold, whatever the engine does: a header decision and a StreamFilter decision
+ * that have not come by the request's R4 deadline are answered without the engine (cancelled or
+ * closed empty), and the engine is told `unverifiable:timeout` on a path that does not wait for
+ * that request's own pending decisions. Firefox answers an extension's blocking
  * webRequest events in batches (all listeners of a batch settle before any reply), so a held page
  * event can also hold the extension's own fetches.
  */
@@ -301,22 +301,6 @@ export function createFirefoxBackend(deps: FirefoxBackendDeps): FirefoxBackend {
     }
     void s.push(o).catch(() => undefined);
   };
-
-  /** `p`, or a cancel when it has not settled within `ms` (R4) or failed. */
-  const within = (p: Promise<BlockingResponse>, ms: number): Promise<BlockingResponse> =>
-    new Promise(resolve => {
-      const timer = setTimer(() => resolve({cancel: true}), ms);
-      void p.then(
-        r => {
-          clearTimer(timer);
-          resolve(r);
-        },
-        () => {
-          clearTimer(timer);
-          resolve({cancel: true});
-        },
-      );
-    });
 
   const covered = (po: ProtectedOrigin, url: string, type: ResType): boolean => {
     let cls;
@@ -633,15 +617,11 @@ export function createFirefoxBackend(deps: FirefoxBackendDeps): FirefoxBackend {
     if (type === 'script' && doc !== null) docs.noteScript(url, doc);
     if (!isCovered) return {};
     if (doc === null) {
-      // A request another site's document makes (`documentUrl` is Firefox's loading principal,
-      // not the page's word): denied, and no document of the protected origin is marked for it.
-      if (d.documentUrl !== undefined && originOf(d.documentUrl) !== po.origin) {
-        return {cancel: true};
-      }
-      // R2: an active request no known document owns (held at most R4 for the engine's answer).
-      const decided = push(rec, obs).then(r => (r.act === 'block' ? {cancel: true} : {}));
-      rec.announced = true;
-      return within(decided, r4Ms(type));
+      // R2: a covered request no known document owns is denied at once. The engine hears of it
+      // (to mark the tab's documents), unless another site's document makes it (`documentUrl` is
+      // Firefox's loading principal, not the page's word): no document of the origin is marked.
+      if (d.documentUrl === undefined || originOf(d.documentUrl) === po.origin) announce(rec, obs);
+      return {cancel: true};
     }
     announce(rec, obs);
     return startFilter(rec);

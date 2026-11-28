@@ -1048,7 +1048,7 @@ class EngineImpl implements EngineRuntime {
       s.untracked = true;
       await this.#evaluate(s);
     }
-    // Only covered requests come here (the backend holds them without a filter). Every one is
+    // Only covered requests come here (the backend has cancelled them already). Every one is
     // denied: a locale or a `.wasm` read by fetch() is no less what the page runs on than a script
     // (R2).
     return {act: 'block', state: 'PROTECTION_LOST', reason: 'untracked'};
