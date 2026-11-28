@@ -401,9 +401,7 @@ describe('Vaultwarden Web Vault profile', () => {
       expect(dynamic(path), path).toBeDefined();
     }
     expect(dynamic('/css/vaultwarden.css')).toBeUndefined();
-    expect(r.server_styles).toEqual([
-      {path: '/css/vaultwarden.css', validator: 'vaultwarden-css/v1'},
-    ]);
+    expect(r.server_styles).toEqual([{path: '/css/vaultwarden.css'}]);
     expect(r.not_covered_paths).toEqual([
       {path: '/vw_static/**', reason: 'server-embedded-admin-assets'},
     ]);

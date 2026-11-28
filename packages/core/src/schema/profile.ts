@@ -6,7 +6,6 @@
  * (R8).
  */
 
-import type {StyleValidator} from '../style/serverStyle.ts';
 import type {Assurance} from '../verdict/states.ts';
 
 /** webRequest resource types. */
@@ -95,7 +94,6 @@ export interface NotCoveredPath {
 export interface ServerStyle {
   /** Exact path (no glob), relative to the deployment base path. */
   readonly path: string;
-  readonly validator: StyleValidator;
   readonly deployments?: readonly string[];
 }
 

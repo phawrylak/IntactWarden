@@ -212,13 +212,13 @@ describe("coreProblem (the builders' postcondition)", () => {
       'query in a path',
       bitwardenCloudCore(),
       m => (files(m)['/x.js?v=1'] = {sha256: H('1'), size: 1, class: 'script'}),
-      'without query',
+      '"?" or "#"',
     ],
     [
       'fragment in a path',
       bitwardenCloudCore(),
       m => (files(m)['/x.js#f'] = {sha256: H('1'), size: 1, class: 'script'}),
-      'without query',
+      '"?" or "#"',
     ],
     [
       'dot segment',
@@ -230,7 +230,7 @@ describe("coreProblem (the builders' postcondition)", () => {
       'relative path',
       bitwardenCloudCore(),
       m => (files(m)['x.js'] = {sha256: H('1'), size: 1, class: 'script'}),
-      'absolute URL path',
+      'must start with "/"',
     ],
     [
       'placeholder in an exact entry',

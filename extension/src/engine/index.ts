@@ -11,7 +11,7 @@
  * (internal-error) and denies.
  */
 
-import {checkServerStyle} from '@intactwarden/core/style/serverStyle.ts';
+import {checkVaultwardenCss} from '@intactwarden/core/style/serverStyle.ts';
 import {join, rankOf, stateRow} from '@intactwarden/core/verdict/states.ts';
 import {
   r4Ms,
@@ -1185,7 +1185,7 @@ class EngineImpl implements EngineRuntime {
     const cls = classifyServerPath(po, item.url, item.type);
     if (cls.k !== 'server-style') return;
     if (o.bytes === undefined) return;
-    const check = checkServerStyle(cls.style.validator, o.bytes);
+    const check = checkVaultwardenCss(o.bytes);
     s.serverStyles[item.path] = check.ok
       ? {
           sha256: o.sha256,

@@ -1,5 +1,5 @@
 /**
- * Closed validators for stylesheets that a self-hosted server generates
+ * Closed validator for stylesheets that a self-hosted server generates
  * itself (profile `resources.server_styles`). Such a stylesheet is never part
  * of a core manifest: its bytes depend on the server's configuration and on
  * templates the admin may replace (Vaultwarden's `/css/vaultwarden.css`).
@@ -16,7 +16,7 @@
  * for well-formed CSS with other rules or other selectors, `malformed` for
  * input the strict parser refuses. Nothing here builds a RegExp from data (R8).
  *
- * `vaultwarden-css/v1` accepts what Vaultwarden's built-in template
+ * checkVaultwardenCss accepts what Vaultwarden's built-in template
  * (`src/static/templates/scss/vaultwarden.scss.hbs`) compiles to:
  * - rules whose only declaration is `display: none` (with or without
  *   `!important`) and whose selectors are all in
@@ -40,9 +40,6 @@
  * rules are both accepted. The exact grass output on every config-flag
  * combination, and the list for later server tags, are not known yet.
  */
-
-export const STYLE_VALIDATORS = ['vaultwarden-css/v1'] as const;
-export type StyleValidator = (typeof STYLE_VALIDATORS)[number];
 
 /** Upper bound on a server stylesheet (the stock Vaultwarden output is ~2 KB). */
 export const MAX_SERVER_STYLE_BYTES = 64 * 1024;
@@ -69,16 +66,6 @@ interface Rule {
 }
 
 class StyleSyntaxError extends Error {}
-
-/** Runs the named closed validator on the stylesheet bytes. Never throws. */
-export function checkServerStyle(validator: StyleValidator, css: Uint8Array): StyleCheck {
-  switch (validator) {
-    case 'vaultwarden-css/v1':
-      return checkVaultwardenCss(css);
-    default:
-      return {ok: false, reason: 'malformed', detail: 'unknown style validator'};
-  }
-}
 
 const ICON_SELECTOR = 'bit-nav-logo bit-nav-item a:before';
 const ICON_DECLARATIONS: ReadonlyMap<string, readonly string[]> = new Map([
@@ -151,7 +138,7 @@ export const VAULTWARDEN_STOCK_HIDE_SELECTORS: readonly string[] = [
   'bit-dialog div.tw-col-span-4:has(input[formcontrolname*="access"], input[formcontrolname*="manage"])',
 ];
 
-/** `vaultwarden-css/v1` (module comment). Never throws. */
+/** Checks Vaultwarden's server stylesheet (module comment). Never throws. */
 export function checkVaultwardenCss(css: Uint8Array): StyleCheck {
   try {
     const rules = parseStylesheet(css);

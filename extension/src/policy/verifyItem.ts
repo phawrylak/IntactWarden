@@ -1,7 +1,7 @@
 /**
  * Subresource verification against the bound core: server paths first, then
  * mapUrl; exact or template match with the binding's slots; third parties; server stylesheets
- * through checkServerStyle; content type and charset per entry class. Pure.
+ * through checkVaultwardenCss; content type and charset per entry class. Pure.
  */
 
 import {mapUrl} from '@intactwarden/core/routing/mapUrl.ts';
@@ -12,7 +12,7 @@ import {
   type FileEntry,
 } from '@intactwarden/core/schema/manifest.ts';
 import {matchUrlPattern} from '@intactwarden/core/schema/profile.ts';
-import {checkServerStyle} from '@intactwarden/core/style/serverStyle.ts';
+import {checkVaultwardenCss} from '@intactwarden/core/style/serverStyle.ts';
 import {matchTemplate} from '@intactwarden/core/template/match.ts';
 import type {
   ItemClass,
@@ -109,8 +109,7 @@ export const verifyItem: VerifyItem = async i => {
       }
       if (body === null)
         return rec(path, 'server-style', {r: 'unverifiable', reason: 'empty-body'});
-      const check =
-        body.bytes !== undefined ? checkServerStyle(sp.style.validator, body.bytes) : null;
+      const check = body.bytes !== undefined ? checkVaultwardenCss(body.bytes) : null;
       if (check === null)
         return rec(path, 'server-style', {r: 'unverifiable', reason: 'internal-error'});
       return check.ok
