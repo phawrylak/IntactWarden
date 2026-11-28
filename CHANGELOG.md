@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. The project follows
 [Semantic Versioning](https://semver.org/) from the first release on.
 
-## 1.0.1 (not published yet)
+## 1.0.1 (2026-11-29)
 
 - **Two GitHub permissions instead of four**: release files are downloaded through the GitHub API
   (`api.github.com`), which redirects to `release-assets.githubusercontent.com`. IntactWarden no
