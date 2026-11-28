@@ -106,114 +106,109 @@ export interface E2EDriver {
   /** The extension's base URL (`moz-extension://<uuid>/`). */
   readonly baseUrl: string;
   /**
-   * Firefox only: the options page's own UI (type the address, "Add server"; a look-alike host
+   * The options page's own UI (type the address, "Add server"; a look-alike host
    * asks for a confirmation and a second click); returns the confirmations given.
    */
-  addInstanceInOptions?(input: string): Promise<readonly string[]>;
-  /** Firefox only: `permissions.remove` of host patterns, as the user does in about:addons. */
-  revokeHosts?(patterns: readonly string[]): Promise<void>;
-  /** Firefox only: `permissions.request` from a click handler (as the popup's "Grant" does). */
-  grantHosts?(patterns: readonly string[]): Promise<void>;
-  /** Firefox only: the onboarding page's "Grant" button; returns the patterns still missing. */
-  grantFromOnboarding?(): Promise<readonly string[]>;
+  addInstanceInOptions(input: string): Promise<readonly string[]>;
+  /** `permissions.remove` of host patterns, as the user does in about:addons. */
+  revokeHosts(patterns: readonly string[]): Promise<void>;
+  /** `permissions.request` from a click handler (as the popup's "Grant" does). */
+  grantHosts(patterns: readonly string[]): Promise<void>;
+  /** The onboarding page's "Grant" button; returns the patterns still missing. */
+  grantFromOnboarding(): Promise<readonly string[]>;
   /**
-   * Firefox only: the text the toolbar popup (`ui/popup.html`) renders for `tab`: the page runs
-   * in an inactive tab while `tab` is the active one, which is the tab its query picks.
-   */
-  popupText?(tab: number): Promise<string>;
-  /**
-   * Firefox only: the event page's state (`running`, `stopped`, `starting`, `suspending`) and how
+   * The event page's state (`running`, `stopped`, `starting`, `suspending`) and how
    * many times it has started in this profile, read in the chrome context.
    */
-  background?(): Promise<{readonly state: string; readonly starts: number}>;
-  /** Firefox only: closes a tab. */
-  closeTab?(tab: number): Promise<void>;
-  /** Firefox only: the ids of the tabs whose URL is `url` (a window a page opened, say). */
-  tabsWithUrl?(url: string): Promise<readonly number[]>;
+  background(): Promise<{readonly state: string; readonly starts: number}>;
+  /** Closes a tab. */
+  closeTab(tab: number): Promise<void>;
+  /** The ids of the tabs whose URL is `url` (a window a page opened, say). */
+  tabsWithUrl(url: string): Promise<readonly number[]>;
   /**
-   * Firefox only: one `fetch` of a same-origin path from the tab's document, as the app's i18n
+   * One `fetch` of a same-origin path from the tab's document, as the app's i18n
    * service reads a locale (`cache: 'no-store'`); the response's status, the start of its body
    * text, its length and the headers the page sees.
    */
-  pageFetch?(tab: number, path: string): Promise<PageFetchResult>;
-  /** Firefox only: a click (user input) on the element `selector` names in the tab's page. */
-  pageClick?(tab: number, selector: string): Promise<void>;
-  /** Firefox only: sets `self[marker] = true` in the tab's page (read back with `ran`). */
-  mark?(tab: number, marker: string): Promise<void>;
+  pageFetch(tab: number, path: string): Promise<PageFetchResult>;
+  /** A click (user input) on the element `selector` names in the tab's page. */
+  pageClick(tab: number, selector: string): Promise<void>;
+  /** Sets `self[marker] = true` in the tab's page (read back with `ran`). */
+  mark(tab: number, marker: string): Promise<void>;
   /**
-   * Firefox only: inserts an inline `<script>` that sets `scriptMarker` and an element whose
+   * Inserts an inline `<script>` that sets `scriptMarker` and an element whose
    * inline event handler sets `attrMarker` into the tab's page, as a DOM injection would.
    */
-  pageInject?(tab: number, scriptMarker: string, attrMarker: string): Promise<void>;
+  pageInject(tab: number, scriptMarker: string, attrMarker: string): Promise<void>;
   /**
-   * Firefox only: appends an `<iframe>` of the same-origin page `src` to the tab's document, as
+   * Appends an `<iframe>` of the same-origin page `src` to the tab's document, as
    * the app's two-step login frames its WebAuthn connector; answers the first message the frame
    * posts to its parent, or null when none came within 15 s.
    */
-  pageFrame?(tab: number, src: string): Promise<string | null>;
+  pageFrame(tab: number, src: string): Promise<string | null>;
   /**
-   * Firefox only: inserts an image from another origin and an inline `<script>` that would set
+   * Inserts an image from another origin and an inline `<script>` that would set
    * `marker` into the tab's page; answers the browser's CSP reports of the next 1.5 s.
    */
-  pageCspReports?(tab: number, marker: string): Promise<readonly CspReport[]>;
-  /** Firefox only: the first frame of the tab's page. */
-  frameState?(tab: number, marker: string): Promise<FrameState>;
+  pageCspReports(tab: number, marker: string): Promise<readonly CspReport[]>;
+  /** The first frame of the tab's page. */
+  frameState(tab: number, marker: string): Promise<FrameState>;
   /**
-   * Firefox only: a click (user input) on the element `selector` names in the first frame of the
+   * A click (user input) on the element `selector` names in the first frame of the
    * tab's page; false when the frame has no such element.
    */
-  frameClick?(tab: number, selector: string): Promise<boolean>;
+  frameClick(tab: number, selector: string): Promise<boolean>;
   /**
-   * Firefox only: the vault's "Add credit → PayPal" form (`method=post`, `target=_top`) with
+   * The vault's "Add credit → PayPal" form (`method=post`, `target=_top`) with
    * these hidden fields, submitted from the tab's page.
    */
-  pagePost?(tab: number, action: string, fields: Readonly<Record<string, string>>): Promise<void>;
+  pagePost(tab: number, action: string, fields: Readonly<Record<string, string>>): Promise<void>;
   /**
-   * Firefox only: the vault's `launchUri` (a `target=_blank` link, clicked) from the tab's page;
+   * The vault's `launchUri` (a `target=_blank` link, clicked) from the tab's page;
    * answers the URL the new tab shows.
    */
-  pageLaunch?(tab: number, url: string): Promise<string>;
-  /** Firefox only: reloads the tab (as F5 does) and waits for the load to finish. */
-  reload?(tab: number): Promise<void>;
+  pageLaunch(tab: number, url: string): Promise<string>;
+  /** Reloads the tab (as F5 does) and waits for the load to finish. */
+  reload(tab: number): Promise<void>;
   /**
-   * Firefox only: `location.reload()` from the tab's page, as a page script calls it; returns at
+   * `location.reload()` from the tab's page, as a page script calls it; returns at
    * once, without waiting for the load.
    */
-  reloadNow?(tab: number): Promise<void>;
+  reloadNow(tab: number): Promise<void>;
   /**
-   * Firefox only: `location.reload()` twice from one script of the tab's page, the second call
+   * `location.reload()` twice from one script of the tab's page, the second call
    * `gapMs` after the first; returns at once, without waiting for a load.
    */
-  reloadTwice?(tab: number, gapMs: number): Promise<void>;
-  /** Firefox only: loads `url` in the tab (as typing it) and waits for the load to finish. */
-  navigate?(tab: number, url: string): Promise<void>;
-  /** Firefox only: the tab goes back one history entry ("Back"). */
-  back?(tab: number): Promise<void>;
-  /** Firefox only: the tab goes forward one history entry ("Forward"). */
-  forward?(tab: number): Promise<void>;
+  reloadTwice(tab: number, gapMs: number): Promise<void>;
+  /** Loads `url` in the tab (as typing it) and waits for the load to finish. */
+  navigate(tab: number, url: string): Promise<void>;
+  /** The tab goes back one history entry ("Back"). */
+  back(tab: number): Promise<void>;
+  /** The tab goes forward one history entry ("Forward"). */
+  forward(tab: number): Promise<void>;
   /**
-   * Firefox only: the toolbar popup for `tab`, in a background tab that loaded while `tab` was
+   * The toolbar popup for `tab`, in a background tab that loaded while `tab` was
    * the active one; driven through its own buttons.
    */
-  popup?(tab: number): Promise<PopupHandle>;
+  popup(tab: number): Promise<PopupHandle>;
   /**
-   * Firefox only: clears the cookies and site data of `origin`'s site, as "Clear cookies and site
+   * Clears the cookies and site data of `origin`'s site, as "Clear cookies and site
    * data" in the address bar's site panel does (its service workers go with them).
    */
-  clearSiteData?(origin: string): Promise<void>;
+  clearSiteData(origin: string): Promise<void>;
   /**
-   * Firefox only: the service workers the tab's page sees: how many registrations its origin
+   * The service workers the tab's page sees: how many registrations its origin
    * lists, and whether a worker controls the page.
    */
-  pageWorkers?(tab: number): Promise<PageWorkers>;
-  /** Firefox only: on the blocked page in `tab`, ticks the confirmation and clicks "Proceed once". */
-  proceedOnce?(tab: number): Promise<void>;
+  pageWorkers(tab: number): Promise<PageWorkers>;
+  /** On the blocked page in `tab`, ticks the confirmation and clicks "Proceed once". */
+  proceedOnce(tab: number): Promise<void>;
   uninstall(): Promise<void>;
 }
 
 /** The toolbar popup of one tab (`popup`). */
 export interface PopupHandle {
-  /** The popup's text as shown. */
+  /** The popup's text as shown, once its verdict (`.state-title`) has rendered. */
   text(): Promise<string>;
   /** Whether a button with exactly this label is shown. */
   hasButton(label: string): Promise<boolean>;
@@ -375,7 +370,7 @@ export function tabState(d: E2EDriver, tab: number): Promise<TabStateRecord | nu
  * taint source of a closed tab, and its co-resident flag never clears.
  */
 async function closeTabs(d: E2EDriver, ...tabs: number[]): Promise<void> {
-  for (const tab of tabs) await d.closeTab!(tab);
+  for (const tab of tabs) await d.closeTab(tab);
   await poll(
     `the engine to handle the removal of tabs ${tabs.join(', ')}`,
     () => Promise.all(tabs.map(t => tabState(d, t))),
@@ -569,7 +564,7 @@ async function workerBeforeAdd(d: E2EDriver, site: Site, mode: WorkerMode): Prom
     x => x,
   );
   expect(await tabState(d, tab)).toBeNull();
-  await d.closeTab!(tab);
+  await d.closeTab(tab);
   await addInstance(d, site);
 }
 
@@ -650,8 +645,9 @@ async function popupHas(
   want: readonly string[],
   absent: readonly string[] = [],
 ): Promise<string> {
-  if (d.popupText === undefined) return '';
-  const text = await d.popupText(tab);
+  const popup = await d.popup(tab);
+  const text = await popup.text();
+  await popup.close();
   for (const w of want) expect(text, 'popup text').toContain(w);
   for (const a of absent) expect(text, 'popup text').not.toContain(a);
   return (
@@ -695,8 +691,7 @@ async function smGenuine(
     itemLine(items.get(sm)!),
     `after the lazy load: ${summary(t)}`,
   ];
-  const popup = await popupHas(d, tab, ['Verified']);
-  if (popup !== '') lines.push(popup);
+  lines.push(await popupHas(d, tab, ['Verified']));
   // The deep link: the app starts on the route in a fresh tab.
   const deep = await d.open(`${site.origin}/${SM_ROUTE}`);
   const deepItems = await waitForItems(d, deep, [shared, sm]);
@@ -731,7 +726,7 @@ async function locale203(d: E2EDriver, fx: Fixtures): Promise<string[]> {
     () => tabState(d, tab),
     s => s?.top?.binding?.buildId === VW_BUILD,
   );
-  const read = await d.pageFetch!(tab, LOCALE_PATH);
+  const read = await d.pageFetch(tab, LOCALE_PATH);
   const items = await waitForItems(d, tab, [LOCALE_PATH]);
   const item = items.get(LOCALE_PATH)!;
   expect(item).toMatchObject({outcome: {r: 'mismatch', reason: 'bytes'}});
@@ -774,14 +769,14 @@ async function proceedPastUnverified(d: E2EDriver, tab: number, url: string): Pr
       if (!now.startsWith(`${d.baseUrl}ui/blocked.html#`)) return null;
       const incidentId = decodeURIComponent(now.slice(now.indexOf('#') + 1));
       const v = await d.ui('UI_GET_BLOCKED', {incidentId});
-      if (v?.state === 'NEW_BUILD' && v.job?.finishedAt !== undefined) await d.navigate!(tab, url);
+      if (v?.state === 'NEW_BUILD' && v.job?.finishedAt !== undefined) await d.navigate(tab, url);
       return v;
     },
     v => v?.state === 'BUILD_UNVERIFIED',
     60_000,
   );
   expect(view).toMatchObject({retry: false, canProceedOnce: true});
-  await d.proceedOnce!(tab);
+  await d.proceedOnce(tab);
   await poll(
     'the page to load after "Proceed once"',
     () => d.tabUrl(tab),
@@ -969,7 +964,7 @@ export const SCENARIOS: readonly Scenario[] = [
       const cloud = fx.bitwardenCloud;
       const tab = await d.open(`${cloud.origin}/#/login`);
       await waitForState(d, tab, 'VERIFIED', allScriptsOk);
-      await d.pageInject!(tab, INLINE_MARKER, ATTR_MARKER);
+      await d.pageInject(tab, INLINE_MARKER, ATTR_MARKER);
       const t = await waitForState(d, tab, 'MISMATCH', s => s.reasons.includes('inline-code'));
       expect(await d.ran(tab, INLINE_MARKER)).toBe(false);
       expect(await d.ran(tab, ATTR_MARKER)).toBe(false);
@@ -1024,7 +1019,7 @@ export const SCENARIOS: readonly Scenario[] = [
       // A denied payment script taints nothing.
       expect((await tabState(d, other))?.state).toBe('VERIFIED');
       // The popup: "Allow Stripe for one page load…", the consent text, "Allow Stripe and reload".
-      const popup = await d.popup!(tab);
+      const popup = await d.popup(tab);
       await popup.click('Allow Stripe for one page load…');
       const consent = await popup.text();
       await popup.click('Allow Stripe and reload');
@@ -1064,7 +1059,7 @@ export const SCENARIOS: readonly Scenario[] = [
       const popupOther = await popupHas(d, other, ['A page that runs a payment script is open.']);
       expect(await d.notifications()).toEqual([]);
       // A further reload: the grant was for one page load, so the script is denied again.
-      await d.reload!(tab);
+      await d.reload(tab);
       const third = await d.pageScript(tab, STRIPE_JS);
       expect(third).toBe('error');
       expect(await d.ran(tab, STRIPE_MARKER)).toBe(false);
@@ -1086,10 +1081,10 @@ export const SCENARIOS: readonly Scenario[] = [
       expect((await tabState(d, other))?.state).toBe('CO_RESIDENT_UNVERIFIED');
       // "Add credit" needs no payment script: BitPay opens its invoice in a new tab (launchUri),
       // PayPal is a plain form post that leaves the vault page.
-      const bitpay = await d.pageLaunch!(fresh, BITPAY_INVOICE);
+      const bitpay = await d.pageLaunch(fresh, BITPAY_INVOICE);
       expect(bitpay).toBe(BITPAY_INVOICE);
       expect((await tabState(d, fresh))?.state).toBe('VERIFIED');
-      await d.pagePost!(fresh, PAYPAL_ACTION, {
+      await d.pagePost(fresh, PAYPAL_ACTION, {
         cmd: '_xclick',
         business: 'e2e',
         item_name: 'Bitwarden Account Credit',
@@ -1110,7 +1105,7 @@ export const SCENARIOS: readonly Scenario[] = [
         'popup: "Allow Stripe for one page load…" → consent panel (heading, source, reach, scope, private window) → "Allow Stripe and reload"',
         `reloaded page (new document): Stripe.js ${second}, ran: ${summary(allowed)}`,
         `other tab: ${summary(co)}; no alert, no notification`,
-        ...(popupOther !== '' ? [popupOther] : []),
+        popupOther,
         `further reload: Stripe.js ${third} again: ${summary(again)}`,
         `a new vault tab: ${summary(f)}; the other tab stays CO_RESIDENT_UNVERIFIED`,
         `Add credit with the payment scripts denied: BitPay invoice opened in a new tab (${bitpay}); PayPal form posted (${post!.fields.length} fields), the tab left for ${paypal}`,
@@ -1254,19 +1249,15 @@ export const SCENARIOS: readonly Scenario[] = [
         summary(t),
         `server style ${t.top!.serverStyle!.path} accepted, hides ${t.top!.serverStyle!.hiddenCount} selectors`,
       ];
-      if (d.popupText !== undefined) {
-        // The popup shows the verdict, the stylesheet line and the Vaultwarden note (en catalogue).
-        const text = await d.popupText(tab);
-        expect(text).toContain('Verified');
-        expect(text).toContain(
+      // The popup shows the verdict, the stylesheet line and the Vaultwarden note (en catalogue).
+      lines.push(
+        await popupHas(d, tab, [
+          'Verified',
           `Server stylesheet: accepted, hides ${t.top!.serverStyle!.hiddenCount} element types.`,
-        );
-        expect(text).toContain('Vaultwarden servers add their own stylesheet.');
-        lines.push(
-          'popup: "Verified", "Server stylesheet: accepted, hides … element types.", "Vaultwarden servers add their own stylesheet. …"',
-        );
-      }
-      lines.push(await expectPrivateStorage(d));
+          'Vaultwarden servers add their own stylesheet.',
+        ]),
+        await expectPrivateStorage(d),
+      );
       return lines;
     },
   },
@@ -1404,7 +1395,7 @@ export const SCENARIOS: readonly Scenario[] = [
         fx.github.emulator.serveInstead(repo, tag, asset, null);
         // "Retry", the second button next to "Go back", in the final view only (the one with the
         // "Proceed once" card; on the NEW_BUILD view the second button is "Go back").
-        await d.pageClick!(tab, '.actions:has(~ .proceed) > button:nth-child(2)');
+        await d.pageClick(tab, '.actions:has(~ .proceed) > button:nth-child(2)');
         await poll(
           'the vault to load after "Retry"',
           () => d.tabUrl(tab),
@@ -1505,9 +1496,12 @@ export const SCENARIOS: readonly Scenario[] = [
       expect(t.top).toMatchObject({path: '/', binding: {buildId: VW_BUILD}});
       expect(t.frames).toEqual([]);
       // Nothing turns it later (the old hop's timeout was 60 s; filter-failed was immediate).
-      await new Promise(r => setTimeout(r, 3000));
-      const again = await tabState(d, tab);
-      expect(again?.state).toBe('VERIFIED');
+      const again = await holds(
+        'VERIFIED with no stale session',
+        () => tabState(d, tab),
+        s => s?.state === 'VERIFIED',
+        3000,
+      );
       expect(await d.ui('UI_LIST_ALERTS', {})).toEqual([]);
       expect(await d.notifications()).toEqual([]);
       return [summary(again ?? t), 'no stale session, no alert', await expectPrivateStorage(d)];
@@ -1556,8 +1550,8 @@ export const SCENARIOS: readonly Scenario[] = [
         s => s.top?.binding?.buildId === VW_BUILD && allScriptsOk(s),
       );
       // The same responses the page reads with fetch: the document path and a listed file.
-      const doc = await d.pageFetch!(tab, '/');
-      const locale = await d.pageFetch!(tab, LOCALE_PATH);
+      const doc = await d.pageFetch(tab, '/');
+      const locale = await d.pageFetch(tab, LOCALE_PATH);
       for (const r of [doc, locale]) {
         expect(r.status).toBe(200);
         expect(r.headers['link'], JSON.stringify(r.headers)).toBeUndefined();
@@ -1592,14 +1586,14 @@ export const SCENARIOS: readonly Scenario[] = [
       const tab = await d.open(`${site.origin}/#/login`);
       const t = await waitForState(d, tab, 'VERIFIED', allScriptsOk);
       const doc = t.top!.doc;
-      await d.mark!(tab, '__iwVault');
+      await d.mark(tab, '__iwVault');
       // Another site (not protected, no no-store: Firefox may keep it in the back/forward cache)
       // in the same tab, then "Back".
       const away = `${fx.bitwardenScriptRedirect.evilOrigin!}/`;
-      await d.navigate!(tab, away);
+      await d.navigate(tab, away);
       expect(await d.tabUrl(tab)).toBe(away);
-      await d.mark!(tab, '__iwAway');
-      await d.back!(tab);
+      await d.mark(tab, '__iwAway');
+      await d.back(tab);
       await poll(
         'the vault to come back',
         () => d.tabUrl(tab),
@@ -1622,7 +1616,7 @@ export const SCENARIOS: readonly Scenario[] = [
       // reports the restore as a commit; it may also load it again. Either way the vault's
       // document must end (the tab is no longer protected). The restore-as-commit path itself
       // is covered by the engine test "a document restored from the back/forward cache".
-      await d.forward!(tab);
+      await d.forward(tab);
       await poll(
         'the other site to come back',
         () => d.tabUrl(tab),
@@ -1660,7 +1654,7 @@ export const SCENARIOS: readonly Scenario[] = [
         n => n > 0,
       );
       // Firefox ends the response's filter with the bytes that had arrived: a prefix of the file.
-      await d.closeTab!(tab);
+      await d.closeTab(tab);
       await new Promise(r => setTimeout(r, 6000));
       expect(await d.ui('UI_LIST_INCIDENTS', {limit: 20})).toEqual([]);
       expect(await d.ui('UI_LIST_ALERTS', {})).toEqual([]);
@@ -1704,7 +1698,7 @@ export const SCENARIOS: readonly Scenario[] = [
       expect(t.reasons).toEqual(['image-only-release']);
       expect(await d.notifications()).toEqual([]);
       // "Proceed once" is spent: a reload of the same document in the same tab is denied again.
-      await d.reload!(tab);
+      await d.reload(tab);
       await poll(
         'the reload to be denied again',
         () => d.tabUrl(tab),
@@ -1755,12 +1749,14 @@ export const SCENARIOS: readonly Scenario[] = [
           ),
       );
       // It stays so (a document ends only when Firefox says its frame shows another one).
-      for (let i = 0; i < 6; i++) {
-        await new Promise(r => setTimeout(r, 1000));
-        const now = await tabState(d, tab);
-        expect(now?.state).not.toBe('VERIFIED');
-        expect(now?.frames.find(f => f.path === '/')?.state).toBe('CO_RESIDENT_UNVERIFIED');
-      }
+      await holds(
+        'never VERIFIED, framed vault CO_RESIDENT_UNVERIFIED',
+        () => tabState(d, tab),
+        s =>
+          s?.state !== 'VERIFIED' &&
+          s?.frames.find(f => f.path === '/')?.state === 'CO_RESIDENT_UNVERIFIED',
+        6000,
+      );
       return [
         `${ATTACKER_PAGE}: denied as ${denied.state} (${denied.reasons.join(', ')}), let through with "Proceed once"`,
         `forged pagehide dispatched; the page framed the vault and reads its DOM`,
@@ -1812,10 +1808,10 @@ export const SCENARIOS: readonly Scenario[] = [
         2000,
       );
       // A click on its link opens the vault from the blob page.
-      await d.pageClick!(tab, '#iw-open');
+      await d.pageClick(tab, '#iw-open');
       const [vault] = await poll(
         'the window the blob: page opened',
-        () => d.tabsWithUrl!(`${site.origin}/`),
+        () => d.tabsWithUrl(`${site.origin}/`),
         ids => ids.length === 1,
       );
       const t = await waitForState(d, vault!, 'CO_RESIDENT_UNVERIFIED', allScriptsOk);
@@ -1871,7 +1867,7 @@ export const SCENARIOS: readonly Scenario[] = [
         return tab;
       };
       const frameAndPage = async (tab: number): Promise<FrameState & {heard: boolean}> => ({
-        ...(await d.frameState!(tab, FRAMED_MARKER)),
+        ...(await d.frameState(tab, FRAMED_MARKER)),
         heard: await d.ran(tab, FRAMING_HEARD_MARKER),
       });
       // The attacker document's script comes from the framing site: nothing holds or denies it.
@@ -1889,16 +1885,16 @@ export const SCENARIOS: readonly Scenario[] = [
       const incidents = await d.ui('UI_LIST_INCIDENTS', {limit: 20});
       expect(incidents.map(i => i.reasons.join(','))).not.toContain('release-differs');
       // At a click the frame opens the vault and reads it: that window is never green.
-      expect(await d.frameClick!(outside, `#${FRAMED_BUTTON}`)).toBe(true);
+      expect(await d.frameClick(outside, `#${FRAMED_BUTTON}`)).toBe(true);
       const [opened] = await poll(
         'the vault window the frame opened',
-        () => d.tabsWithUrl!(`${site.origin}/#/login`),
+        () => d.tabsWithUrl(`${site.origin}/#/login`),
         ids => ids.length === 1,
       );
       const co = await waitForState(d, opened!, 'CO_RESIDENT_UNVERIFIED', allScriptsOk);
       await poll(
         'the frame to read the window it opened',
-        () => d.frameState!(outside, FRAMED_READ_MARKER),
+        () => d.frameState(outside, FRAMED_READ_MARKER),
         x => x.ran,
         15_000,
       );
@@ -1929,7 +1925,7 @@ export const SCENARIOS: readonly Scenario[] = [
       const fresh = await d.open(`${site.origin}/`);
       const f = await waitForState(d, fresh, 'VERIFIED', allScriptsOk);
       expect(f.alert).toBeNull();
-      await d.closeTab!(fresh);
+      await d.closeTab(fresh);
       // An inline script runs too (no CSP floor); the content script reports it.
       const inline = await framed('inline');
       const m = await waitForState(d, inline, 'MISMATCH', s => s.reasons.includes('inline-code'));
@@ -1955,7 +1951,7 @@ export const SCENARIOS: readonly Scenario[] = [
     async run(d, fx) {
       const site = fx.vaultwardenFramed;
       await addInstance(d, site);
-      await d.grantHosts!([`https://${FRAMING_HOST}/*`]);
+      await d.grantHosts([`https://${FRAMING_HOST}/*`]);
       const loads = site.framedLoads!();
       const tab = await d.open(framingUrl(site, 'inline'));
       const t = await waitForState(d, tab, 'MISMATCH', s => s.reasons.includes('release-differs'));
@@ -1964,7 +1960,7 @@ export const SCENARIOS: readonly Scenario[] = [
       const frame = await holds(
         'the denied frame empty',
         async () => ({
-          ...(await d.frameState!(tab, FRAMED_MARKER)),
+          ...(await d.frameState(tab, FRAMED_MARKER)),
           heard: await d.ran(tab, FRAMING_HEARD_MARKER),
         }),
         f => !f.ran && !f.heard,
@@ -2011,7 +2007,7 @@ export const SCENARIOS: readonly Scenario[] = [
         );
         const frame = await poll(
           "Firefox's error page in the frame",
-          () => d.frameState!(tab, FRAMED_MARKER),
+          () => d.frameState(tab, FRAMED_MARKER),
           f => f.error !== null,
           15_000,
         );
@@ -2036,7 +2032,7 @@ export const SCENARIOS: readonly Scenario[] = [
             `in the frame; for 3 s the framing tab has ${seen.framing ?? 'no state'}, the vault ` +
             `tab is ${seen.vault}, no incident, no origin alert, no notification`,
         );
-        for (const t of [tab, vault]) await d.closeTab!(t);
+        for (const t of [tab, vault]) await d.closeTab(t);
       }
       lines.push(await expectPrivateStorage(d));
       return lines;
@@ -2061,7 +2057,7 @@ export const SCENARIOS: readonly Scenario[] = [
         btnText: encodeURIComponent('Read security key'),
         v: '1',
       });
-      const said = await d.pageFrame!(tab, `webauthn-connector.html?${params.toString()}`);
+      const said = await d.pageFrame(tab, `webauthn-connector.html?${params.toString()}`);
       expect(said).toBe('error|Cannot parse webauthn data.');
       const t = await waitForState(
         d,
@@ -2275,7 +2271,7 @@ export const SCENARIOS: readonly Scenario[] = [
         const held = site.heldResponses!();
         // A page script reloads, and reloads again while the first reload's document is held:
         // the filter has written nothing of it.
-        await d.reloadNow!(tab);
+        await d.reloadNow(tab);
         await poll(
           'the first reload at the server',
           async () => site.heldResponses!(),
@@ -2289,7 +2285,7 @@ export const SCENARIOS: readonly Scenario[] = [
             s => s !== null && s.top !== null && s.top.doc !== first.top!.doc,
           );
         }
-        await d.reloadNow!(tab);
+        await d.reloadNow(tab);
         await poll(
           'Firefox to cut off the first reload',
           async () => site.abortedResponses!(),
@@ -2315,7 +2311,7 @@ export const SCENARIOS: readonly Scenario[] = [
           `cancelled ${when}: ${site.heldResponses!() - held} document requests, ` +
             `${site.abortedResponses!()} cut off by Firefox; ${summary(kept ?? t)}`,
         );
-        await d.closeTab!(tab);
+        await d.closeTab(tab);
       }
       lines.push('no alert, no incident, no notification', await expectPrivateStorage(d));
       return lines;
@@ -2349,7 +2345,7 @@ export const SCENARIOS: readonly Scenario[] = [
           const end = Date.now() + 4000 + offset;
           const first = await tabState(d, tab);
           await new Promise(r => setTimeout(r, Math.max(0, end - Date.now())));
-          await d.reloadNow!(tab);
+          await d.reloadNow(tab);
           // The reloaded document verified: the response the reload cut off was decided before.
           const t = await waitForState(
             d,
@@ -2363,7 +2359,7 @@ export const SCENARIOS: readonly Scenario[] = [
           );
           expect(await d.notifications()).toEqual([]);
           last = summary(t);
-          await d.closeTab!(tab);
+          await d.closeTab(tab);
         }
         lines.push(`${coding}: 7 reloads at the end of the .wasm response; the last page ${last}`);
       }
@@ -2392,7 +2388,7 @@ export const SCENARIOS: readonly Scenario[] = [
         const held = site.heldResponses!();
         const aborted = site.abortedResponses!();
         const before = shown.top!.doc;
-        await d.reloadTwice!(tab, gap);
+        await d.reloadTwice(tab, gap);
         // Either way the second reload's document is checked and shown; in the false alarm the tab
         // holds the cancelled reload's document as well.
         const t = (await poll(
@@ -2432,7 +2428,7 @@ export const SCENARIOS: readonly Scenario[] = [
             reasons: ['filter-failed'],
             acknowledged: false,
           });
-          await d.reload!(tab);
+          await d.reload(tab);
           const again = await waitForState(
             d,
             tab,
@@ -2546,9 +2542,9 @@ export const SCENARIOS: readonly Scenario[] = [
       const url = `${site.origin}/#/login`;
       const tab = await d.open(url);
       const first = await waitForState(d, tab, 'VERIFIED', allScriptsOk);
-      await d.navigate!(tab, `${fx.bitwardenScriptRedirect.evilOrigin!}/`);
+      await d.navigate(tab, `${fx.bitwardenScriptRedirect.evilOrigin!}/`);
       const seen = site.log.length;
-      await d.navigate!(tab, url);
+      await d.navigate(tab, url);
       const again = await waitForState(
         d,
         tab,
@@ -2605,10 +2601,10 @@ export const SCENARIOS: readonly Scenario[] = [
       // Not protected yet: nothing is held or rewritten, and Firefox caches what it loads.
       const tab = await d.open(url);
       expect(await tabState(d, tab)).toBeNull();
-      await d.navigate!(tab, away);
+      await d.navigate(tab, away);
       await addInstance(d, site);
       const first = site.log.length;
-      await d.navigate!(tab, url);
+      await d.navigate(tab, url);
       const t = await waitForState(d, tab, 'VERIFIED', allScriptsOk);
       expect(t.top!.binding).toMatchObject({buildId: BW_BUILD, assurance: 'release-exact'});
       expect(answers(first, 304)).toContain('/');
@@ -2616,16 +2612,16 @@ export const SCENARIOS: readonly Scenario[] = [
       const notModified = answers(first, 304);
       // The policies in force on the revalidated document: an image from another origin breaks
       // only the server's, and an inline script is reported by the floor as well.
-      const reports = await d.pageCspReports!(tab, INLINE_MARKER);
+      const reports = await d.pageCspReports(tab, INLINE_MARKER);
       const by = (directive: string, part: string): boolean =>
         reports.some(r => r.directive === directive && r.policy.includes(part));
       expect(by('img-src', SERVER_IMG_SRC), JSON.stringify(reports)).toBe(true);
       expect(by('script-src-elem', FLOOR_SCRIPT_ATTR), JSON.stringify(reports)).toBe(true);
       expect(await d.ran(tab, INLINE_MARKER)).toBe(false);
       const m = await waitForState(d, tab, 'MISMATCH', s => s.reasons.includes('inline-code'));
-      await d.navigate!(tab, away);
+      await d.navigate(tab, away);
       const second = site.log.length;
-      await d.navigate!(tab, url);
+      await d.navigate(tab, url);
       await poll(
         'the document of the second visit',
         async () => site.log.slice(second).filter(r => r.path === '/'),
@@ -2706,10 +2702,9 @@ export const SCENARIOS: readonly Scenario[] = [
       const site = fx.vaultwardenServiceWorker;
       await workerBeforeAdd(d, site, 'script');
       const tab = await d.open(`${site.origin}/`);
-      await firstState(d, tab);
       const red = await waitForState(d, tab, 'MISMATCH', s => s.reasons.includes('service-worker'));
       const withheld = await workerScriptWithheld(d, site, tab);
-      const workers = await d.pageWorkers!(tab);
+      const workers = await d.pageWorkers(tab);
       expect(workers).toEqual({registrations: 1, controlled: true});
       const alert = await expectWorkerAlert(d, site);
       const other = await d.open(`${site.origin}/`);
@@ -2737,15 +2732,14 @@ export const SCENARIOS: readonly Scenario[] = [
       const site = fx.vaultwardenServiceWorker;
       await workerBeforeAdd(d, site, 'script-unregistered');
       const tab = await d.open(`${site.origin}/`);
-      await firstState(d, tab);
       const red = await waitForState(d, tab, 'MISMATCH', s => s.reasons.includes('service-worker'));
-      const workers = await d.pageWorkers!(tab);
+      const workers = await d.pageWorkers(tab);
       expect(workers).toEqual({registrations: 0, controlled: true});
       const withheld = await workerScriptWithheld(d, site, tab);
       const alert = await expectWorkerAlert(d, site);
       const other = await d.open(`${site.origin}/`);
       const o = await waitForState(d, other, 'CO_RESIDENT_UNVERIFIED', allScriptsOk);
-      expect(await d.pageWorkers!(other)).toEqual({registrations: 0, controlled: false});
+      expect(await d.pageWorkers(other)).toEqual({registrations: 0, controlled: false});
       await holds(
         'the other tab CO_RESIDENT_UNVERIFIED',
         () => tabState(d, other),
@@ -2776,7 +2770,6 @@ export const SCENARIOS: readonly Scenario[] = [
       const site = fx.vaultwardenServiceWorker;
       await workerBeforeAdd(d, site, 'script-fetched');
       const tab = await d.open(`${site.origin}/`);
-      await firstState(d, tab);
       const red = await waitForState(d, tab, 'MISMATCH', s => s.reasons.includes('service-worker'));
       await poll(
         "the worker's script to run",
@@ -2786,7 +2779,7 @@ export const SCENARIOS: readonly Scenario[] = [
       const {top, script} = await shownItem(d, tab, site.mainScript);
       expect(top.counts.document).toEqual({ok: 1, total: 1});
       expect(script.outcome).toEqual({r: 'unverifiable', reason: 'filter-failed', delivered: true});
-      expect(await d.pageWorkers!(tab)).toEqual({registrations: 0, controlled: true});
+      expect(await d.pageWorkers(tab)).toEqual({registrations: 0, controlled: true});
       const alert = await expectWorkerAlert(d, site);
       const other = await d.open(`${site.origin}/`);
       const o = await waitForState(d, other, 'CO_RESIDENT_UNVERIFIED', allScriptsOk);
@@ -2818,7 +2811,7 @@ export const SCENARIOS: readonly Scenario[] = [
       const tab = await d.open(`${site.origin}/`);
       const red = await waitForState(d, tab, 'MISMATCH', s => s.reasons.includes('service-worker'));
       // Loaded again, the vault is the worker's document again.
-      await d.navigate!(tab, `${site.origin}/`);
+      await d.navigate(tab, `${site.origin}/`);
       const again = await waitForState(
         d,
         tab,
@@ -2826,15 +2819,15 @@ export const SCENARIOS: readonly Scenario[] = [
         s => s.reasons.includes('service-worker') && s.top!.doc !== red.top!.doc,
       );
       expect(await d.ran(tab, WORKER_DOCUMENT_MARKER)).toBe(true);
-      await d.clearSiteData!(site.origin);
-      await d.navigate!(tab, `${site.origin}/`);
+      await d.clearSiteData(site.origin);
+      await d.navigate(tab, `${site.origin}/`);
       const recovering = await waitForState(d, tab, 'RECOVERING', allScriptsOk);
       expect(recovering.top!.binding).toMatchObject({buildId: VW_BUILD});
-      expect(await d.pageWorkers!(tab)).toEqual({registrations: 0, controlled: false});
+      expect(await d.pageWorkers(tab)).toEqual({registrations: 0, controlled: false});
       expect(await d.ran(tab, WORKER_DOCUMENT_MARKER)).toBe(false);
       await d.ui('UI_ACK_ALERT', {origin: site.origin});
       const verified = await waitForState(d, tab, 'VERIFIED', allScriptsOk);
-      await d.navigate!(tab, `${site.origin}/`);
+      await d.navigate(tab, `${site.origin}/`);
       const reloaded = await waitForState(
         d,
         tab,
@@ -2965,7 +2958,7 @@ export const SCENARIOS: readonly Scenario[] = [
         summary(after),
         notes(n),
         `the vault document stays (${url.replace(site.origin, '<origin>')}): no blocked page`,
-        ...(popup2 !== '' ? [popup2] : []),
+        popup2,
         await expectPrivateStorage(d),
       ];
     },
@@ -2979,7 +2972,7 @@ export const SCENARIOS: readonly Scenario[] = [
     async run(d, fx) {
       const configs = (): number => fx.vaultwarden.log.filter(r => r.path === '/api/config').length;
       const before = configs();
-      const confirmed = await d.addInstanceInOptions!(`${fx.vaultwarden.origin}/`);
+      const confirmed = await d.addInstanceInOptions(`${fx.vaultwarden.origin}/`);
       // The extension asks the server one thing: its /api/config (the app's own reads come later).
       expect(configs() - before).toBe(1);
       expect(confirmed).toEqual([]);
@@ -3018,14 +3011,14 @@ export const SCENARIOS: readonly Scenario[] = [
       await waitForState(d, tab, 'VERIFIED', s => settled(s) && (s.top?.counts.wasm.ok ?? 0) === 1);
       // The pattern the options page requests for the instance (ports are not part of patterns).
       const pattern = matchPatternFor(site.origin);
-      await d.revokeHosts!([pattern]);
+      await d.revokeHosts([pattern]);
       const lost = await waitForState(d, tab, 'PROTECTION_LOST', s =>
         s.reasons.includes('permission-revoked'),
       );
       expect(lost.permissionMissing).toBe(true);
       // A reload while the permission is missing: webRequest reports nothing, only the commit
       // (webNavigation needs no host permission), and the page that ran unchecked stays red.
-      await d.reload!(tab);
+      await d.reload(tab);
       const reloaded = await waitForState(
         d,
         tab,
@@ -3033,7 +3026,7 @@ export const SCENARIOS: readonly Scenario[] = [
         s => s.reasons.includes('permission-revoked') && s.reasons.includes('untracked'),
       );
       expect(reloaded.permissionMissing).toBe(true);
-      await d.grantHosts!([pattern]);
+      await d.grantHosts([pattern]);
       // The first tab may have run code nobody verified while the permission was missing: it is a
       // taint source, so a vault opened next to it is CO_RESIDENT_UNVERIFIED.
       const beside = await d.open(`${site.origin}/`);
@@ -3042,12 +3035,12 @@ export const SCENARIOS: readonly Scenario[] = [
       await closeTabs(d, tab, beside);
       const again = await d.open(`${site.origin}/`);
       const t = await waitForState(d, again, 'VERIFIED', allScriptsOk);
-      await d.revokeHosts!(['https://api.github.com/*']);
+      await d.revokeHosts(['https://api.github.com/*']);
       const before = await d.ui('UI_GET_ONBOARDING', {});
       expect(before.permissions.filter(p => !p.granted).map(p => p.pattern)).toEqual([
         'https://api.github.com/*',
       ]);
-      const missing = await d.grantFromOnboarding!();
+      const missing = await d.grantFromOnboarding();
       expect(missing).toEqual([]);
       return [
         `revoked: ${summary(lost)}; permissionMissing ${lost.permissionMissing}`,
@@ -3075,25 +3068,25 @@ export const SCENARIOS: readonly Scenario[] = [
       // Nothing keeps it alive while it is idle, and nothing in the page restarts it.
       const idle = await poll(
         'the event page to stop with the vault open',
-        () => d.background!(),
+        () => d.background(),
         b => b.state === 'stopped',
         30_000,
       );
       const asleep = await holds(
         'the event page stopped with the vault open',
-        () => d.background!(),
+        () => d.background(),
         b => b.state === 'stopped' && b.starts === idle.starts,
         5000,
       );
       // The popup's state request wakes it: the tab is rehydrated from storage.session.
       const kept = await tabState(d, tab);
       expect(kept?.state, JSON.stringify(kept?.reasons)).toBe('VERIFIED');
-      const woke = await d.background!();
+      const woke = await d.background();
       expect(woke.starts).toBeGreaterThan(idle.starts);
-      await d.closeTab!(tab);
+      await d.closeTab(tab);
       const stopped = await poll(
         'the event page to stop with no vault open',
-        () => d.background!(),
+        () => d.background(),
         b => b.state === 'stopped' && b.starts === woke.starts,
         30_000,
       );
@@ -3101,7 +3094,7 @@ export const SCENARIOS: readonly Scenario[] = [
       // StreamFilter after awaiting the engine's start (rehydration, cores).
       const again = await d.open(`${site.origin}/`);
       const t = await waitForState(d, again, 'VERIFIED', allScriptsOk);
-      const after = await d.background!();
+      const after = await d.background();
       expect(after.starts).toBeGreaterThan(stopped.starts);
       return [
         `vault open: event page ${asleep.state} for 5 s (starts ${asleep.starts}), no restart`,
@@ -3123,7 +3116,7 @@ export const SCENARIOS: readonly Scenario[] = [
       await addInstance(d, fx.bitwardenTampered);
       const stopped = await poll(
         'the event page to stop',
-        () => d.background!(),
+        () => d.background(),
         b => b.state === 'stopped',
         30_000,
       );
@@ -3131,7 +3124,7 @@ export const SCENARIOS: readonly Scenario[] = [
       const t = await waitForState(d, tab, 'MISMATCH');
       expect(t.reasons).toContain('bytes');
       expect(await d.ran(tab, TAMPER_MARKER)).toBe(false);
-      const after = await d.background!();
+      const after = await d.background();
       expect(after.starts).toBeGreaterThan(stopped.starts);
       return [
         `event page ${stopped.state} (starts ${stopped.starts}) → woken by the vault load (starts ${after.starts})`,
@@ -3160,7 +3153,7 @@ export const SCENARIOS: readonly Scenario[] = [
       // again, and nothing in the page restarts the event page.
       const stopped = await poll(
         'the event page to stop with the vault open',
-        () => d.background!(),
+        () => d.background(),
         b => b.state === 'stopped',
         30_000,
       );
@@ -3176,7 +3169,7 @@ export const SCENARIOS: readonly Scenario[] = [
         () => d.notifications(),
         x => x.length > 0,
       );
-      const after = await d.background!();
+      const after = await d.background();
       expect(after.starts).toBeGreaterThan(stopped.starts);
       const url = await d.tabUrl(tab);
       expect(url.startsWith(`${site.origin}/`), `tab shows ${url}`).toBe(true);
@@ -3211,9 +3204,9 @@ export const SCENARIOS: readonly Scenario[] = [
         );
         const incidentId = decodeURIComponent(blocked.slice(blocked.indexOf('#') + 1));
         expect(await d.ui('UI_GET_BLOCKED', {incidentId})).toMatchObject({state: 'NEW_BUILD'});
-        const before = await d.background!();
+        const before = await d.background();
         await new Promise(r => setTimeout(r, 35_000));
-        const during = await d.background!();
+        const during = await d.background();
         // Terminated mid-job, the event page loses the job (listed as failed at the next start)
         // instead of finishing it.
         expect(during.starts, 'the event page restarted during the job').toBe(before.starts);
@@ -3236,7 +3229,7 @@ export const SCENARIOS: readonly Scenario[] = [
         // from IndexedDB while it holds the response that woke it.
         const stopped = await poll(
           'the event page to stop after the job',
-          () => d.background!(),
+          () => d.background(),
           b => b.state === 'stopped',
           60_000,
         );
@@ -3249,7 +3242,7 @@ export const SCENARIOS: readonly Scenario[] = [
           60_000,
         );
         expect(s.top!.binding).toMatchObject({source: 'deep-verify'});
-        const woken = await d.background!();
+        const woken = await d.background();
         expect(woken.starts).toBeGreaterThan(stopped.starts);
         return [
           `event page during the 35 s held download: ${before.state} (starts ${before.starts}) → ${during.state} (starts ${during.starts})`,
@@ -3277,7 +3270,7 @@ export const SCENARIOS: readonly Scenario[] = [
       // The manifest's `default_area`: a fresh install has the state icon on the toolbar.
       expect(status.pinned).toBe(true);
       expect((await d.ui('UI_GET_TRUST', {})).cores).toEqual([]);
-      const confirmed = await d.addInstanceInOptions!(`${fx.vaultwarden.origin}/`);
+      const confirmed = await d.addInstanceInOptions(`${fx.vaultwarden.origin}/`);
       const tab = await d.open(`${fx.vaultwarden.origin}/`);
       const t = await waitForState(
         d,

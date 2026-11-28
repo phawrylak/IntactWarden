@@ -254,7 +254,7 @@ export const ENCODING_SCENARIOS: readonly Scenario[] = [
           front.setUpstream(site.origin);
           const view: Site = {...site, origin: front.origin, port: front.port};
           // The test package holds the http loopback hosts only; an https instance asks.
-          if (tls) await d.grantHosts!(['https://127.0.0.1/*']);
+          if (tls) await d.grantHosts(['https://127.0.0.1/*']);
           const {instance} = await addInstance(d, view);
           expect(instance).toMatchObject({app: 'vaultwarden-web', base_path: '/'});
           const tab = await d.open(`${front.origin}/#/login`);
