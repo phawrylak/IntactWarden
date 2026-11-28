@@ -100,7 +100,6 @@ describe('iterateTar: valid archives', () => {
     expect(DEFAULT_TAR_LIMITS).toEqual({
       maxEntries: 20_000,
       maxEntrySize: 256 * 1024 * 1024,
-      maxTotalSize: 1024 * 1024 * 1024,
     });
   });
 });
@@ -289,15 +288,13 @@ describe('iterateTar: names and entries', () => {
     ]);
     await expectCode(tar, 'limit-exceeded', {maxEntries: 1});
     await expectCode(tar, 'limit-exceeded', {maxEntrySize: 1});
-    await expectCode(tar, 'limit-exceeded', {maxTotalSize: 3});
-    expect(await files(tar, {limits: {maxEntries: 2, maxEntrySize: 2, maxTotalSize: 4}})).toEqual({
+    expect(await files(tar, {limits: {maxEntries: 2, maxEntrySize: 2}})).toEqual({
       '/a': 'xx',
       '/b': 'yy',
     });
     // A declared size beyond the input is truncated, whatever the limits.
     await expectCode(writeTar([{name: 'a', patch: [[124, octal(2 ** 32, 12)]]}]), 'truncated', {
       maxEntrySize: 2 ** 40,
-      maxTotalSize: 2 ** 40,
     });
   });
 });

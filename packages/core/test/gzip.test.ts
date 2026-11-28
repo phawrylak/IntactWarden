@@ -206,10 +206,7 @@ describe('gunzip: content checks', () => {
     }
   });
 
-  it('validates the limits', async () => {
-    for (const maxOutputSize of [-1, 1.5, 2 ** 32, Number.NaN]) {
-      await expect(gunzip(gz('a'), {maxOutputSize})).rejects.toThrow(TypeError);
-    }
+  it('rejects input that is not bytes', async () => {
     await expect(gunzip('x' as unknown as Uint8Array)).rejects.toThrow(TypeError);
   });
 

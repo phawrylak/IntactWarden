@@ -72,14 +72,11 @@ export interface TarLimits {
   maxEntries?: number;
   /** Maximum declared size of one file, in bytes. */
   maxEntrySize?: number;
-  /** Maximum sum of declared file sizes, in bytes. */
-  maxTotalSize?: number;
 }
 
 export const DEFAULT_TAR_LIMITS: Readonly<Required<TarLimits>> = Object.freeze({
   maxEntries: 20_000,
   maxEntrySize: 256 * 1024 * 1024,
-  maxTotalSize: 1024 * 1024 * 1024,
 });
 
 export interface TarFile {
@@ -238,14 +235,12 @@ export async function* iterateTar(
   }
   const maxEntries = opts.limits?.maxEntries ?? DEFAULT_TAR_LIMITS.maxEntries;
   const maxEntrySize = opts.limits?.maxEntrySize ?? DEFAULT_TAR_LIMITS.maxEntrySize;
-  const maxTotalSize = opts.limits?.maxTotalSize ?? DEFAULT_TAR_LIMITS.maxTotalSize;
   const input = new ChunkReader(chunks);
   try {
     if (length % BLOCK !== 0) {
       throw new TarError('truncated', `archive length ${length} is not a multiple of 512`);
     }
     const entries: NamedEntry[] = [];
-    let totalSize = 0;
     let longName: {name: string; bytes: Uint8Array} | null = null;
     for (;;) {
       const p = input.pos;
@@ -329,10 +324,6 @@ export async function* iterateTar(
           'limit-exceeded',
           `${where}: ${h.size} bytes exceed the entry limit of ${maxEntrySize}`,
         );
-      }
-      totalSize += h.size;
-      if (totalSize > maxTotalSize) {
-        throw new TarError('limit-exceeded', `total size exceeds the limit of ${maxTotalSize}`);
       }
       const entry = {name, isDirectory};
       if (!insidePrefix(entry, prefix)) {
