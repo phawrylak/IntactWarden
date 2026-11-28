@@ -764,6 +764,7 @@ describe('trust store: pins and disputes', () => {
     const third = setup({kv, db, fingerprint: 'f2', pkg: updatedPkg});
     await third.store.ready();
     expect(third.store.releaseState(key(NEW))).toEqual(disputed);
+    expect((await getCore(third.store, key(NEW)))?.ref.status).toBe('disputed');
     expect(third.env.logs).toEqual(['trust.store.ready']);
   });
 
