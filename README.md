@@ -3,6 +3,7 @@
 [![Mozilla Add-on](https://img.shields.io/amo/v/intactwarden?label=addons.mozilla.org&logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/firefox/addon/intactwarden/)
 [![Firefox 153+](https://img.shields.io/badge/Firefox-153%2B-FF7139?logo=firefoxbrowser&logoColor=white)](docs/security.md#why-firefox-only)
 [![ci](https://github.com/phawrylak/IntactWarden/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/phawrylak/IntactWarden/actions/workflows/ci.yml?query=branch%3Amain)
+[![AMO package = release](https://img.shields.io/github/actions/workflow/status/phawrylak/IntactWarden/store-diff.yml?branch=main&label=AMO%20package%20%3D%20release)](https://github.com/phawrylak/IntactWarden/actions/workflows/store-diff.yml)
 [![GitHub release](https://img.shields.io/github/v/release/phawrylak/IntactWarden)](https://github.com/phawrylak/IntactWarden/releases)
 [![License: MIT](https://img.shields.io/github/license/phawrylak/IntactWarden)](LICENSE)
 
