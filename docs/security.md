@@ -85,7 +85,7 @@ third-party code and is not minified, so the code you can read is the code that 
 
 **Reproducible packages.** A release is built only from a tag on `main` signed by the maintainer's
 release key, twice and byte-identical, with build provenance and `SHA256SUMS`
-([release](release.md#ci)). Only that zip is submitted to AMO, and once the add-on is listed a daily
+([release](release.md#ci)). Only that zip is submitted to AMO, and from version 1.0.1 a daily
 workflow compares the package AMO serves with it.
 
 **What you still trust:**
@@ -126,7 +126,7 @@ reveals: [privacy policy](privacy.md#network-requests).
 
 These checks show that a package was built from its tagged source and that the store gave you that
 package; only reading the code catches a malicious change in the source. You need Node.js 22.18 or
-newer, `git`, `gpg`, `sha256sum` and the GitHub CLI `gh`. Steps 2 to 4 need a published release.
+newer, `git`, `gpg`, `sha256sum` and the GitHub CLI `gh`.
 
 **1. Check the permissions.** In Extensions and Themes → IntactWarden → **Permissions and data**,
 the site switches must be the six required hosts plus one per server you added, and "Access your
@@ -142,8 +142,10 @@ gh attestation verify intactwarden-<version>-firefox.zip --repo phawrylak/Intact
 ```
 
 **3. Compare the installed package with the release.** AMO re-signs every package; the tool ignores
-only its signature files. The installed file is in the profile folder (`about:support` →
-**Profile Folder**).
+only its signature files and compares every other file byte for byte. (In 1.0.0 only, AMO's
+`manifest.json` differs too: AMO wrote the `ł` in the author's name as `\u0142` and dropped the
+final newline. From 1.0.1 the release writes it that way itself.) The installed file is in the
+profile folder (`about:support` → **Profile Folder**).
 
 ```sh
 git clone https://github.com/phawrylak/IntactWarden && cd IntactWarden && npm ci --ignore-scripts

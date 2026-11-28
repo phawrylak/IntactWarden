@@ -1,4 +1,11 @@
-# IntactWarden
+# <img src="extension/assets/icons/icon-128.png" alt="" width="40" height="40" align="top"> IntactWarden
+
+[![Mozilla Add-on](https://img.shields.io/amo/v/intactwarden?label=addons.mozilla.org&logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/firefox/addon/intactwarden/)
+[![Firefox 153+](https://img.shields.io/badge/Firefox-153%2B-FF7139?logo=firefoxbrowser&logoColor=white)](docs/security.md#why-firefox-only)
+[![ci](https://github.com/phawrylak/IntactWarden/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/phawrylak/IntactWarden/actions/workflows/ci.yml?query=branch%3Amain)
+[![AMO package = release](https://img.shields.io/github/actions/workflow/status/phawrylak/IntactWarden/store-diff.yml?branch=main&label=AMO%20package%20%3D%20release)](https://github.com/phawrylak/IntactWarden/actions/workflows/store-diff.yml)
+[![GitHub release](https://img.shields.io/github/v/release/phawrylak/IntactWarden)](https://github.com/phawrylak/IntactWarden/releases)
+[![License: MIT](https://img.shields.io/github/license/phawrylak/IntactWarden)](LICENSE)
 
 **IntactWarden is a Firefox extension that blocks Bitwarden and Vaultwarden web vault code that
 does not match the vendor's release on GitHub.**
@@ -13,9 +20,11 @@ visit. IntactWarden compares that code byte for byte with the vendor's GitHub re
 page can use it. **Code that does not match does not run.** Your browser does the whole check;
 there is no project server.
 
-**Status (November 2026):** version 1.0.0 is implemented and tested, but not published: there is no
-listing on addons.mozilla.org (AMO) and no GitHub release yet. One person maintains the project. It
-is independent: not affiliated with or endorsed by Bitwarden, Inc. or the Vaultwarden project.
+**[Get IntactWarden for Firefox](https://addons.mozilla.org/firefox/addon/intactwarden/)** from
+addons.mozilla.org (AMO). Version 1.0.0 is published there and as a
+[GitHub release](https://github.com/phawrylak/IntactWarden/releases). One person maintains the
+project. It is independent: not affiliated with or endorsed by Bitwarden, Inc. or the Vaultwarden
+project.
 
 ## What it looks like
 
@@ -56,7 +65,11 @@ most people.
 
 ## Install and try
 
-Until IntactWarden is on AMO, build it (Node.js 22.18 or newer) and load it as a temporary add-on:
+Install IntactWarden from
+[addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/). The
+[user guide](docs/guide.md) explains the rest.
+
+To try your own build instead, build it (Node.js 22.18 or newer) and load it as a temporary add-on:
 
 ```sh
 git clone https://github.com/phawrylak/IntactWarden.git && cd IntactWarden
@@ -65,8 +78,7 @@ npm run build:ext      # → extension/dist/firefox/
 ```
 
 In Firefox, open `about:debugging#/runtime/this-firefox`, choose "Load Temporary Add-on…" and select
-`extension/dist/firefox/manifest.json`. Firefox removes a temporary add-on when it restarts. The
-[user guide](docs/guide.md) explains the rest.
+`extension/dist/firefox/manifest.json`. Firefox removes a temporary add-on when it restarts.
 
 ## How it works
 
@@ -96,8 +108,8 @@ An extension like this runs next to your password vault, so do not take it on fa
 - There is no external audit. Please review the code yourself, by hand or with an AI assistant:
   give it the repository and [docs/security.md](docs/security.md), and ask how the extension could
   leak data, accept tampered code or raise a false alarm.
-- Builds are reproducible, every release zip comes with GitHub build provenance, and once the add-on
-  is on AMO a public workflow compares the package AMO serves with that zip every day
+- Builds are reproducible, every release zip comes with GitHub build provenance, and from version
+  1.0.1 a public workflow compares the package AMO serves with that zip every day
   ([how to check](docs/security.md#check-it-yourself)).
 - No third-party code, no remote code, no telemetry. It talks only to the protected sites and GitHub
   ([privacy policy](docs/privacy.md)) and never asks for access to all websites.
