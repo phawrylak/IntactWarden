@@ -1213,7 +1213,7 @@
     "message": "Vaultwarden servers add their own stylesheet. IntactWarden accepts it only if it just hides stock elements; Details lists what it hides."
   },
   "privacy_network_github": {
-    "message": "GitHub (api.github.com, github.com, release-assets.githubusercontent.com, objects.githubusercontent.com, raw.githubusercontent.com), to fetch a release that a protected site runs and that IntactWarden does not have yet. The requests carry no cookies, no credentials and no site address. Apart from the add-on's random address (moz-extension://…), which Firefox adds to requests to api.github.com, they are the same for every user of that release."
+    "message": "GitHub (api.github.com, release-assets.githubusercontent.com, raw.githubusercontent.com), to fetch a release that a protected site runs and that IntactWarden does not have yet. The requests carry no cookies, no credentials and no site address. Apart from the add-on's random address (moz-extension://…), which Firefox adds to requests to raw.githubusercontent.com, they are the same for every user of that release."
   },
   "privacy_network_hint": {
     "message": "The version file of a protected site (/version.json or /vw-version.json), at most once a minute, only to choose which release to fetch."

@@ -5,6 +5,16 @@ All notable changes to this project are documented here. The project follows
 
 ## Unreleased
 
+### 1.0.1 (not published yet)
+
+- **Two GitHub permissions instead of four**: release files are downloaded through the GitHub API
+  (`api.github.com`), which redirects to `release-assets.githubusercontent.com`. IntactWarden no
+  longer contacts `github.com` or `objects.githubusercontent.com`, and `raw.githubusercontent.com`
+  needs no permission because it answers with CORS headers. So IntactWarden no longer has access to
+  `github.com`, where you may be signed in, and Firefox no longer reports your browsing there to
+  it. Deep verify makes one more GitHub API request per release, which counts towards GitHub's
+  limit of 60 requests an hour.
+
 ### 1.0.0, the first release (not published yet)
 
 IntactWarden 1.0.0 checks, in desktop Firefox 153 or newer, that the web vault runs exactly the code

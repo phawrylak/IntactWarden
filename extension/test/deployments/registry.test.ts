@@ -237,10 +237,8 @@ describe('createRegistry', () => {
     const status = await reg.permissionStatus();
     expect(status.every(p => p.granted)).toBe(true);
     expect(status.filter(p => p.purpose === 'deep-verify').map(p => p.pattern)).toEqual([
-      'https://github.com/*',
+      'https://api.github.com/*',
       'https://release-assets.githubusercontent.com/*',
-      'https://objects.githubusercontent.com/*',
-      'https://raw.githubusercontent.com/*',
     ]);
   });
 

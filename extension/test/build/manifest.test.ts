@@ -30,17 +30,22 @@ describe('host permissions', () => {
     }
   });
 
-  it('is the official origins plus the four GitHub hosts (and loopback in test builds)', () => {
+  it('is the official origins plus the API and release-assets (and loopback in test builds)', () => {
     const production = generatedHostPermissions({test: false});
     expect(production).toEqual([
       'https://vault.bitwarden.com/*',
       'https://vault.bitwarden.eu/*',
-      'https://github.com/*',
+      'https://api.github.com/*',
       'https://release-assets.githubusercontent.com/*',
-      'https://objects.githubusercontent.com/*',
-      'https://raw.githubusercontent.com/*',
     ]);
-    expect(production).not.toContain('https://api.github.com/*');
+    // raw answers with CORS headers, and github.com is never contacted.
+    for (const host of [
+      'raw.githubusercontent.com',
+      'github.com',
+      'objects.githubusercontent.com',
+    ]) {
+      expect(production).not.toContain(`https://${host}/*`);
+    }
     expect(generatedHostPermissions({test: true})).toEqual([
       ...production,
       ...TEST_HOST_PERMISSIONS,

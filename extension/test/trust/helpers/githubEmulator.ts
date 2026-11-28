@@ -1,7 +1,8 @@
 /**
- * A GitHub emulator on top of the fake fetch: the REST release and git-ref
- * endpoints by repository id (with rate limits), release downloads (302 to
- * release-assets), and raw files by commit.
+ * A GitHub emulator on top of the fake fetch: the REST release, release-asset and git-ref
+ * endpoints by repository id (with rate limits; an asset fetched with
+ * `Accept: application/octet-stream` answers 302 to release-assets), the files on release-assets,
+ * and raw files by commit. github.com answers nothing: deep verify never contacts it.
  */
 
 import {createHash} from 'node:crypto';
@@ -48,8 +49,14 @@ export interface GitHubEmulator {
 
 const sha256 = (b: Uint8Array | string): string => createHash('sha256').update(b).digest('hex');
 
+/** The asset id the emulator lists for an asset: stable, so a test can name it. */
+export function emuAssetId(repoId: number, tag: string, name: string): number {
+  return 1000 + (parseInt(sha256(`${repoId}/${tag}/${name}`).slice(0, 8), 16) % 1_000_000_000);
+}
+
 export function createGitHubEmulator(fake: FakeFetch): GitHubEmulator {
   const releases = new Map<string, EmuRelease>(); // `${repoId}/${tag}`
+  const assetsById = new Map<number, {release: EmuRelease; asset: EmuAsset}>();
   const tags = new Map<string, EmuTag & {repoId: number}>(); // `${repo}/${tag}` (lowercase repo)
   const raw = new Map<string, Uint8Array>();
   const replaced = new Map<string, Uint8Array>();
@@ -64,6 +71,8 @@ export function createGitHubEmulator(fake: FakeFetch): GitHubEmulator {
     immutable: true,
     body: 'release notes',
     assets: r.assets.map(a => ({
+      id: emuAssetId(r.repoId, r.tag, a.name),
+      url: `https://api.github.com/repos/${r.downloadRepo ?? r.repo}/releases/assets/${emuAssetId(r.repoId, r.tag, a.name)}`,
       name: a.name,
       size: a.size ?? a.bytes.length,
       state: 'uploaded',
@@ -92,6 +101,23 @@ export function createGitHubEmulator(fake: FakeFetch): GitHubEmulator {
       if (r === undefined) return jsonResponse({message: 'Not Found'}, {status: 404, headers});
       return jsonResponse(releaseJson(r), {headers});
     }
+    m = /^\/repositories\/(\d+)\/releases\/assets\/(\d+)$/.exec(u.pathname);
+    if (m !== null) {
+      const hit = assetsById.get(Number(m[2]));
+      if (hit === undefined || hit.release.repoId !== Number(m[1])) {
+        return jsonResponse({message: 'Not Found'}, {status: 404, headers});
+      }
+      if (!(req.headers.get('accept') ?? '').includes('application/octet-stream')) {
+        return jsonResponse({id: Number(m[2]), name: hit.asset.name}, {headers});
+      }
+      return new Response(null, {
+        status: 302,
+        headers: {
+          ...headers,
+          location: `https://release-assets.githubusercontent.com/github-production-release-asset/${hit.release.repoId}/${encodeURIComponent(`${hit.release.tag}/${hit.asset.name}`)}?sig=x`,
+        },
+      });
+    }
     m = /^\/repositories\/(\d+)\/git\/ref\/tags\/([^/]+)$/.exec(u.pathname);
     if (m !== null) {
       const tag = decodeURIComponent(m[2]!);
@@ -116,21 +142,6 @@ export function createGitHubEmulator(fake: FakeFetch): GitHubEmulator {
 
   const web = (req: FakeRequest): Response | null => {
     const u = new URL(req.url);
-    if (u.host === 'github.com') {
-      const m = /^\/([^/]+\/[^/]+)\/releases\/download\/([^/]+)\/([^/]+)$/.exec(u.pathname);
-      if (m === null) return new Response('not found', {status: 404});
-      const r = [...releases.values()].find(
-        x => (x.downloadRepo ?? x.repo).toLowerCase() === m[1]!.toLowerCase() && x.tag === m[2],
-      );
-      const asset = r?.assets.find(a => a.name === decodeURIComponent(m[3]!));
-      if (asset === undefined) return new Response('not found', {status: 404});
-      return new Response(null, {
-        status: 302,
-        headers: {
-          location: `https://release-assets.githubusercontent.com/github-production-release-asset/${r!.repoId}/${encodeURIComponent(`${r!.tag}/${asset.name}`)}?sig=x`,
-        },
-      });
-    }
     if (u.host === 'release-assets.githubusercontent.com') {
       const m = /^\/github-production-release-asset\/(\d+)\/([^/]+)$/.exec(u.pathname);
       if (m === null) return new Response('not found', {status: 404});
@@ -163,6 +174,8 @@ export function createGitHubEmulator(fake: FakeFetch): GitHubEmulator {
   return {
     addRelease(r) {
       releases.set(`${r.repoId}/${r.tag}`, r);
+      for (const a of r.assets)
+        assetsById.set(emuAssetId(r.repoId, r.tag, a.name), {release: r, asset: a});
     },
     setTag(repo, repoId, tag, value) {
       tags.set(`${repo.toLowerCase()}/${tag}`, {...value, repoId});

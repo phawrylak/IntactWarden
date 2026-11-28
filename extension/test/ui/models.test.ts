@@ -319,8 +319,8 @@ describe('onboarding', () => {
         granted: true,
       },
       {
-        pattern: 'https://github.com/*',
-        origin: 'https://github.com',
+        pattern: 'https://release-assets.githubusercontent.com/*',
+        origin: 'https://release-assets.githubusercontent.com',
         purpose: 'deep-verify',
         required: true,
         granted: false,
@@ -342,9 +342,9 @@ describe('onboarding', () => {
     const m = onboardingModel(status);
     expect(m.permissions.map(p => [p.pattern, p.status])).toEqual([
       ['https://vault.bitwarden.com/*', 'granted'],
-      ['https://github.com/*', 'not granted'],
+      ['https://release-assets.githubusercontent.com/*', 'not granted'],
     ]);
-    expect(m.missing).toEqual(['https://github.com/*']);
+    expect(m.missing).toEqual(['https://release-assets.githubusercontent.com/*']);
     expect(m.protection).toMatch(/^IntactWarden checks every file before/);
     expect(m.protectionDetail).toMatch(/only in Firefox with IntactWarden/);
     expect(m.pin).toBe('Make sure the IntactWarden icon is pinned to the toolbar.');

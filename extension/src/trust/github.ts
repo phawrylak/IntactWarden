@@ -23,6 +23,8 @@ import {
 import {readBodyCapped, withDeadline} from './download.ts';
 
 export interface GitHubAsset {
+  /** GitHub's numeric asset id (the API download addresses it). */
+  readonly id: number;
   readonly name: string;
   readonly size: number;
   /** Lowercase hex from GitHub's `digest: "sha256:<hex>"`, or null when GitHub lists none. */
@@ -105,7 +107,8 @@ function readState(raw: unknown): GitHubState {
 
 function reduceAsset(raw: unknown): GitHubAsset | null {
   if (!isRecord(raw)) return null;
-  const {name, size, digest, browser_download_url: url, state} = raw;
+  const {id, name, size, digest, browser_download_url: url, state} = raw;
+  if (!isSafeCount(id) || id < 1) return null;
   if (typeof name !== 'string' || name.length === 0 || name.length > 255) return null;
   if (!isSafeCount(size)) return null;
   if (typeof url !== 'string' || url.length > 2048) return null;
@@ -115,6 +118,7 @@ function reduceAsset(raw: unknown): GitHubAsset | null {
     sha256 = m === null ? null : m[1]!;
   }
   return {
+    id,
     name,
     size,
     sha256,

@@ -5,9 +5,9 @@
  * `host_permissions`.
  *
  * The expected host-permission set is computed independently by `generatedHostPermissions()`
- * (official origins of the bundled profiles + the GitHub hosts of `GITHUB_HOSTS`, without
- * api.github.com), and bundle-lint requires `host_permissions` and the static content script's
- * matches to equal it exactly.
+ * (official origins of the bundled profiles + the GitHub hosts of `GITHUB_HOST_KEYS`), and
+ * bundle-lint requires `host_permissions` and the static content script's matches to equal it
+ * exactly.
  */
 
 import {readFile} from 'node:fs/promises';
@@ -23,8 +23,12 @@ export interface JsonObject {
 /** Loopback hosts of test builds; never in a production build. */
 export const TEST_HOST_PERMISSIONS = Object.freeze(['http://127.0.0.1/*', 'http://localhost/*']);
 
-/** GitHub hosts that need host permission (api.github.com sends ACAO * and needs none). */
-export const GITHUB_HOST_KEYS = Object.freeze(['web', 'releaseAssets', 'objects', 'raw'] as const);
+/**
+ * GitHub hosts that need host permission: api.github.com, where a release download starts, and
+ * release-assets, where it ends (raw.githubusercontent.com sends `Access-Control-Allow-Origin: *`
+ * and needs none).
+ */
+export const GITHUB_HOST_KEYS = Object.freeze(['api', 'releaseAssets'] as const);
 
 /** `https://host` → `https://host/*`. An origin with a port is refused. */
 export function originMatchPattern(origin: string): string {
@@ -42,7 +46,7 @@ export function officialMatchPatterns(origins: readonly string[] = OFFICIAL_ORIG
 
 /**
  * The generated required host-permission set (docs/security.md):
- * official origins, then the four GitHub hosts, then (test builds) the loopback hosts.
+ * official origins, then the two GitHub hosts, then (test builds) the loopback hosts.
  */
 export function generatedHostPermissions(options: {readonly test: boolean}): string[] {
   return [

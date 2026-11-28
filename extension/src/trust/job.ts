@@ -16,7 +16,7 @@ import {
 } from '@intactwarden/builders/api.ts';
 import {sha256Hex} from '@intactwarden/core/hash/sha256.ts';
 import type {JobPhase, ReleaseJobResult, ReleaseJobSpec} from '../contracts.ts';
-import {DOWNLOAD_HOSTS, RAW_HOST, rawFileUrl, releaseDownloadUrl} from './common.ts';
+import {DOWNLOAD_HOSTS, RAW_HOST, rawFileUrl, releaseAssetApiUrl} from './common.ts';
 import {downloadVerified, isAllowedHttpsUrl, readBodyCapped, withDeadline} from './download.ts';
 
 export interface JobLimits {
@@ -119,7 +119,8 @@ async function run(spec: ReleaseJobSpec, deps: JobDeps): Promise<ReleaseJobResul
   progress({phase: 'downloading', bytes: 0, total: spec.asset.size});
   let lastReport = 0;
   const download = await downloadVerified(deps.fetch, {
-    url: releaseDownloadUrl(plan.repo, plan.tag, spec.asset.name),
+    url: releaseAssetApiUrl(plan.repoId, spec.asset.id),
+    accept: 'application/octet-stream',
     sha256: spec.asset.sha256,
     size: spec.asset.size,
     maxBytes: limits.maxAssetBytes,

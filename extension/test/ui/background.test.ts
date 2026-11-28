@@ -46,8 +46,8 @@ function statusOf(granted: boolean | 'fails'): Pick<ProfileRegistry, 'permission
       if (granted === 'fails') throw new Error('not ready');
       return [
         {
-          pattern: 'https://github.com/*',
-          origin: 'https://github.com',
+          pattern: 'https://release-assets.githubusercontent.com/*',
+          origin: 'https://release-assets.githubusercontent.com',
           purpose: 'deep-verify',
           required: true,
           granted,
@@ -231,8 +231,8 @@ function fakeRegistry(
           granted: true,
         },
         {
-          pattern: 'https://github.com/*',
-          origin: 'https://github.com',
+          pattern: 'https://release-assets.githubusercontent.com/*',
+          origin: 'https://release-assets.githubusercontent.com',
           purpose: 'deep-verify',
           required: true,
           granted: githubGranted,
@@ -284,7 +284,9 @@ describe('registerUiHandlers', () => {
     expect(
       status.permissions.find(p => p.pattern === 'https://vault.bitwarden.com/*'),
     ).toMatchObject({granted: true, purpose: 'official'});
-    expect(status.permissions.find(p => p.pattern === 'https://github.com/*')).toMatchObject({
+    expect(
+      status.permissions.find(p => p.pattern === 'https://release-assets.githubusercontent.com/*'),
+    ).toMatchObject({
       granted: false,
       purpose: 'deep-verify',
     });

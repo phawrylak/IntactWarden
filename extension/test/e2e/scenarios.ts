@@ -460,11 +460,18 @@ function summary(t: TabStateRecord): string {
 
 /**
  * The deep-verify requests the GitHub mirror answered carry nothing about the user or the vault:
- * no Cookie, no Referer, an Origin that is the extension's own (or none), and no vault host or
- * page path in any URL or header. They are only the requests of local deep verify (release and
- * tag JSON by repository id, the release download, config files by commit): no release
+ * no Cookie, no Referer, an Origin that is the extension's own, `null` (after a redirect) or none,
+ * and no vault host or page path in any URL or header. They are only the requests of local deep
+ * verify (release, asset and tag JSON by repository id, the release download, config files by
+ * commit), to api.github.com, release-assets and raw only (never github.com): no release
  * signature, no signed data. Returns an evidence line.
  */
+const DEEP_VERIFY_HOSTS = [
+  'api.github.com',
+  'release-assets.githubusercontent.com',
+  'raw.githubusercontent.com',
+];
+
 function expectPrivateGitHub(
   requests: readonly MirrorRequest[],
   vaults: readonly string[],
@@ -474,7 +481,9 @@ function expectPrivateGitHub(
     const where = `${r.method} ${r.host}${r.path}`;
     expect(r.cookie, `${where}: Cookie`).toBeNull();
     expect(r.referer, `${where}: Referer`).toBeNull();
-    if (r.origin !== null) expect(r.origin, `${where}: Origin`).toMatch(/^moz-extension:\/\//);
+    expect(DEEP_VERIFY_HOSTS, `${where}: host`).toContain(r.host);
+    if (r.origin !== null)
+      expect(r.origin, `${where}: Origin`).toMatch(/^(moz-extension:\/\/|null$)/);
     for (const value of [r.path, r.origin ?? '']) {
       for (const h of [...hosts, '127.0.0.1', 'localhost', 'vault.bitwarden']) {
         expect(value, `${where}: names ${h}`).not.toContain(h);
@@ -483,12 +492,15 @@ function expectPrivateGitHub(
     expect(r.path, `${where}: a release signature`).not.toMatch(/\.asc$/);
     expect(r.path, `${where}: signed data`).not.toMatch(/\/contents\/|\/data\/v1\//);
   }
-  const origins = [
-    ...new Set(requests.map(r => r.origin?.replace(/[0-9a-f-]{36}/, '<uuid>') ?? 'none')),
-  ];
+  const origins = DEEP_VERIFY_HOSTS.flatMap(host => {
+    const seen = requests.filter(r => r.host === host);
+    if (seen.length === 0) return [];
+    const values = new Set(seen.map(r => r.origin?.replace(/[0-9a-f-]{36}/, '<uuid>') ?? 'none'));
+    return [`${host} ${[...values].join(' / ')}`];
+  });
   return (
     `GitHub privacy: ${requests.length} requests, no Cookie, no Referer, Origin ` +
-    `${origins.join(' / ')}, no vault host or page path, no signature or signed-data request`
+    `(${origins.join('; ')}), no vault host or page path, no signature or signed-data request`
   );
 }
 
@@ -1317,13 +1329,13 @@ export const SCENARIOS: readonly Scenario[] = [
         );
         expect(downloads.length).toBeGreaterThanOrEqual(1);
         // Only the release JSON, the tag by repository id (its ref, then the annotated tag
-        // object), their CORS preflights and the tarball's download; never sha256sums.txt, which
+        // object), CORS preflights and the tarball's download through the API; never sha256sums.txt, which
         // the mirror's release lists with another digest, and no git-upload-pack.
         const allowed = [
           /^(OPTIONS|GET) api\.github\.com\/repositories\/\d+\/releases\/tags\/v2026\.10\.1$/,
           /^(OPTIONS|GET) api\.github\.com\/repositories\/\d+\/git\/ref\/tags\/v2026\.10\.1$/,
           /^(OPTIONS|GET) api\.github\.com\/repositories\/\d+\/git\/tags\/[0-9a-f]{40}$/,
-          /^GET github\.com\/dani-garcia\/bw_web_builds\/releases\/download\/v2026\.10\.1\/bw_web_v2026\.10\.1\.tar\.gz$/,
+          /^GET api\.github\.com\/repositories\/\d+\/releases\/assets\/\d+$/,
           /^GET release-assets\.githubusercontent\.com\/\S*bw_web_v2026\.10\.1\.tar\.gz$/,
         ];
         for (const r of mine) {
@@ -3026,14 +3038,13 @@ export const SCENARIOS: readonly Scenario[] = [
       const beside = await d.open(`${site.origin}/`);
       const co = await waitForState(d, beside, 'CO_RESIDENT_UNVERIFIED', allScriptsOk);
       expect(co.top?.coResident).toMatchObject({class: 'unverifiable', sourcePath: '/'});
-      await d.closeTab!(tab);
-      await d.closeTab!(beside);
+      await closeTabs(d, tab, beside);
       const again = await d.open(`${site.origin}/`);
       const t = await waitForState(d, again, 'VERIFIED', allScriptsOk);
-      await d.revokeHosts!(['https://github.com/*']);
+      await d.revokeHosts!(['https://api.github.com/*']);
       const before = await d.ui('UI_GET_ONBOARDING', {});
       expect(before.permissions.filter(p => !p.granted).map(p => p.pattern)).toEqual([
-        'https://github.com/*',
+        'https://api.github.com/*',
       ]);
       const missing = await d.grantFromOnboarding!();
       expect(missing).toEqual([]);
@@ -3042,7 +3053,7 @@ export const SCENARIOS: readonly Scenario[] = [
         `reloaded while revoked: ${summary(reloaded)}`,
         `granted again, next to the revoked tab: ${summary(co)}`,
         `granted again, revoked tab closed, new tab: ${summary(t)}`,
-        'github.com revoked → onboarding "Grant" → every required host granted',
+        'api.github.com revoked → onboarding "Grant" → every required host granted',
         await expectPrivateStorage(d),
       ];
     },
@@ -3255,8 +3266,9 @@ export const SCENARIOS: readonly Scenario[] = [
     title:
       'The shipping package (production build, no test overlay, no bundled cores): its toolbar ' +
       'button is pinned after the install; Vaultwarden instance added through the options page ' +
-      '→ deep verify from the GitHub mirror → VERIFIED; the tampered Bitwarden main script is ' +
-      'denied after its release is deep-verified',
+      '→ deep verify from the GitHub mirror → VERIFIED; Bitwarden cloud → deep verify with the ' +
+      'config files from raw.githubusercontent.com (no host permission) → VERIFIED; the ' +
+      'tampered Bitwarden main script is denied after its release is deep-verified',
     pkg: 'release',
     async run(d, fx) {
       const status = await d.ui('UI_GET_ONBOARDING', {});
@@ -3276,6 +3288,28 @@ export const SCENARIOS: readonly Scenario[] = [
       expect(t.top!.binding).toMatchObject({source: 'deep-verify', assurance: 'release-exact'});
       const core = (await d.ui('UI_GET_TRUST', {})).cores.find(c => c.buildId === VW_BUILD);
       expect(core?.sha256).toBe(GOLDEN_CORES[VW_BUILD]);
+      // Bitwarden cloud: both regions are derived from the release zip and the config files on
+      // raw, which the shipping package reads without a host permission (raw sends CORS headers).
+      const rawSeen = fx.github.requests.length;
+      const cloudTab = await d.open(`${fx.bitwardenCloud.origin}/`);
+      const c = await waitForState(
+        d,
+        cloudTab,
+        'VERIFIED',
+        s => settled(s) && s.top?.binding?.buildId === BW_CLOUD_US,
+        180_000,
+      );
+      expect(c.top!.binding).toMatchObject({source: 'deep-verify', assurance: 'release-derived'});
+      const cloudCore = (await d.ui('UI_GET_TRUST', {})).cores.find(x => x.buildId === BW_CLOUD_US);
+      expect(cloudCore?.sha256).toBe(GOLDEN_CORES[BW_CLOUD_US]);
+      const raw = fx.github.requests
+        .slice(rawSeen)
+        .filter(r => r.host === 'raw.githubusercontent.com');
+      expect(raw.map(r => `${r.status} ${r.path.split('/').pop()}`).sort()).toEqual([
+        '200 base.json',
+        '200 cloud.json',
+        '200 euprd.json',
+      ]);
       await addInstance(d, fx.bitwardenTampered);
       const bad = await d.open(`${fx.bitwardenTampered.origin}/`);
       const m = await waitForState(d, bad, 'MISMATCH', () => true, 180_000);
@@ -3286,6 +3320,8 @@ export const SCENARIOS: readonly Scenario[] = [
         'fresh install: the toolbar button is pinned',
         `options page: confirmations [${confirmed.join(', ')}]; ${summary(t)}`,
         `deep-verified core ${VW_BUILD} sha256 ${core!.sha256} (= golden)`,
+        `Bitwarden cloud: ${summary(c)}; core sha256 ${cloudCore!.sha256} (= golden); raw: ${raw.map(r => `${r.status} ${r.path}`).join(', ')}`,
+        expectPrivateGitHub(fx.github.requests.slice(rawSeen), [fx.bitwardenCloud.origin]),
         `tampered Bitwarden: ${summary(m)}; the script never ran`,
         await expectPrivateStorage(d),
       ];

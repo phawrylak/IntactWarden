@@ -113,10 +113,12 @@ and to contain no third-party code, `eval`, remote scripts or source maps
 | `storage` | Settings, servers, alerts, incidents, manifests |
 | `notifications` | A notification for each new red state (can be turned off) |
 
-Site access: `vault.bitwarden.com`, `vault.bitwarden.eu`, and the GitHub hosts that serve release
-downloads and configuration files. Access to other sites is requested one site at a time, when you
-add a server; Firefox's "Access your data for all websites" must stay off. Not requested: `tabs`,
-`cookies`, `history`, `debugger`, `<all_urls>`.
+Site access: `vault.bitwarden.com`, `vault.bitwarden.eu`, `api.github.com` and
+`release-assets.githubusercontent.com`, where a release download starts and ends.
+`raw.githubusercontent.com` answers with CORS headers and needs no access; `github.com` is never
+contacted. Access to other sites is requested one site at a time, when you add a server; Firefox's
+"Access your data for all websites" must stay off. Not requested: `tabs`, `cookies`, `history`,
+`debugger`, `<all_urls>`.
 
 Every network request follows a page that runs a release IntactWarden does not have, **Retry** on a
 blocked page, or adding a server; nothing runs on a schedule. The full list, with what each request
@@ -129,7 +131,7 @@ package; only reading the code catches a malicious change in the source. You nee
 newer, `git`, `gpg`, `sha256sum` and the GitHub CLI `gh`. Steps 2 to 4 need a published release.
 
 **1. Check the permissions.** In Extensions and Themes → IntactWarden → **Permissions and data**,
-the site switches must be the six required hosts plus one per server you added, and "Access your
+the site switches must be the four required hosts plus one per server you added, and "Access your
 data for all websites" must be off.
 
 **2. Check checksums and provenance** of the release files:

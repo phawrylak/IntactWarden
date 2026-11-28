@@ -153,10 +153,8 @@ export interface MiniExt {
 export const HOST_PERMISSIONS = [
   'https://vault.bitwarden.com/*',
   'https://vault.bitwarden.eu/*',
-  'https://github.com/*',
+  'https://api.github.com/*',
   'https://release-assets.githubusercontent.com/*',
-  'https://objects.githubusercontent.com/*',
-  'https://raw.githubusercontent.com/*',
 ];
 
 /** A memory-backed Ext with the members the UI background code calls; every call is recorded. */

@@ -4,7 +4,7 @@ import {BuildError, type BuildRequest, type CoreBuilder} from '@intactwarden/bui
 import type {ReleaseJobSpec} from '../../src/contracts.ts';
 import {runReleaseJob, type JobProgress} from '../../src/trust/job.ts';
 import {createFakeFetch} from './helpers/fakeFetch.ts';
-import {createGitHubEmulator} from './helpers/githubEmulator.ts';
+import {createGitHubEmulator, emuAssetId} from './helpers/githubEmulator.ts';
 import {
   buildVwCore,
   idsFor,
@@ -35,7 +35,12 @@ function specFor(a: VwAssets, over: Partial<ReleaseJobSpec> = {}): ReleaseJobSpe
     plan,
     commit: ids.commit,
     tagObject: ids.tagObject,
-    asset: {name: a.asset, sha256: sha256(a.tarball), size: a.tarball.length},
+    asset: {
+      id: emuAssetId(plan.repoId, plan.tag, a.asset),
+      name: a.asset,
+      sha256: sha256(a.tarball),
+      size: a.tarball.length,
+    },
     configs: [],
     ...over,
   };
@@ -93,6 +98,39 @@ describe('runReleaseJob', () => {
       'building',
       'storing',
     ]);
+  });
+
+  it('downloads through the API asset endpoint, never from github.com', async () => {
+    const {fake, deps} = setup();
+    const spec = specFor(assets);
+    const r = await runReleaseJob(spec, deps);
+    expect(r.ok).toBe(true);
+    const asset = fake.calls.find(c => c.url.includes('/releases/assets/'))!;
+    expect(asset.url).toBe(
+      `https://api.github.com/repositories/${spec.plan.repoId}/releases/assets/${spec.asset.id}`,
+    );
+    expect([...asset.headers.keys()]).toEqual(['accept']);
+    expect(asset.headers.get('accept')).toBe('application/octet-stream');
+    expect(asset.init.credentials).toBe('omit');
+    expect(fake.calls.map(c => new URL(c.url).host)).not.toContain('github.com');
+  });
+
+  it('refuses a download that ends outside release-assets and the API', async () => {
+    const {fake, builder, deps} = setup();
+    const spec = specFor(assets);
+    fake.route(
+      'GET',
+      `https://api.github.com/repositories/${spec.plan.repoId}/releases/assets/${spec.asset.id}`,
+      () => new Response(null, {status: 302, headers: {location: 'https://example.org/asset'}}),
+    );
+    fake.route(
+      'GET',
+      'https://example.org/asset',
+      () => new Response(assets.tarball as Uint8Array<ArrayBuffer>),
+    );
+    const r = await runReleaseJob(spec, deps);
+    expect(r).toEqual({ok: false, failure: 'build-refused', detail: 'unsupported'});
+    expect(builder.calls).toHaveLength(0);
   });
 
   it('refuses a digest mismatch before anything parses the bytes', async () => {

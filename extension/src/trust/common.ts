@@ -90,20 +90,30 @@ export function randomId(): string {
 }
 
 /**
- * Hosts a release download may end on: github.com redirects to release-assets; objects is kept
- * as a spare redirect target.
+ * Hosts a release download may end on: the API redirects to release-assets (it could also answer
+ * with the bytes itself).
  */
 export const DOWNLOAD_HOSTS: readonly string[] = Object.freeze([
-  new URL(GITHUB_HOSTS.web).host,
   new URL(GITHUB_HOSTS.releaseAssets).host,
-  new URL(GITHUB_HOSTS.objects).host,
+  new URL(GITHUB_HOSTS.api).host,
 ]);
 
 export const RAW_HOST = new URL(GITHUB_HOSTS.raw).host;
 
-/** `https://github.com/<repo>/releases/download/<tag>/<asset>`. */
+/**
+ * `https://github.com/<repo>/releases/download/<tag>/<asset>`: the address GitHub lists for an
+ * asset. Compared with the listing, never fetched.
+ */
 export function releaseDownloadUrl(repo: string, tag: string, asset: string): string {
-  return `${GITHUB_HOSTS.web}/${repo}/releases/download/${encodeURIComponent(tag)}/${encodeURIComponent(asset)}`;
+  return `https://github.com/${repo}/releases/download/${encodeURIComponent(tag)}/${encodeURIComponent(asset)}`;
+}
+
+/**
+ * `https://api.github.com/repositories/<repoId>/releases/assets/<assetId>`: fetched with
+ * `Accept: application/octet-stream`, it redirects to the file on release-assets.
+ */
+export function releaseAssetApiUrl(repoId: number, assetId: number): string {
+  return `${GITHUB_HOSTS.api}/repositories/${repoId}/releases/assets/${assetId}`;
 }
 
 /** `https://raw.githubusercontent.com/<repo>/<commit>/<path>` (by commit, never by tag). */

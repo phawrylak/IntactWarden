@@ -75,8 +75,8 @@ export async function resolveRelease(plan: AssetPlan, deps: ResolveDeps): Promis
   if (asset === null || !asset.uploaded) {
     return permanent(plan.app === 'vaultwarden-web' ? 'image-only-release' : 'asset-not-found');
   }
-  // The release answered by repository id must be the repository the profile names:
-  // otherwise the name-addressed download could reach another repository.
+  // The release answered by repository id must be the repository the profile names: the asset's
+  // listed address must name the profile's repository and tag.
   const assetUrl = releaseDownloadUrl(plan.repo, plan.tag, plan.assetName);
   if (asset.downloadUrl.toLowerCase() !== assetUrl.toLowerCase())
     return permanent('release-not-found');
@@ -112,7 +112,7 @@ export async function resolveRelease(plan: AssetPlan, deps: ResolveDeps): Promis
     plan,
     commit,
     ...(tagObject === undefined ? {} : {tagObject}),
-    asset: {name: asset.name, sha256: asset.sha256, size: asset.size},
+    asset: {id: asset.id, name: asset.name, sha256: asset.sha256, size: asset.size},
     configs: plan.configPaths.map(path => {
       const pin = deps.pins.findConfig(plan.repo, commit, path);
       return pin === null ? {path} : {path, sha256: pin.sha256};

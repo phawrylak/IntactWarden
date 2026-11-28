@@ -328,8 +328,13 @@ export interface ReleaseJobSpec {
   readonly plan: AssetPlan;
   readonly commit: string;
   readonly tagObject?: string;
-  /** Downloaded from github.com/<repo>/releases/download/<tag>/<asset> (302 to release-assets). */
+  /**
+   * Downloaded from api.github.com/repositories/<repoId>/releases/assets/<id>, which redirects to
+   * release-assets.
+   */
   readonly asset: {
+    /** GitHub's numeric asset id. */
+    readonly id: number;
     readonly name: string;
     /** GitHub's listed digest (already compared with the local pin, if any). */
     readonly sha256: Sha256Hex;
@@ -1620,19 +1625,24 @@ export const MANIFEST_MESSAGE_KEYS = Object.freeze([
   'actionTitle',
 ] as const);
 
-/** Hosts the deep verify contacts (required host permissions, except api.github.com, which sends ACAO *). */
+/**
+ * Hosts the deep verify contacts. A release file is downloaded through api.github.com, which
+ * redirects to release-assets.githubusercontent.com: both need a host permission, because
+ * release-assets sends no CORS headers and Firefox applies CORS to a whole redirect chain that
+ * starts at a host without one. raw.githubusercontent.com answers with
+ * `Access-Control-Allow-Origin: *` and needs none. github.com is never contacted.
+ */
 export const GITHUB_HOSTS = Object.freeze({
   api: 'https://api.github.com',
-  web: 'https://github.com',
   releaseAssets: 'https://release-assets.githubusercontent.com',
-  objects: 'https://objects.githubusercontent.com',
   raw: 'https://raw.githubusercontent.com',
 });
 
-/** Host-permission patterns of the GitHub hosts deep verify needs (required; users can revoke them). */
+/**
+ * Host-permission patterns deep verify needs (required; users can revoke them). Without them, deep
+ * verify sends no request to GitHub at all.
+ */
 export const GITHUB_PERMISSION_PATTERNS: readonly string[] = Object.freeze([
-  `${GITHUB_HOSTS.web}/*`,
+  `${GITHUB_HOSTS.api}/*`,
   `${GITHUB_HOSTS.releaseAssets}/*`,
-  `${GITHUB_HOSTS.objects}/*`,
-  `${GITHUB_HOSTS.raw}/*`,
 ]);

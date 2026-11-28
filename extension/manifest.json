@@ -3,7 +3,7 @@
   "name": "__MSG_extName__",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Paweł Hawrylak",
   "icons": {
     "16": "assets/icons/icon-16.png",
@@ -27,10 +27,8 @@
   "host_permissions": [
     "https://vault.bitwarden.com/*",
     "https://vault.bitwarden.eu/*",
-    "https://github.com/*",
-    "https://release-assets.githubusercontent.com/*",
-    "https://objects.githubusercontent.com/*",
-    "https://raw.githubusercontent.com/*"
+    "https://api.github.com/*",
+    "https://release-assets.githubusercontent.com/*"
   ],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "content_scripts": [

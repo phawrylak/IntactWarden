@@ -13,16 +13,21 @@
  */
 
 import {OFFICIAL_ORIGINS} from '@intactwarden/profiles';
-import {GITHUB_HOSTS, type Origin, type AddInstanceRefusal} from '../contracts.ts';
+import {type Origin, type AddInstanceRefusal} from '../contracts.ts';
 
 const OFFICIAL_HOSTS: readonly string[] = OFFICIAL_ORIGINS.map(o => new URL(o).hostname);
 /** "bitwarden.com", "bitwarden.eu": the official hosts without their first label. */
 const OFFICIAL_DOMAINS: readonly string[] = [
   ...new Set(OFFICIAL_HOSTS.map(h => h.split('.').slice(1).join('.')).filter(d => d.includes('.'))),
 ];
-const GITHUB_HOST_NAMES: ReadonlySet<string> = new Set(
-  Object.values(GITHUB_HOSTS).map(o => new URL(o).hostname),
-);
+/** GitHub's own hosts: never a vault server. */
+const GITHUB_HOST_NAMES: ReadonlySet<string> = new Set([
+  'github.com',
+  'api.github.com',
+  'raw.githubusercontent.com',
+  'release-assets.githubusercontent.com',
+  'objects.githubusercontent.com',
+]);
 
 /** localhost, *.localhost, 127.0.0.0/8 and [::1], as `URL.hostname` spells them. */
 function isLoopbackHost(hostname: string): boolean {

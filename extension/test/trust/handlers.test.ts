@@ -66,15 +66,8 @@ function stubs() {
     ],
     permissionStatus: async () => [
       {
-        pattern: 'https://github.com/*',
-        origin: 'https://github.com',
-        purpose: 'deep-verify',
-        required: true,
-        granted: true,
-      },
-      {
-        pattern: 'https://raw.githubusercontent.com/*',
-        origin: 'https://raw.githubusercontent.com',
+        pattern: 'https://release-assets.githubusercontent.com/*',
+        origin: 'https://release-assets.githubusercontent.com',
         purpose: 'deep-verify',
         required: true,
         granted: false,
@@ -104,7 +97,7 @@ describe('registerTrustHandlers', () => {
     }
   });
 
-  it('builds the trust panel view, with the GitHub permission only when every host is granted', async () => {
+  it('builds the trust panel view, with the GitHub permission only when it is granted', async () => {
     const {router, call} = captureRouter();
     const {trust, registry} = stubs();
     registerTrustHandlers(router, trust, registry);

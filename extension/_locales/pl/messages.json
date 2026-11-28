@@ -1166,7 +1166,7 @@
     "message": "Serwery Vaultwarden dodają własny arkusz stylów. IntactWarden akceptuje go tylko wtedy, gdy jedynie ukrywa standardowe elementy; w Szczegółach widać, co ukrywa."
   },
   "privacy_network_github": {
-    "message": "GitHub (api.github.com, github.com, release-assets.githubusercontent.com, objects.githubusercontent.com, raw.githubusercontent.com), aby pobrać wydanie, na którym działa chroniona witryna, a którego IntactWarden jeszcze nie ma. Żądania nie zawierają ciasteczek, danych logowania ani adresu witryny. Poza losowym adresem dodatku (moz-extension://…), który Firefox dołącza do żądań do api.github.com, są takie same dla każdego użytkownika danego wydania."
+    "message": "GitHub (api.github.com, release-assets.githubusercontent.com, raw.githubusercontent.com), aby pobrać wydanie, na którym działa chroniona witryna, a którego IntactWarden jeszcze nie ma. Żądania nie zawierają ciasteczek, danych logowania ani adresu witryny. Poza losowym adresem dodatku (moz-extension://…), który Firefox dołącza do żądań do raw.githubusercontent.com, są takie same dla każdego użytkownika danego wydania."
   },
   "privacy_network_hint": {
     "message": "Plik wersji chronionej witryny (/version.json lub /vw-version.json), najwyżej raz na minutę, wyłącznie po to, by wybrać wydanie do pobrania."
