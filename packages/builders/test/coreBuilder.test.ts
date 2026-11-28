@@ -282,22 +282,17 @@ describe('CoreBuilder.build: Vaultwarden', () => {
 describe('toBuildError', () => {
   it('keeps BuildErrors and the refusal of a RefusalError', () => {
     const e = new BuildError('tag-mismatch', 'x');
-    expect(toBuildError(e, 'unsupported')).toBe(e);
-    expect(toBuildError(new RefusalError('m', 'version-mismatch'), 'unsupported').code).toBe(
-      'version-mismatch',
-    );
-    expect(toBuildError(new RefusalError('m'), 'invalid-core').code).toBe('invalid-core');
+    expect(toBuildError(e)).toBe(e);
+    expect(toBuildError(new RefusalError('m', 'version-mismatch')).code).toBe('version-mismatch');
   });
 
-  it('maps core error classes and falls back to the phase code', () => {
-    expect(toBuildError(new ZipError('bad-signature' as never, 'x'), 'unsupported').code).toBe(
-      'archive-invalid',
-    );
-    expect(toBuildError(new ContextError('x'), 'unsupported').code).toBe('derivation-failed');
-    expect(toBuildError(new TypeError('x'), 'archive-invalid')).toMatchObject({
-      code: 'archive-invalid',
+  it('maps core error classes and anything unexpected to unsupported', () => {
+    expect(toBuildError(new ZipError('bad-signature' as never, 'x')).code).toBe('archive-invalid');
+    expect(toBuildError(new ContextError('x')).code).toBe('derivation-failed');
+    expect(toBuildError(new TypeError('x'))).toMatchObject({
+      code: 'unsupported',
       message: 'TypeError: x',
     });
-    expect(toBuildError('thrown string', 'derivation-failed').code).toBe('derivation-failed');
+    expect(toBuildError('thrown string').code).toBe('unsupported');
   });
 });
