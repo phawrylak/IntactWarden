@@ -11,8 +11,9 @@ A release is one `MAJOR.MINOR.PATCH` version, one signed tag
 
 ## Release checklist
 
-1. **Prepare** the version in both files, a [CHANGELOG](../CHANGELOG.md) entry, complete English and
-   Polish strings, and a [privacy policy](privacy.md) that still lists every network request.
+1. **Prepare** the version in both files, a [CHANGELOG](../CHANGELOG.md) entry dated with the day of
+   the tag (the tag's source tarball includes it), complete English and Polish strings, and a
+   [privacy policy](privacy.md) that still lists every network request.
 2. **Merge** the pull request once `ci.yml` is green, then push the signed, annotated tag
    `v<version>` on `main`.
 3. **Build and attest** with `release-extension.yml`. Check `SHA256SUMS` and the provenance
