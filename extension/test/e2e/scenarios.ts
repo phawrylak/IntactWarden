@@ -1392,7 +1392,7 @@ export const SCENARIOS: readonly Scenario[] = [
         const failed = await poll(
           'the deep verify to fail and the page to turn Build not verified',
           () => d.ui('UI_GET_BLOCKED', {incidentId}),
-          v => v?.state === 'BUILD_UNVERIFIED',
+          v => v?.job?.finishedAt !== undefined,
           120_000,
         );
         expect(failed).toMatchObject({
@@ -1402,8 +1402,9 @@ export const SCENARIOS: readonly Scenario[] = [
           job: {phase: 'failed', failure: 'digest-mismatch'},
         });
         fx.github.emulator.serveInstead(repo, tag, asset, null);
-        // "Retry", the second button next to "Go back" (the "Proceed once" card has one button).
-        await d.pageClick!(tab, '.actions > button:nth-child(2)');
+        // "Retry", the second button next to "Go back", in the final view only (the one with the
+        // "Proceed once" card; on the NEW_BUILD view the second button is "Go back").
+        await d.pageClick!(tab, '.actions:has(~ .proceed) > button:nth-child(2)');
         await poll(
           'the vault to load after "Retry"',
           () => d.tabUrl(tab),
