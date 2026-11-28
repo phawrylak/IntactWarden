@@ -147,7 +147,8 @@ gh attestation verify intactwarden-<version>-firefox.zip --repo phawrylak/Intact
 **3. Compare the installed package with the release.** AMO re-signs every package; the tool ignores
 only its signature files and compares every other file byte for byte. (In 1.0.0 only, AMO's
 `manifest.json` differs too: AMO wrote the `ł` in the author's name as `\u0142` and dropped the
-final newline. From 1.0.1 the release writes it that way itself.) The installed file is in the
+final newline. From 1.0.1 the release writes `manifest.json` in AMO's encoding itself, and the
+author's name is plain ASCII.) The installed file is in the
 profile folder (`about:support` → **Profile Folder**).
 
 ```sh
