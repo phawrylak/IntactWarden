@@ -39,7 +39,6 @@ import {
   type PinnedFetch,
 } from '../../build/bootstrap.ts';
 import {BOOTSTRAP_INDEX_PATH, type BootstrapIndex} from '../../src/contracts.ts';
-import {validatePins} from '../../src/trust/pins.ts';
 
 const BW_REPO = 'bitwarden/clients';
 const ZIP = buildReleaseZip();
@@ -151,7 +150,7 @@ afterEach(async () => {
 });
 
 describe('buildBootstrap', () => {
-  it('builds every core of every lock with the CoreBuilder, plus bundled pins', async () => {
+  it('builds every core of every lock with the CoreBuilder', async () => {
     const data = await buildBootstrap({locksDir: locks, fetchPinned: makeFetch()});
     const {index} = data;
     expect(index.schema).toBe('intactwarden.bootstrap/1');
@@ -214,44 +213,6 @@ describe('buildBootstrap', () => {
     expect(data.indexSha256).toBe(sha256(data.indexBytes));
   });
 
-  it('pins the release assets and the configs at the tag commit', async () => {
-    const {index} = await buildBootstrap({locksDir: locks, fetchPinned: makeFetch()});
-    expect(index.pins.schema).toBe('intactwarden.localpins/1');
-    expect(index.pins.pins).toEqual([
-      ...['base', 'cloud', 'euprd'].map(name => ({
-        kind: 'config-file',
-        repo: BW_REPO,
-        commit: COMMIT,
-        path: `apps/web/config/${name}.json`,
-        sha256: sha256(CONFIGS[name as keyof typeof CONFIGS]),
-        source: 'bundled',
-      })),
-      {
-        kind: 'release-asset',
-        repo: BW_REPO,
-        tag: TAG,
-        tag_commit: COMMIT,
-        asset: COMMERCIAL_ASSET,
-        sha256: sha256(ZIP),
-        size: ZIP.length,
-        source: 'bundled',
-      },
-      {
-        kind: 'release-asset',
-        repo: VW_REPO,
-        tag: VW_TAG,
-        tag_commit: VW_COMMIT,
-        tag_object: VW_TAG_OBJECT,
-        asset: VW_ASSET,
-        sha256: sha256(TARBALL),
-        size: TARBALL.length,
-        source: 'bundled',
-      },
-    ]);
-    // The extension's loader keeps every bundled pin the build writes (closed key sets).
-    expect(validatePins(index.pins, 'bundled')).toEqual({pins: index.pins.pins, dropped: 0});
-  });
-
   it('is deterministic', async () => {
     const a = await buildBootstrap({locksDir: locks, fetchPinned: makeFetch()});
     const b = await buildBootstrap({locksDir: locks, fetchPinned: makeFetch()});
@@ -270,14 +231,12 @@ describe('buildBootstrap', () => {
       schema: 'intactwarden.bootstrap/1',
       generated_from: [],
       cores: [],
-      pins: {schema: 'intactwarden.localpins/1', pins: []},
     } satisfies BootstrapIndex);
     expect([...none.files.keys()]).toEqual([BOOTSTRAP_INDEX_PATH]);
     expect(calls).toEqual([]);
 
     const bw = await buildBootstrap({locksDir: locks, fetchPinned: makeFetch(), apps: 'bitwarden'});
     expect(bw.index.cores.map(c => c.app)).toEqual(Array(3).fill('bitwarden-web'));
-    expect(bw.index.pins.pins.every(p => p.repo === BW_REPO)).toBe(true);
     const vw = await buildBootstrap({
       locksDir: locks,
       fetchPinned: makeFetch(),

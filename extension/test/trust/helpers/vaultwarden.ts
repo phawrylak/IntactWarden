@@ -14,7 +14,7 @@ import {
   vwFiles,
   vwTarball,
 } from '../../../../packages/builders/test/helpers/vaultwardenFixture.ts';
-import type {BootstrapIndex, LocalPin} from '../../../src/contracts.ts';
+import type {BootstrapIndex} from '../../../src/contracts.ts';
 import type {GitHubEmulator} from './githubEmulator.ts';
 
 export {VW_COMMIT, VW_REPO, VW_TAG_OBJECT};
@@ -93,28 +93,14 @@ export interface BundledPackage {
   readonly cores: readonly BuiltCore[];
 }
 
-/** A package with bundled Vaultwarden cores (and their pins) for the given versions. */
+/** A package with bundled Vaultwarden cores for the given versions. */
 export async function bundledPackage(versions: readonly string[]): Promise<BundledPackage> {
   const files = new Map<string, Uint8Array>();
   const cores: BuiltCore[] = [];
-  const pins: LocalPin[] = [];
   for (const version of versions) {
-    const a = vwAssets(version);
-    const ids = idsFor(version);
-    const core = await buildVwCore(a, ids);
+    const core = await buildVwCore(vwAssets(version));
     cores.push(core);
     files.set(`data/bootstrap/cores/${core.sha256}.json`, core.bytes);
-    pins.push({
-      kind: 'release-asset',
-      repo: VW_REPO,
-      tag: a.tag,
-      tag_commit: ids.commit,
-      tag_object: ids.tagObject,
-      asset: a.asset,
-      sha256: sha256(a.tarball),
-      size: a.tarball.length,
-      source: 'bundled',
-    });
   }
   const index: BootstrapIndex = {
     schema: 'intactwarden.bootstrap/1',
@@ -129,7 +115,6 @@ export async function bundledPackage(versions: readonly string[]): Promise<Bundl
       size: c.bytes.length,
       path: `data/bootstrap/cores/${c.sha256}.json`,
     })),
-    pins: {schema: 'intactwarden.localpins/1', pins},
   };
   files.set('data/bootstrap/index.json', enc.encode(JSON.stringify(index)));
   return {files, index, cores};

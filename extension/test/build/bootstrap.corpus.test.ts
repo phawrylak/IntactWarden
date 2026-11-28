@@ -6,7 +6,7 @@
  * Generates the bootstrap from the real corpus locks and checks that every
  * bundled core equals, byte for byte, what the recompute command
  * (tools/recompute.ts) writes for the same release, and the golden digests of
- * the builders' corpus tests; and that the bundled pins are the locks' values.
+ * the builders' corpus tests.
  */
 
 import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
@@ -120,24 +120,6 @@ describe.runIf(CORPUS_ENABLED)('bootstrap data of test packages', () => {
         true,
       );
     }
-  });
-
-  it('bundles the lock values as pins', () => {
-    const pins = data.index.pins.pins;
-    expect(pins.filter(p => p.kind === 'config-file').map(p => [p.path, p.sha256])).toEqual(
-      (['base', 'cloud', 'euprd'] as const).map(n => [BW.config[n].path, BW.config[n].sha256]),
-    );
-    const assets = pins.flatMap(p => (p.kind === 'release-asset' ? [p] : []));
-    expect(assets.map(p => [p.asset, p.sha256, p.size, p.tag_commit, p.tag_object])).toEqual([
-      [BW.release.asset, BW.release.sha256, BW.release.size, BW.release.commit, undefined],
-      [
-        VW.release.asset,
-        VW.release.sha256,
-        VW.release.size,
-        VW.release.commit,
-        VW.release.tag_object,
-      ],
-    ]);
   });
 
   it('writes the package files', async () => {

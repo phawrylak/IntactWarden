@@ -364,7 +364,7 @@ export interface DeepVerifyJobView {
   readonly detail?: ReleaseDetail;
 }
 
-/** A release-asset pin: what this browser (or a test package) saw on GitHub for a release asset. */
+/** A release-asset pin: what this browser saw on GitHub for a release asset. */
 export interface ReleaseAssetPin {
   readonly kind: 'release-asset';
   readonly repo: string;
@@ -374,8 +374,8 @@ export interface ReleaseAssetPin {
   readonly asset: string;
   readonly sha256: Sha256Hex;
   readonly size: number;
-  /** bundled: data of a test package; local: first seen by this browser (TOFU). */
-  readonly source: 'bundled' | 'local';
+  /** First seen by this browser (TOFU). */
+  readonly source: 'local';
 }
 
 /** Config file content at a commit (cloud derivation input). */
@@ -385,15 +385,14 @@ export interface ConfigFilePin {
   readonly commit: string;
   readonly path: string;
   readonly sha256: Sha256Hex;
-  readonly source: 'bundled' | 'local';
+  readonly source: 'local';
 }
 
 export type LocalPin = ReleaseAssetPin | ConfigFilePin;
 
 /**
- * storage.local `l:v1:pins` (local pins) and the bundled `pins` of a test
- * package's bootstrap index. A local storage layout, not an interchange format.
- * Bundled pins win; a local pin is never replaced, only disputed.
+ * storage.local `l:v1:pins`. A local storage layout, not an interchange format.
+ * A local pin is never replaced, only disputed.
  */
 export interface LocalPins {
   readonly schema: 'intactwarden.localpins/1';
@@ -419,7 +418,6 @@ export interface BootstrapIndex {
     /** Package path of the core's exact JCS bytes, "data/bootstrap/cores/<sha256>.json". */
     readonly path: string;
   }[];
-  readonly pins: LocalPins;
 }
 
 export const BOOTSTRAP_INDEX_PATH = 'data/bootstrap/index.json';

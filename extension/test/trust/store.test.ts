@@ -20,7 +20,6 @@ import {
 } from '../../src/trust/store.ts';
 import {createFakeFetch, type FakeFetch} from './helpers/fakeFetch.ts';
 import {createGitHubEmulator, type GitHubEmulator} from './helpers/githubEmulator.ts';
-import {vwFiles, vwTarball} from '../../../packages/builders/test/helpers/vaultwardenFixture.ts';
 import {
   flip,
   getCore,
@@ -132,7 +131,6 @@ describe('trust store: bundled cores', () => {
     ).toEqual([]);
     expect((await store.getCoreBySha256(pkg.cores[0]!.sha256))?.ref.version).toBe(BUNDLED);
     expect(await getCore(store, key(NEW))).toBeNull();
-    expect((await store.pins()).pins).toHaveLength(1);
   });
 
   it('orders candidates by hint, then newest version', async () => {
@@ -713,98 +711,6 @@ describe('trust store: pins and disputes', () => {
     expect(kv.data.has(LOCAL_KEYS.pins)).toBe(false);
   });
 
-  it('disputes a bundled release whose pin contradicts the pin this browser recorded first', async () => {
-    // An update that bundles another digest for an asset this browser pinned must not silently
-    // replace the local pin and core.
-    const kv = memoryKv();
-    const db = memoryExtensionDb();
-    const first = setup({kv, db, fingerprint: 'f1'});
-    const files = vwFiles();
-    files['vw-version.json'] = `{"version":"${NEW}"}`;
-    files['version.json'] = `{ "version": "${NEW}" }`;
-    files['app/vendor.55e794a42a5fe0d2e9eb.js'] = 'var vendor=1;/* what this browser saw first */';
-    const tarball = vwTarball(files);
-    const asset = `bw_web_v${NEW}.tar.gz`;
-    first.emu.addRelease({
-      repoId: VW_REPO_ID,
-      repo: VW_REPO,
-      tag: `v${NEW}`,
-      assets: [{name: asset, bytes: tarball}],
-    });
-    first.emu.setTag(VW_REPO, VW_REPO_ID, `v${NEW}`, idsFor(NEW));
-    expect((await first.store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(
-      true,
-    );
-
-    const updatedPkg = await bundledPackage([BUNDLED, NEW]); // bundles NEW with another digest
-    const second = setup({kv, db, fingerprint: 'f2', pkg: updatedPkg});
-    await second.store.ready();
-    const disputed = second.store.releaseState(key(NEW));
-    expect(disputed).toMatchObject({
-      k: 'disputed',
-      reason: 'pin-changed',
-      evidence: {recorded: expect.stringMatching(/^[0-9a-f]{64}$/)},
-    });
-    const evidence = disputed.k === 'disputed' ? disputed.evidence : undefined;
-    expect(evidence?.observed).toMatch(/^[0-9a-f]{64}$/);
-    expect(evidence?.observed).not.toBe(evidence?.recorded);
-    expect((await getCore(second.store, key(NEW)))?.ref).toMatchObject({
-      source: 'bundled',
-      status: 'disputed',
-    });
-    expect(second.store.releaseState(key(BUNDLED)).k).toBe('known');
-    expect(second.env.logs).toContain('trust.pins.bundled-contradicts-local');
-    const calls = second.fake.calls.length;
-    expect(await second.store.ensureRelease({key: key(NEW), trigger: 'user'})).toMatchObject({
-      failure: 'disputed',
-    });
-    expect(second.fake.calls.length).toBe(calls);
-
-    // The dispute is persisted and survives a restart.
-    const third = setup({kv, db, fingerprint: 'f2', pkg: updatedPkg});
-    await third.store.ready();
-    expect(third.store.releaseState(key(NEW))).toEqual(disputed);
-    expect((await getCore(third.store, key(NEW)))?.ref.status).toBe('disputed');
-    expect(third.env.logs).toEqual(['trust.store.ready']);
-  });
-
-  it('a bundled release that contradicts a local pin unread at start-up is disputed once the pins are read', async () => {
-    // A comparison only at start-up would let a failed read there hide the dispute until the next
-    // start, and a deep verify would find nothing either (the bundled pin is checked first).
-    const kv = memoryKv();
-    const db = memoryExtensionDb();
-    const first = setup({kv, db, fingerprint: 'f1'});
-    publishVw(first.emu, NEW, {tagObject: 'c'.repeat(40)});
-    expect((await first.store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(
-      true,
-    );
-    const updatedPkg = await bundledPackage([BUNDLED, NEW]);
-    const flakyPins = (failures: number): MemoryKv => ({
-      ...kv,
-      get: async k => {
-        if (k === LOCAL_KEYS.pins && failures-- > 0) throw new Error('read failed');
-        return kv.get(k);
-      },
-    });
-    // One failed read at start-up is retried at once.
-    const retried = setup({kv: flakyPins(1), db, fingerprint: 'f2', pkg: updatedPkg});
-    await retried.store.ready();
-    expect(retried.store.releaseState(key(NEW))).toMatchObject({
-      k: 'disputed',
-      reason: 'tag-moved',
-    });
-    kv.data.delete(LOCAL_KEYS.releases);
-    // Two: the pins stay unread until the next job (of any release) reads them, which then raises
-    // the dispute.
-    const second = setup({kv: flakyPins(2), db, fingerprint: 'f2', pkg: updatedPkg});
-    await second.store.ready();
-    expect(second.store.releaseState(key(NEW)).k).toBe('known');
-    publishVw(second.emu, '2026.11.1');
-    await second.store.ensureRelease({key: key('2026.11.1'), trigger: 'unknown-build'});
-    expect(second.store.releaseState(key(NEW))).toMatchObject({k: 'disputed', reason: 'tag-moved'});
-    expect(second.env.disputed).toContainEqual([key(NEW), 'tag-moved']);
-  });
-
   it('a release record that cannot be read at start-up is never written over: a dispute survives', async () => {
     // A start-up write after a failed read would erase the stored disputes.
     const kv = memoryKv();
@@ -836,41 +742,6 @@ describe('trust store: pins and disputes', () => {
     const third = setup({kv, db});
     await third.store.ready();
     expect(third.store.releaseState(key(NEW))).toMatchObject({k: 'disputed'});
-  });
-
-  it('disputes a bundled release whose tag object differs from the one this browser recorded, same commit (tag-moved)', async () => {
-    const kv = memoryKv();
-    const db = memoryExtensionDb();
-    const first = setup({kv, db, fingerprint: 'f1'});
-    const other = 'c'.repeat(40);
-    publishVw(first.emu, NEW, {tagObject: other});
-    expect((await first.store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(
-      true,
-    );
-    // The update bundles the same asset and commit with another annotated-tag object.
-    const second = setup({kv, db, fingerprint: 'f2', pkg: await bundledPackage([BUNDLED, NEW])});
-    await second.store.ready();
-    expect(second.store.releaseState(key(NEW))).toMatchObject({
-      k: 'disputed',
-      reason: 'tag-moved',
-      evidence: {recorded: other, observed: idsFor(NEW).tagObject},
-    });
-    expect((await getCore(second.store, key(NEW)))?.ref.status).toBe('disputed');
-  });
-
-  it('stays quiet when the bundled pin confirms the pin this browser recorded first', async () => {
-    const kv = memoryKv();
-    const db = memoryExtensionDb();
-    const first = setup({kv, db});
-    publishVw(first.emu, NEW);
-    expect((await first.store.ensureRelease({key: key(NEW), trigger: 'unknown-build'})).ok).toBe(
-      true,
-    );
-    const second = setup({kv, db, pkg: await bundledPackage([BUNDLED, NEW])});
-    await second.store.ready();
-    const state = second.store.releaseState(key(NEW));
-    expect(state.k === 'known' && state.refs[0]!.source).toBe('bundled');
-    expect(second.env.logs).toEqual(['trust.store.ready']);
   });
 
   it('records the pin before downloading, so a digest mismatch leaves GitHub’s digest pinned', async () => {

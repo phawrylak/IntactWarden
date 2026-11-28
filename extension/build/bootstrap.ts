@@ -1,6 +1,6 @@
 /**
  * Bootstrap data generator, for test packages only (the end-to-end suite,
- * extension/test/e2e/run.ts): the shipping package bundles no cores and no pins.
+ * extension/test/e2e/run.ts): the shipping package bundles no cores.
  *
  * Reads the corpus locks in fixtures/corpora/ (`bitwarden-web-<x.y.z>.lock.json`,
  * `vaultwarden-web-<x.y.z>.lock.json`), checks every pinned coordinate against
@@ -13,10 +13,6 @@
  *
  *   <out>/data/bootstrap/index.json            BootstrapIndex (RFC 8785 bytes)
  *   <out>/data/bootstrap/cores/<sha256>.json   exact JCS bytes of each core
- *
- * The index also carries the bundled pins (`LocalPins`, `source: "bundled"`):
- * release assets (digest, size, tag → commit, tag object) and the config files
- * of the cloud derivation.
  *
  * Deterministic: the output is a pure function of the locks, the pinned bytes,
  * the builders and the bundled profiles (no clock, no environment). Vendor
@@ -37,14 +33,7 @@ import type {
 import {createCoreBuilder} from '@intactwarden/builders/coreBuilder.ts';
 import {canonicalBytes} from '@intactwarden/core/jcs/canonicalize.ts';
 import {fetchPinned as corpusFetchPinned, sha256} from '../../tools/corpus.ts';
-import {
-  BOOTSTRAP_INDEX_PATH,
-  type AppId,
-  type BootstrapIndex,
-  type ConfigFilePin,
-  type LocalPin,
-  type ReleaseAssetPin,
-} from '../src/contracts.ts';
+import {BOOTSTRAP_INDEX_PATH, type AppId, type BootstrapIndex} from '../src/contracts.ts';
 import {REPO_ROOT} from './paths.ts';
 
 /** Which apps get bundled cores. */
@@ -170,14 +159,13 @@ interface PinnedFile {
   readonly size?: number;
 }
 
-/** Build requests (one per variant) whose byte inputs are still to be fetched, and the pins they rest on. */
+/** Build requests (one per variant) whose byte inputs are still to be fetched. */
 interface Job {
   readonly lock: LockFile;
   readonly asset: PinnedFile & {readonly name: string; readonly size: number};
   readonly configs: readonly (PinnedFile & {readonly path: string})[];
   readonly variants: readonly BuilderVariant[];
   readonly request: Omit<BuildRequest, 'asset' | 'configs' | 'variant'>;
-  readonly pins: readonly LocalPin[];
 }
 
 function bitwardenJob(builder: CoreBuilder, lock: LockFile, raw: Json): Job {
@@ -212,31 +200,12 @@ function bitwardenJob(builder: CoreBuilder, lock: LockFile, raw: Json): Job {
   });
   expectEqual(configs.length, plan.configPaths.length, `${where}: number of config files`);
 
-  const assetPin: ReleaseAssetPin = {
-    kind: 'release-asset',
-    repo,
-    tag,
-    tag_commit: commit,
-    asset,
-    sha256: digest,
-    size,
-    source: 'bundled',
-  };
-  const configPins: ConfigFilePin[] = configs.map(c => ({
-    kind: 'config-file',
-    repo,
-    commit,
-    path: c.path,
-    sha256: c.sha256,
-    source: 'bundled',
-  }));
   return {
     lock,
     asset: {name: asset, url: releaseDownloadUrl(repo, tag, asset), sha256: digest, size},
     configs,
     variants: ['selfhosted-commercial', 'cloud-us', 'cloud-eu'],
     request: {app: 'bitwarden-web', version: lock.version, release: {tag, commit}},
-    pins: [assetPin, ...configPins],
   };
 }
 
@@ -258,24 +227,12 @@ function vaultwardenJob(builder: CoreBuilder, lock: LockFile, raw: Json): Job {
   expectEqual(asset, plan.assetName, `${w}.asset`);
   expectEqual(str(release, 'url', w), releaseDownloadUrl(repo, tag, asset), `${w}.url`);
 
-  const pin: ReleaseAssetPin = {
-    kind: 'release-asset',
-    repo,
-    tag,
-    tag_commit: commit,
-    tag_object: tagObject,
-    asset,
-    sha256: digest,
-    size,
-    source: 'bundled',
-  };
   return {
     lock,
     asset: {name: asset, url: releaseDownloadUrl(repo, tag, asset), sha256: digest, size},
     configs: [],
     variants: ['release'],
     request: {app: 'vaultwarden-web', version: lock.version, release: {tag, commit, tagObject}},
-    pins: [pin],
   };
 }
 
@@ -303,25 +260,25 @@ async function readLocks(dir: string, apps: readonly AppId[]): Promise<LockFile[
   return out;
 }
 
-function pinKey(pin: LocalPin): string {
-  return pin.kind === 'release-asset'
-    ? `release-asset\u0000${pin.repo}\u0000${pin.tag}\u0000${pin.asset}`
-    : `config-file\u0000${pin.repo}\u0000${pin.commit}\u0000${pin.path}`;
-}
-
-/** A bundled core's artifact and source must equal the pin of its asset and tag. */
-function checkAgainstPin(core: BuiltCore, pin: ReleaseAssetPin): void {
+/** A bundled core's artifact, source and config inputs must equal its lock's. */
+function checkAgainstLock(core: BuiltCore, job: Job): void {
   const {artifact, source} = core.core;
+  const {release} = job.request;
   const where = `${core.buildId}`;
   if (artifact === null || artifact.kind !== 'github-release-asset') {
     throw new LockError(`${where}: artifact is not a GitHub release asset`);
   }
-  expectEqual(artifact.name, pin.asset, `${where}: artifact.name`);
-  expectEqual(artifact.sha256, pin.sha256, `${where}: artifact.sha256`);
-  expectEqual(artifact.size, pin.size, `${where}: artifact.size`);
-  expectEqual(source.commit, pin.tag_commit, `${where}: source.commit`);
-  expectEqual(source.tag, pin.tag, `${where}: source.tag`);
-  expectEqual(source.tag_object, pin.tag_object, `${where}: source.tag_object`);
+  expectEqual(artifact.name, job.asset.name, `${where}: artifact.name`);
+  expectEqual(artifact.sha256, job.asset.sha256, `${where}: artifact.sha256`);
+  expectEqual(artifact.size, job.asset.size, `${where}: artifact.size`);
+  expectEqual(source.commit, release.commit, `${where}: source.commit`);
+  expectEqual(source.tag, release.tag, `${where}: source.tag`);
+  expectEqual(source.tag_object, release.tagObject, `${where}: source.tag_object`);
+  for (const input of core.configInputs ?? []) {
+    const config = job.configs.find(c => c.path === input.path);
+    expectEqual(input.commit, release.commit, `${where}: config ${input.path} commit`);
+    expectEqual(input.sha256, config?.sha256, `${where}: config ${input.path}`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -339,7 +296,6 @@ export async function buildBootstrap(options: BootstrapOptions = {}): Promise<Bo
   const locks = await readLocks(options.locksDir ?? DEFAULT_LOCKS_DIR, SELECTED[selection]);
 
   const cores: BuiltCore[] = [];
-  const pins = new Map<string, LocalPin>();
   for (const lock of locks) {
     let raw: Json;
     try {
@@ -354,23 +310,12 @@ export async function buildBootstrap(options: BootstrapOptions = {}): Promise<Bo
       lock.app === 'bitwarden-web'
         ? bitwardenJob(builder, lock, raw)
         : vaultwardenJob(builder, lock, raw);
-    for (const pin of job.pins) {
-      const key = pinKey(pin);
-      const prev = pins.get(key);
-      if (prev !== undefined && JSON.stringify(prev) !== JSON.stringify(pin)) {
-        throw new LockError(
-          `${lock.display}: conflicting pins for ${key.replaceAll('\u0000', ' ')}`,
-        );
-      }
-      pins.set(key, pin);
-    }
 
     log(`${lock.display}: fetching ${job.asset.name}`);
     const bytes = await fetchPinned(job.asset.url, job.asset.sha256, job.asset.size);
     const configs: Record<string, Uint8Array> = {};
     for (const c of job.configs) configs[c.path] = await fetchPinned(c.url, c.sha256);
     log(`${lock.display}: building ${job.request.app} ${job.request.version}`);
-    const assetPin = job.pins[0] as ReleaseAssetPin;
     for (const variant of job.variants) {
       const core = await builder.build({
         ...job.request,
@@ -378,13 +323,7 @@ export async function buildBootstrap(options: BootstrapOptions = {}): Promise<Bo
         asset: {name: job.asset.name, sha256: job.asset.sha256, size: job.asset.size, bytes},
         ...(job.configs.length === 0 ? {} : {configs}),
       });
-      checkAgainstPin(core, assetPin);
-      for (const input of core.configInputs ?? []) {
-        const pin = pins.get(
-          `config-file\u0000${assetPin.repo}\u0000${input.commit}\u0000${input.path}`,
-        );
-        expectEqual(pin?.sha256, input.sha256, `${core.buildId}: config ${input.path}`);
-      }
+      checkAgainstLock(core, job);
       log(`${core.sha256}  ${core.buildId}`);
       cores.push(core);
     }
@@ -409,10 +348,6 @@ export async function buildBootstrap(options: BootstrapOptions = {}): Promise<Bo
       size: c.bytes.length,
       path: `${BOOTSTRAP_CORES_DIR}/${c.sha256}.json`,
     })),
-    pins: {
-      schema: 'intactwarden.localpins/1',
-      pins: [...pins.entries()].sort(([a], [b]) => compare(a, b)).map(([, p]) => p),
-    },
   };
   const indexBytes = canonicalBytes(index);
   const files = new Map<string, Uint8Array>();

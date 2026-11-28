@@ -41,12 +41,7 @@ import type {
 } from '../contracts.ts';
 import {buildIdOf, LOCAL_KEYS} from '../contracts.ts';
 import {profileByApp} from '@intactwarden/profiles';
-import {
-  loadBootstrap,
-  profileAssurance,
-  type BootstrapResult,
-  type PackageReader,
-} from './bootstrap.ts';
+import {loadBootstrap, profileAssurance, type PackageReader} from './bootstrap.ts';
 import {
   compareVersions,
   isRecord,
@@ -63,7 +58,7 @@ import {createCoresDb, verifyCoreBytes, type CoresDb} from './coresDb.ts';
 import type {GitHubClient} from './github.ts';
 import type {JobHost} from './jobHost.ts';
 import type {JobProgress} from './job.ts';
-import {createPinStore, disputeEvidence, type PinStore} from './pins.ts';
+import {createPinStore, type PinStore} from './pins.ts';
 import {resolveRelease} from './resolve.ts';
 
 export const MAX_JOBS = 50;
@@ -267,7 +262,6 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
   let writes: Promise<void> = Promise.resolve();
   let isReady = false;
   let initFailed = false;
-  let bundledCores: BootstrapResult['cores'] = [];
   /**
    * The stored release record could not be read at start-up, or start-up failed: memory may lack
    * its disputes, failures and local cores, so it is never written over (a write would erase a
@@ -340,41 +334,6 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
 
   // ----- start-up
 
-  /**
-   * A bundled core that contradicts the asset pin this browser recorded first is a dispute
-   * (bundled pins win). Runs at start-up, and again once local pins that could not be
-   * read then are read. Returns the releases it newly disputed.
-   */
-  function disputeBundledAgainstLocalPins(now: number): {key: ReleaseKey; reason: DisputeReason}[] {
-    const out: {key: ReleaseKey; reason: DisputeReason}[] = [];
-    for (const {entry, parsed} of bundledCores) {
-      if (states.get(entry.build_id)?.k === 'disputed') continue;
-      const {artifact, source} = parsed.core;
-      const repo = /^https:\/\/github\.com\/(.+)$/.exec(source.repo)?.[1];
-      const pin =
-        repo === undefined || source.tag === undefined
-          ? null
-          : pins.findLocalAsset(repo, source.tag, artifact.name);
-      if (pin === null) continue;
-      const changed = pin.sha256 !== artifact.sha256 || pin.size !== artifact.size;
-      const sameTag =
-        pin.tag_commit === source.commit &&
-        (pin.tag_object ?? null) === (source.tag_object ?? null);
-      if (!changed && sameTag) continue;
-      const reason: DisputeReason = changed ? 'pin-changed' : 'tag-moved';
-      const evidence = disputeEvidence(reason, pin, {
-        sha256: artifact.sha256,
-        commit: source.commit,
-        tagObject: source.tag_object,
-      });
-      log('trust.pins.bundled-contradicts-local', {build: entry.build_id, reason});
-      states.set(entry.build_id, {k: 'disputed', reason, at: now, evidence});
-      refs.set(entry.build_id, {...refs.get(entry.build_id)!, status: 'disputed'});
-      out.push({key: {app: entry.app, variant: entry.variant, version: entry.version}, reason});
-    }
-    return out;
-  }
-
   async function init(): Promise<void> {
     const [releasesRaw, jobsRaw] = await Promise.all([
       deps.kv
@@ -388,8 +347,7 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
     ]);
     await deps.github.load();
     const boot = await loadBootstrap(deps.readPackageFile, log);
-    bundledCores = boot.cores;
-    await pins.load(boot.pins);
+    await pins.load();
 
     const persistedCores =
       isRecord(releasesRaw) && isRecord(releasesRaw['cores']) ? releasesRaw['cores'] : {};
@@ -462,7 +420,6 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
         if (ref !== undefined) refs.set(id, {...ref, status: 'disputed'});
       }
     }
-    if (disputeBundledAgainstLocalPins(now).length > 0) dirty = true;
     if (await deps.hasGitHubPermission().catch(() => false)) {
       for (const [id, st] of states) {
         if (st.k === 'failed' && st.failure === 'permission-missing') {
@@ -786,13 +743,8 @@ export function createLocalTrustStore(deps: StoreDeps): LocalTrustStore {
           });
         }
         // The local pins must be in memory before one is checked or recorded (a failed read at
-        // start-up is retried here; while it fails, the job fails as transient). Read now, they
-        // may contradict a bundled core.
-        if (await pins.reload()) {
-          const disputed = disputeBundledAgainstLocalPins(deps.now());
-          if (disputed.length > 0) await persistReleases();
-          for (const d of disputed) emitDisputed(d.key, d.reason);
-        }
+        // start-up is retried here; while it fails, the job fails as transient).
+        await pins.reload();
         const dispute = disputeOf(plan);
         if (dispute !== null) return await failJob(viewRef.current, plan, disputedOutcome(dispute));
         const resolved = await resolveRelease(plan, {github: deps.github, pins});

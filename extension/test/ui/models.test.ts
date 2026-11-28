@@ -434,7 +434,7 @@ describe('options', () => {
             asset: 'bw_web_v2026.10.1.tar.gz',
             sha256: SHA_B,
             size: 41793283,
-            source: 'bundled',
+            source: 'local',
           },
         ],
       },
@@ -450,7 +450,7 @@ describe('options', () => {
       source: 'Bundled with IntactWarden',
     });
     expect(m.pins).toEqual([
-      `dani-garcia/bw_web_builds v2026.10.1 · bw_web_v2026.10.1.tar.gz · sha256 ${SHA_B} · bundled`,
+      `dani-garcia/bw_web_builds v2026.10.1 · bw_web_v2026.10.1.tar.gz · sha256 ${SHA_B} · first seen by this browser`,
     ]);
   });
 

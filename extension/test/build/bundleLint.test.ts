@@ -60,7 +60,6 @@ async function validPackage(test = false): Promise<string> {
       schema: 'intactwarden.bootstrap/1',
       generated_from: [{lock: LOCK, sha256: sha256(readFileSync(join(REPO_ROOT, LOCK)))}],
       cores: [{sha256: coreSha, size: CORE.length, path: `data/bootstrap/cores/${coreSha}.json`}],
-      pins: {schema: 'intactwarden.localpins/1', pins: []},
     }),
   );
   return dir;

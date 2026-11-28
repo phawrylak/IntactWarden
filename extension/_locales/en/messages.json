@@ -1674,9 +1674,6 @@
       }
     }
   },
-  "trust_pin_bundled": {
-    "message": "bundled"
-  },
   "trust_pin_config": {
     "message": "$REPO$ · $PATH$ · sha256 $HASH$ · $SOURCE$",
     "description": "Placeholders: $REPO$, $PATH$, $HASH$, $SOURCE$.",

@@ -238,7 +238,7 @@ export async function lintBundle(dir: string, options: LintOptions): Promise<Lin
     else if (!TEXT_EXTENSIONS.includes(ext) && !BINARY_EXTENSIONS.includes(ext)) {
       fail('files', `unexpected file type ${f}`);
     } else if (f.startsWith('data/bootstrap/')) {
-      // Bundled cores and pins are test data: the shipping package has none.
+      // Bundled cores are test data: the shipping package has none.
       if (!test) fail('production-test-data', `${f}: bundled data in a production package`);
     } else if (f.startsWith('data/')) {
       fail('files', `unexpected file ${f}`);

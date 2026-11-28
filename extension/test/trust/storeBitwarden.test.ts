@@ -19,7 +19,7 @@ import {
   TAG,
   VERSION,
 } from '../../../packages/builders/test/helpers/bitwardenFixture.ts';
-import type {ReleaseKey} from '../../src/contracts.ts';
+import {LOCAL_KEYS, type ReleaseKey} from '../../src/contracts.ts';
 import {memoryExtensionDb} from '../helpers/memoryDb.ts';
 import {createGitHubClient} from '../../src/trust/github.ts';
 import {createInProcessJobHost} from '../../src/trust/jobHost.ts';
@@ -42,7 +42,7 @@ const key = (variant: ReleaseKey['variant']): ReleaseKey => ({
   version: VERSION,
 });
 
-function setup(bundledFiles = new Map<string, Uint8Array>()) {
+function setup(kv = memoryKv(), db = memoryExtensionDb()) {
   const fake = createFakeFetch();
   const emu = createGitHubEmulator(fake);
   const zip = buildReleaseZip();
@@ -55,8 +55,6 @@ function setup(bundledFiles = new Map<string, Uint8Array>()) {
   emu.setTag(REPO, REPO_ID, TAG, {commit: COMMIT});
   for (const [path, bytes] of Object.entries(CONFIGS)) emu.setRaw(REPO, COMMIT, path, bytes);
   const clock = manualClock();
-  const kv = memoryKv();
-  const db = memoryExtensionDb();
   const builder = createCoreBuilder();
   const store = createLocalTrustStore({
     kv,
@@ -66,10 +64,10 @@ function setup(bundledFiles = new Map<string, Uint8Array>()) {
     now: clock.now,
     jobHost: createInProcessJobHost({fetch: fake.fetch, builder}),
     github: createGitHubClient({fetch: fake.fetch, now: clock.now, kv}),
-    readPackageFile: packageReader(bundledFiles),
+    readPackageFile: packageReader(new Map()),
     hasGitHubPermission: async () => true,
   });
-  return {fake, emu, store, zip};
+  return {fake, emu, store, zip, kv, db};
 }
 
 describe('local deep verify of a Bitwarden release', () => {
@@ -109,12 +107,8 @@ describe('local deep verify of a Bitwarden release', () => {
   });
 
   it('refuses a config file whose bytes disagree with its pin at the commit', async () => {
-    const bundled = new Map<string, Uint8Array>();
-    const index = {
-      schema: 'intactwarden.bootstrap/1',
-      generated_from: [],
-      cores: [],
-      pins: {
+    const kv = memoryKv({
+      [LOCAL_KEYS.pins]: {
         schema: 'intactwarden.localpins/1',
         pins: [
           {
@@ -123,13 +117,12 @@ describe('local deep verify of a Bitwarden release', () => {
             commit: COMMIT,
             path: 'apps/web/config/cloud.json',
             sha256: 'c'.repeat(64),
-            source: 'bundled',
+            source: 'local',
           },
         ],
       },
-    };
-    bundled.set('data/bootstrap/index.json', new TextEncoder().encode(JSON.stringify(index)));
-    const {store} = setup(bundled);
+    });
+    const {store} = setup(kv);
     expect(
       await store.ensureRelease({key: key('cloud-us'), trigger: 'unknown-build'}),
     ).toMatchObject({
@@ -158,7 +151,7 @@ describe('local deep verify of a Bitwarden release', () => {
   });
 
   it('a dispute seen through one variant covers every variant built from the asset', async () => {
-    const {emu, store} = setup();
+    const {emu, store, kv, db} = setup();
     const disputed: string[] = [];
     store.onReleaseDisputed(k => disputed.push(k.variant));
     expect((await store.ensureRelease({key: key('cloud-us'), trigger: 'unknown-build'})).ok).toBe(
@@ -172,6 +165,12 @@ describe('local deep verify of a Bitwarden release', () => {
     for (const v of ['selfhosted-commercial', 'cloud-us', 'cloud-eu'] as const) {
       expect(store.releaseState(key(v)).k).toBe('disputed');
     }
+    expect((await getCore(store, key('cloud-us')))?.ref.status).toBe('disputed');
+    // After a restart the core built before the dispute is still marked disputed.
+    const restarted = setup(kv, db).store;
+    await restarted.ready();
+    expect(restarted.releaseState(key('cloud-us')).k).toBe('disputed');
+    expect((await getCore(restarted, key('cloud-us')))?.ref.status).toBe('disputed');
   });
 
   it('a dispute stops a sibling variant job queued before it, even if GitHub flips back', async () => {

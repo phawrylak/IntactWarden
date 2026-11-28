@@ -1,8 +1,6 @@
 /**
  * Upstream pins:
  *
- * - **bundled** pins come from a test package's bootstrap index and win (the shipping package
- *   has none);
  * - **local** pins are recorded the first time this browser resolves a release (TOFU, before the
  *   download starts) and are never replaced;
  * - a later observation that differs from the pin of the same `(repo, tag, asset)` is a
@@ -76,9 +74,9 @@ export function disputeEvidence(
   };
 }
 
-/** Validates one pin; `source` must be the expected one ('bundled' in the index, 'local' in storage). */
-export function validatePin(raw: unknown, source: 'bundled' | 'local'): LocalPin | null {
-  if (!isRecord(raw) || raw['source'] !== source) return null;
+/** Validates one stored pin. */
+export function validatePin(raw: unknown): LocalPin | null {
+  if (!isRecord(raw) || raw['source'] !== 'local') return null;
   const repoOk = typeof raw['repo'] === 'string' && REPO_NAME.test(raw['repo']);
   const sha = typeof raw['sha256'] === 'string' && SHA256_HEX.test(raw['sha256']);
   if (!repoOk || !sha) return null;
@@ -121,17 +119,14 @@ export function validatePin(raw: unknown, source: 'bundled' | 'local'): LocalPin
 }
 
 /** Validates a pin list; malformed entries are dropped and counted. */
-export function validatePins(
-  raw: unknown,
-  source: 'bundled' | 'local',
-): {readonly pins: LocalPin[]; readonly dropped: number} {
+export function validatePins(raw: unknown): {readonly pins: LocalPin[]; readonly dropped: number} {
   if (!isRecord(raw) || raw['schema'] !== LOCAL_PINS_SCHEMA || !Array.isArray(raw['pins'])) {
     return {pins: [], dropped: raw === undefined ? 0 : 1};
   }
   const pins: LocalPin[] = [];
   let dropped = 0;
   for (const p of raw['pins']) {
-    const v = validatePin(p, source);
+    const v = validatePin(p);
     if (v === null) dropped++;
     else pins.push(v);
   }
@@ -139,28 +134,24 @@ export function validatePins(
 }
 
 export interface PinStore {
-  /** Loads local pins from storage and sets the bundled ones. */
-  load(bundled: readonly LocalPin[]): Promise<void>;
+  /** Loads local pins from storage. */
+  load(): Promise<void>;
   /**
-   * Reads the local pins again if the last read failed; rejects while they cannot be read, and
-   * resolves true when it read them now. A job calls it before it checks or records a pin.
+   * Reads the local pins again if the last read failed; rejects while they cannot be read. A job
+   * calls it before it checks or records a pin.
    */
-  reload(): Promise<boolean>;
-  /** Bundled pins first, then local ones. */
+  reload(): Promise<void>;
   all(): LocalPins;
   findAsset(repo: string, tag: string, asset: string): ReleaseAssetPin | null;
-  /** The pin this browser recorded itself, even where a bundled pin is in force. */
-  findLocalAsset(repo: string, tag: string, asset: string): ReleaseAssetPin | null;
   findConfig(repo: string, commit: string, path: string): ConfigFilePin | null;
   checkAsset(observed: ObservedAsset): AssetPinCheck;
-  /** Records a local pin unless one exists (bundled or local); returns the pin in force. */
+  /** Records a local pin unless one exists; returns the pin in force. */
   recordAsset(observed: ObservedAsset): Promise<ReleaseAssetPin>;
   recordConfig(repo: string, commit: string, path: string, sha256: string): Promise<ConfigFilePin>;
 }
 
 export function createPinStore(deps: {readonly kv: Kv; readonly log?: TrustLog}): PinStore {
   const log = deps.log ?? noLog;
-  let bundled: readonly LocalPin[] = [];
   let local: LocalPin[] = [];
   let writing: Promise<void> = Promise.resolve();
   /**
@@ -172,7 +163,7 @@ export function createPinStore(deps: {readonly kv: Kv; readonly log?: TrustLog})
 
   const read = async (): Promise<void> => {
     const raw = await deps.kv.get(LOCAL_KEYS.pins);
-    const {pins, dropped} = validatePins(raw, 'local');
+    const {pins, dropped} = validatePins(raw);
     if (dropped > 0) log('trust.pins.dropped', {count: dropped});
     local = pins;
     unread = false;
@@ -194,17 +185,14 @@ export function createPinStore(deps: {readonly kv: Kv; readonly log?: TrustLog})
     return write;
   };
 
-  const assetPins = (pins: readonly LocalPin[]): ReleaseAssetPin[] =>
-    pins.filter((p): p is ReleaseAssetPin => p.kind === 'release-asset');
-
-  const findIn = (pins: readonly LocalPin[], repo: string, tag: string, asset: string) =>
-    assetPins(pins).find(p => sameRepo(p.repo, repo) && p.tag === tag && p.asset === asset) ?? null;
-
   const findAsset = (repo: string, tag: string, asset: string): ReleaseAssetPin | null =>
-    findIn([...bundled, ...local], repo, tag, asset);
+    local.find(
+      (p): p is ReleaseAssetPin =>
+        p.kind === 'release-asset' && sameRepo(p.repo, repo) && p.tag === tag && p.asset === asset,
+    ) ?? null;
 
   const findConfig = (repo: string, commit: string, path: string): ConfigFilePin | null =>
-    [...bundled, ...local].find(
+    local.find(
       (p): p is ConfigFilePin =>
         p.kind === 'config-file' &&
         sameRepo(p.repo, repo) &&
@@ -224,11 +212,9 @@ export function createPinStore(deps: {readonly kv: Kv; readonly log?: TrustLog})
   };
 
   return {
-    async load(bundledPins) {
-      bundled = Object.freeze([...bundledPins]);
+    async load() {
       try {
-        // One retry: a transient failure here would hide a dispute (bundled pins win)
-        // until a job reads them again.
+        // One retry; after a second failure the pins stay unread until a job reads them.
         await read().catch(read);
       } catch {
         local = [];
@@ -237,13 +223,10 @@ export function createPinStore(deps: {readonly kv: Kv; readonly log?: TrustLog})
       }
     },
     async reload() {
-      if (!unread) return false;
-      await read();
-      return true;
+      if (unread) await read();
     },
-    all: () => ({schema: LOCAL_PINS_SCHEMA, pins: [...bundled, ...local]}),
+    all: () => ({schema: LOCAL_PINS_SCHEMA, pins: [...local]}),
     findAsset,
-    findLocalAsset: (repo, tag, asset) => findIn(local, repo, tag, asset),
     findConfig,
     checkAsset,
     async recordAsset(o) {

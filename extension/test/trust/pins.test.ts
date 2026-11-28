@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {LOCAL_KEYS, type ReleaseAssetPin} from '../../src/contracts.ts';
+import {LOCAL_KEYS} from '../../src/contracts.ts';
 import {
   createPinStore,
   disputeEvidence,
@@ -22,21 +22,10 @@ const observed: ObservedAsset = {
   size: 1000,
 };
 
-const bundledPin: ReleaseAssetPin = {
-  kind: 'release-asset',
-  repo: 'bitwarden/clients',
-  tag: 'web-v2026.10.1',
-  tag_commit: '91214c3b978edb5496a32a946451960fe7d44531',
-  asset: 'web-2026.10.1-selfhosted-COMMERCIAL.zip',
-  sha256: '8ae50b7dd15c213b9ce43fbc93cd85af061d95ad0782651d80c5e68f3f3824a6',
-  size: 50220770,
-  source: 'bundled',
-};
-
 async function store(initial: Record<string, unknown> = {}) {
   const kv = memoryKv(initial);
   const pins = createPinStore({kv});
-  await pins.load([bundledPin]);
+  await pins.load();
   return {kv, pins};
 }
 
@@ -60,7 +49,7 @@ describe('pins (TOFU)', () => {
     expect(kv.data.get(LOCAL_KEYS.pins)).toEqual({schema: 'intactwarden.localpins/1', pins: [pin]});
 
     const reloaded = createPinStore({kv});
-    await reloaded.load([]);
+    await reloaded.load();
     expect(reloaded.checkAsset(observed).k).toBe('match');
   });
 
@@ -84,7 +73,7 @@ describe('pins (TOFU)', () => {
       // Recording again keeps the first pin.
       expect((await pins.recordAsset(o)).sha256).toBe(H('a'));
     }
-    expect(pins.all().pins.filter(p => p.source === 'local')).toHaveLength(1);
+    expect(pins.all().pins).toHaveLength(1);
   });
 
   it('names the two values that differ as the evidence of a dispute', async () => {
@@ -110,19 +99,16 @@ describe('pins (TOFU)', () => {
     });
   });
 
-  it('checks GitHub against the bundled pin first (repository name case-insensitive)', async () => {
+  it('matches the repository name case-insensitively', async () => {
     const {pins} = await store();
-    const o: ObservedAsset = {
-      repo: 'Bitwarden/Clients',
-      tag: bundledPin.tag,
-      commit: bundledPin.tag_commit,
-      asset: bundledPin.asset,
-      sha256: H('c'),
-      size: bundledPin.size,
-    };
-    expect(pins.checkAsset(o)).toMatchObject({k: 'dispute', reason: 'pin-changed'});
-    expect(pins.checkAsset({...o, sha256: bundledPin.sha256})).toMatchObject({k: 'match'});
-    expect(await pins.recordAsset(o)).toBe(bundledPin);
+    const pin = await pins.recordAsset(observed);
+    const o: ObservedAsset = {...observed, repo: 'Dani-Garcia/BW_Web_Builds'};
+    expect(pins.checkAsset({...o, sha256: H('c')})).toMatchObject({
+      k: 'dispute',
+      reason: 'pin-changed',
+    });
+    expect(pins.checkAsset(o)).toEqual({k: 'match', pin});
+    expect(await pins.recordAsset(o)).toBe(pin);
   });
 
   it('keeps no pin in force that storage rejected, and keeps writing afterwards', async () => {
@@ -139,21 +125,11 @@ describe('pins (TOFU)', () => {
       },
     };
     const pins = createPinStore({kv: flaky});
-    await pins.load([]);
+    await pins.load();
     await expect(pins.recordAsset(observed)).rejects.toThrow();
     expect(pins.checkAsset(observed)).toEqual({k: 'new'});
     const pin = await pins.recordAsset(observed);
     expect(kv.data.get(LOCAL_KEYS.pins)).toEqual({schema: 'intactwarden.localpins/1', pins: [pin]});
-  });
-
-  it('finds the pin this browser recorded even where a bundled pin is in force', async () => {
-    const local = {...bundledPin, sha256: H('e'), source: 'local'};
-    const {pins} = await store({
-      [LOCAL_KEYS.pins]: {schema: 'intactwarden.localpins/1', pins: [local]},
-    });
-    expect(pins.findAsset(bundledPin.repo, bundledPin.tag, bundledPin.asset)).toBe(bundledPin);
-    expect(pins.findLocalAsset(bundledPin.repo, bundledPin.tag, bundledPin.asset)).toEqual(local);
-    expect(pins.findLocalAsset(bundledPin.repo, 'web-v1.0.0', bundledPin.asset)).toBeNull();
   });
 
   it('pins config files by commit and path', async () => {
@@ -178,7 +154,16 @@ describe('pins (TOFU)', () => {
   });
 
   it('drops malformed persisted pins and pins from the wrong source', async () => {
-    const good = {...bundledPin, source: 'local'};
+    const good = {
+      kind: 'release-asset',
+      repo: 'bitwarden/clients',
+      tag: 'web-v2026.10.1',
+      tag_commit: '91214c3b978edb5496a32a946451960fe7d44531',
+      asset: 'web-2026.10.1-selfhosted-COMMERCIAL.zip',
+      sha256: '8ae50b7dd15c213b9ce43fbc93cd85af061d95ad0782651d80c5e68f3f3824a6',
+      size: 50220770,
+      source: 'local',
+    };
     const {pins} = await store({
       [LOCAL_KEYS.pins]: {
         schema: 'intactwarden.localpins/1',
@@ -191,10 +176,10 @@ describe('pins (TOFU)', () => {
         ],
       },
     });
-    expect(pins.all().pins).toHaveLength(2); // the bundled one and `good`
-    expect(validatePin({...good, tag_object: 'short'}, 'local')).toBeNull();
-    expect(validatePin({...good, repo: '../x'}, 'local')).toBeNull();
+    expect(pins.all().pins).toEqual([good]);
+    expect(validatePin({...good, tag_object: 'short'})).toBeNull();
+    expect(validatePin({...good, repo: '../x'})).toBeNull();
     // A pin with a field outside the closed key set is dropped too.
-    expect(validatePin({...good, first_seen: '2026-10-28T01:05:00Z'}, 'local')).toBeNull();
+    expect(validatePin({...good, first_seen: '2026-10-28T01:05:00Z'})).toBeNull();
   });
 });

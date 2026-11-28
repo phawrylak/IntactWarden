@@ -1615,9 +1615,6 @@
       }
     }
   },
-  "trust_pin_bundled": {
-    "message": "dołączone"
-  },
   "trust_pin_config": {
     "message": "$REPO$ · $PATH$ · sha256 $HASH$ · $SOURCE$",
     "placeholders": {
