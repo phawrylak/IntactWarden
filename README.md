@@ -106,11 +106,10 @@ An extension like this runs next to your password vault, so do not take it on fa
   [keys.openpgp.org](https://keys.openpgp.org/search?q=phawrylak%40outlook.com), also at
   `https://github.com/phawrylak.gpg`.
 - Mozilla reviewed IntactWarden, together with its source code, before publishing it on
-  [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/). The review checks
-  the add-on against Mozilla's policies; it is not a security audit.
-- Beyond that review there is no external audit. Please review the code yourself, by hand or with
-  an AI assistant: give it the repository and [docs/security.md](docs/security.md), and ask how the
-  extension could leak data, accept tampered code or raise a false alarm.
+  [addons.mozilla.org](https://addons.mozilla.org/firefox/addon/intactwarden/).
+- Please review the code yourself, by hand or with an AI assistant: give it the repository and
+  [docs/security.md](docs/security.md), and ask how the extension could leak data, accept tampered
+  code or raise a false alarm.
 - Builds are reproducible, every release zip comes with GitHub build provenance, and a public
   workflow compares the package AMO serves with that zip every day
   ([how to check](docs/security.md#check-it-yourself)).
